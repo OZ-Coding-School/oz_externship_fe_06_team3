@@ -1,0 +1,47 @@
+name: '🐛 Bug Report'
+description: 버그를 간단하게 제보합니다.
+title: '[BUG] '
+labels: ['bug']
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: 버그 요약
+      placeholder: 무슨 문제가 발생했는지 한 줄로 적어주세요.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 재현 방법
+      placeholder: |
+        1)
+        2)
+        3)
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 기대 결과
+      placeholder: 원래 어떻게 동작해야 하나요?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 실제 결과
+      placeholder: 실제로는 어떻게 동작하나요?
+    validations:
+      required: true
+
+  - type: textarea
+    id: ref
+    attributes:
+      label: 참고 자료 (선택)
+      placeholder: 스크린샷, 콘솔 로그, 링크 등
+    validations:
+      required: false
