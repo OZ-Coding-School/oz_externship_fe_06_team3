@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
-import main_banner from '../assets/LandingPage_img/main_banner.png'
-import main_exam from '../assets/LandingPage_img/main_exam.png'
-import main_qna from '../assets/LandingPage_img/main_qna.png'
-import main_community from '../assets/LandingPage_img/main_community.png'
+import main_banner from '@/assets/LandingPage_img/main_banner.png'
+import main_exam from '@/assets/LandingPage_img/main_exam.png'
+import main_qna from '@/assets/LandingPage_img/main_qna.png'
+import main_community from '@/assets/LandingPage_img/main_community.png'
 
 type TabType = 'exam' | 'qna' | 'community'
 
