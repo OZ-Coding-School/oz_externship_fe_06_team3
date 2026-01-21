@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router'
-import './App.css'
-import LandingPage from './pages/LandingPage'
-import Header from './components/Heade'
+import '@/App.css'
+import LandingPage from '@/pages/LandingPage'
+import Header from '@/components/Heade'
 
 function App() {
   return (
