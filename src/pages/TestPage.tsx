@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Dropdown } from '../components'
 import { Password } from '@/components/common/Password'
+import { CommonInput } from '@/components/common/CommonInput'
 
 const options = [
   { label: '옵션 1', value: 'option-1' },
@@ -15,6 +16,7 @@ function TestPage() {
   const [value, setValue] = useState<string | undefined>()
   const [password, setPassword] = useState('')
   const [passwordState, setPasswordState] = useState<'default' | 'error' | 'success'>('default')
+  const [inputValue, setInputValue] = useState('')
   
   // 가짜 로그인용 올바른 비밀번호
   const correctPassword = 'Test123!'
@@ -65,6 +67,17 @@ function TestPage() {
         <p className="text-xs text-gray-500">
           테스트용 올바른 비밀번호: <span className="font-mono font-semibold">{correctPassword}</span>
         </p>
+      </div>
+
+      {/* CommonInput 테스트 */}
+      <div className="mt-8 flex flex-col gap-4">
+        <h2 className="text-xl font-semibold text-black">CommonInput 테스트</h2>
+        <CommonInput
+          value={inputValue}
+          onChange={setInputValue}
+          placeholder="입력해주세요"
+          width={288}
+        />
       </div>
     </div>
   )
