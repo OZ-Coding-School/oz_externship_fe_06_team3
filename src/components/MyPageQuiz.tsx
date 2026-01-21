@@ -3,7 +3,7 @@ import clsx from "clsx";
 
 type TabKey = "all" | "done" | "todo";
 
-const TABS: { key: TabKey; label: string }[] = [
+const Tabs: { key: TabKey; label: string }[] = [
   { key: "all", label: "전체보기" },
   { key: "done", label: "응시완료" },
   { key: "todo", label: "미응시" },
@@ -12,12 +12,15 @@ const TABS: { key: TabKey; label: string }[] = [
 const MyPageQuiz = () => {
   const [currentTab, setCurrentTab] = useState<TabKey>("all");
 
-  const getTabClass = (tabKey: TabKey) =>
+const getTabClass = (tabKey: TabKey) =>
     clsx(
-      "pb-3 transition-colors text-[18px] font-pretendard",                  // 공통 스타일
+      // 공통 스타일
+      "pb-3 transition-colors font-pretendard font-bold text-[20px] leading-[140%] tracking-[-0.03em]",
       currentTab === tabKey
-        ? "border-b-2 border-[#6201E0] text-[#6201E0] font-semibold"     // Active일 때 스타일
-        : "text-[#9D9D9D] hover:text-[#6201E0]"                          // Inactive일 때 스타일
+        ? // Active 스타일
+          "text-[#721AE3] border-b-[3px] border-[#721AE3]"
+        : // Inactive 스타일
+          "text-[#9D9D9D] border-b-[3px] border-transparent" 
     );
 
   return (
@@ -27,8 +30,8 @@ const MyPageQuiz = () => {
       </h1>
 
       {/* 상단 탭 */}
-      <div className="flex gap-6 border-b border-gray-100">
-        {TABS.map((tab) => (
+      <div className="flex gap-10 border-b-2 border-[#E5E5E5] w-full">
+        {Tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setCurrentTab(tab.key)}
@@ -40,6 +43,7 @@ const MyPageQuiz = () => {
       </div>
 
       {/* 카드 리스트 영역 */}
+      
     </div>
   );
 };
