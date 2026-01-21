@@ -1,0 +1,21 @@
+.dropdown-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #bdbdbd transparent;
+}
+
+.dropdown-scrollbar::-webkit-scrollbar {
+  width: 2px;
+}
+
+.dropdown-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background: #bdbdbd;
+}
+
+.dropdown-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dropdown-scrollbar::-webkit-scrollbar-button {
+  display: none;
+}
