@@ -1,11 +1,10 @@
 import { BrowserRouter, Routes, Route } from 'react-router'
 import '@/App.css'
 import LandingPage from '@/pages/LandingPage'
-import TestPage from './pages/TestPage'
-import Header from './components/common/Header'
-import MyPage from './pages/MyPage'
-import MyPageQuiz from './components/MyPageQuiz'
-
+import TestPage from '@/pages/TestPage'
+import Header from '@/components/common/Header'
+import MyPage from '@/pages/MyPage'
+import MyPageQuiz from '@/components/MyPageQuiz'
 
 function App() {
   return (
@@ -23,7 +22,6 @@ function App() {
           <Route path="password" element={<div>비밀번호 변경</div>} />
         </Route>
       </Routes>
-
     </BrowserRouter>
   )
 }
