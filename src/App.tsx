@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router'
 import '@/App.css'
 import LandingPage from '@/pages/LandingPage'
 import TestPage from '@/pages/TestPage'
-import Header from '@/components/common/Header'
+import { Header } from '@/components/common'
 import MyPage from '@/pages/MyPage'
 import MyPageQuiz from '@/components/MyPageQuiz'
 

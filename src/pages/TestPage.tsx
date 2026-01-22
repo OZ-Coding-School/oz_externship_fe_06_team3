@@ -1,7 +1,5 @@
 import { useState } from 'react'
-import { Dropdown } from '../components'
-import { Password } from '@/components/common/Password'
-import { CommonInput } from '@/components/common/CommonInput'
+import { CommonInput, Dropdown, NotFound, Password } from '@/components/common'
 
 const options = [
   { label: '옵션 1', value: 'option-1' },
@@ -17,10 +15,11 @@ function TestPage() {
   const [password, setPassword] = useState('')
   const [passwordState, setPasswordState] = useState<'default' | 'error' | 'success'>('default')
   const [inputValue, setInputValue] = useState('')
-  
+  const [showNotFound, setShowNotFound] = useState(false)
+
   // 가짜 로그인용 올바른 비밀번호
   const correctPassword = 'Test123!'
-  
+
   const handlePasswordChange = (newPassword: string) => {
     setPassword(newPassword)
     // 입력값이 변경되면 상태를 default로 초기화
@@ -28,7 +27,7 @@ function TestPage() {
       setPasswordState('default')
     }
   }
-  
+
   const handleLogin = () => {
     if (password === correctPassword) {
       setPasswordState('success')
@@ -36,10 +35,25 @@ function TestPage() {
       setPasswordState('error')
     }
   }
-  
+
+  if (showNotFound) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#FAFAFB] p-10">
+        <NotFound />
+      </div>
+    )
+  }
+
   return (
     <div className="flex min-h-screen flex-col gap-6 bg-[#FAFAFB] p-10">
       <h1 className="text-2xl font-semibold text-black">컴포넌트 테스트</h1>
+      <button
+        type="button"
+        onClick={() => setShowNotFound(true)}
+        className="w-fit rounded-md bg-[#111111] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#2a2a2a]"
+      >
+        404 테스트
+      </button>
       {/* Dropdown 테스트 */}
       <div className="flex flex-col gap-4">
         <h2 className="text-xl font-semibold text-black">Dropdown 테스트</h2>
