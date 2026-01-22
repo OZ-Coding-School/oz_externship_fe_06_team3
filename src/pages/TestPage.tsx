@@ -88,7 +88,7 @@ function TestPage() {
       <div className="mt-8 flex flex-col gap-4">
         <h2 className="text-xl font-semibold text-black">Password 테스트</h2>
         <Password
-          width="sm"
+          width={288}
           value={password}
           onChange={handlePasswordChange}
           placeholder="비밀번호를 입력해주세요"
