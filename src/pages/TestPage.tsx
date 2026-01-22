@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CommonInput, Dropdown, NotFound, Password } from '@/components/common'
+import { CommonInput, Dropdown, Error404, NotFound, Password } from '@/components/common'
 
 const options = [
   { label: '옵션 1', value: 'option-1' },
@@ -39,6 +39,7 @@ function TestPage() {
   if (showNotFound) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#FAFAFB] p-10">
+        <Error404 />
         <NotFound />
       </div>
     )
