@@ -1,3 +1,5 @@
 export { default as arrowDownBlack } from './arrow_down_black.svg'
 export { default as arrowDownGray } from './arrow_down_gray.svg'
 export { default as checkPurple } from './check_purple.svg'
+export { default as cloud404 } from './cloud_404.svg'
+export { default as notFound } from './not_found.svg'
