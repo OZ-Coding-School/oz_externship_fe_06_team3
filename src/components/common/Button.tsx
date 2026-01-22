@@ -39,11 +39,13 @@ export const buttonVariants = cva(
        * 버튼 사이즈
        */
       size: {
-        xs: 'w-[112px] h-[48px]',
-        sm: 'w-[126px] h-[48px]',
-        md: 'w-[168px] h-[48px]',
-        lg: 'w-[348px] h-[52px]',
-        xl: 'w-[480px] h-[52px]',
+        xxs:'w-[78px] h-[42px]',
+        xs:'w-[92px] h-[64px]',
+        sm: 'w-[112px] h-[48px]',
+        md: 'w-[126px] h-[48px]',
+        lg: 'w-[168px] h-[48px]',
+        xl: 'w-[348px] h-[52px]',
+        xxl: 'w-[480px] h-[52px]',
       },
       /**
        * 버튼 라운드 값
@@ -88,12 +90,15 @@ export function Button({
   size,
   rounded,
   className,
+  children,
   ...props
 }: ButtonProps) {
   return (
     <button
       {...props}
       className={cn(buttonVariants({ variant, size, rounded }), className)}
-    />
+    >
+      {children}
+    </button>
   )
 }
