@@ -1,18 +1,8 @@
 import { http, HttpResponse } from 'msw'
-import examDeployments from '@/mocks/data/examDeployments.json'
 
 export const checkCodeHandler = http.post(
   '/api/v1/exams/deployments/:deploymentId/check-code',
-  async ({ params, request }) => {
-    const deploymentId = Number(params.deploymentId)
-    const deploymentExists = examDeployments.some((item) => item.id === deploymentId)
-
-    if (!deploymentExists) {
-      return HttpResponse.json(
-        { error_detail: '정보없음.' },
-        { status: 404 }
-      )
-    }
+  async ({ request }) => {
 
     let body: { code?: string } = {}
     try {
