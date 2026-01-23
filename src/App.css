@@ -1,4 +1,5 @@
-@import "tailwindcss";
+@config "../tailwind.config.ts";
+@import 'tailwindcss';
 
 @font-face {
   font-family: 'Pretendard Variable';

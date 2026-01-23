@@ -28,19 +28,21 @@ export const buttonVariants = cva(
        */
       variant: {
         primary:
-          'bg-[#6201E0] text-white border-transparent hover:bg-[#4E01B3] active:bg-[#380186]',
+          'bg-primary text-white border-transparent hover:bg-primary-hover active:bg-primary-active',
+
         secondary:
-          'bg-[#EFE6FC] border border-[#6201E0] text-[#6201E0] hover:bg-[#e3cdff] active:bg-[#cdaaff]',
+          'bg-primary-100 border border-primary text-primary hover:bg-primary-200 active:bg-primary-300',
+
         disabled:
-          'bg-gray-200 text-[#BDBDBD] border-transparent cursor-not-allowed pointer-events-none',
+          'bg-gray-200 text-gray-400 border-transparent cursor-not-allowed pointer-events-none',
       },
 
       /**
        * 버튼 사이즈
        */
       size: {
-        xxs:'w-[78px] h-[42px]',
-        xs:'w-[92px] h-[64px]',
+        xxs: 'w-[78px] h-[42px]',
+        xs: 'w-[92px] h-[64px]',
         sm: 'w-[112px] h-[48px]',
         md: 'w-[126px] h-[48px]',
         lg: 'w-[168px] h-[48px]',
@@ -61,7 +63,6 @@ export const buttonVariants = cva(
      */
     defaultVariants: {
       variant: 'primary',
-      size: 'md',
       rounded: 'default',
     },
   }

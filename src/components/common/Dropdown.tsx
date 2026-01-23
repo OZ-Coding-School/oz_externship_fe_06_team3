@@ -57,7 +57,7 @@ function Dropdown({
 
   const selectedOption = useMemo(
     () => options.find((option) => option.value === value),
-    [options, value],
+    [options, value]
   )
 
   let textColor = '#BDBDBD'
@@ -93,17 +93,24 @@ function Dropdown({
   }
 
   return (
-    <div ref={containerRef} className="relative w-full max-w-[288px] text-[14px]">
+    <div
+      ref={containerRef}
+      className="relative w-full max-w-[288px] text-[14px]"
+    >
       <button
         type="button"
         onClick={handleToggle}
         disabled={disabled}
         className={clsx(
           'flex h-[48px] w-full items-center justify-between px-[16px] py-[10px]',
-          'rounded-[4px] border border-[#BDBDBD] bg-white',
-          disabled ? 'cursor-not-allowed bg-[#ECECEC]' : 'cursor-pointer',
+          'border-mono-400 rounded-[4px] border bg-white',
+          disabled ? 'bg-mono-200 cursor-not-allowed' : 'cursor-pointer'
         )}
-        style={disabled ? { backgroundColor: '#ECECEC', borderColor: '#BDBDBD' } : undefined}
+        style={
+          disabled
+            ? { backgroundColor: '#ECECEC', borderColor: '#BDBDBD' }
+            : undefined
+        }
       >
         <span className="block truncate" style={{ color: textColor }}>
           {selectedOption?.label ?? placeholder}
@@ -114,7 +121,7 @@ function Dropdown({
             alt=""
             className={clsx(
               'h-[8px] w-[14px] transition-transform duration-200 ease-out',
-              isOpen ? 'rotate-180' : 'rotate-0',
+              isOpen ? 'rotate-180' : 'rotate-0'
             )}
           />
         </span>
@@ -122,10 +129,12 @@ function Dropdown({
 
       <div
         className={clsx(
-          'dropdown-scrollbar absolute left-0 top-[calc(100%+4px)] z-10 flex w-full flex-col gap-[5px] overflow-y-auto overflow-x-hidden',
-          'rounded-[4px] border border-[#BDBDBD] bg-white py-[5px]',
+          'dropdown-scrollbar absolute top-[calc(100%+4px)] left-0 z-10 flex w-full flex-col gap-[5px] overflow-x-hidden overflow-y-auto',
+          'border-mono-400 rounded-[4px] border bg-white py-[5px]',
           'origin-top transition-all duration-200 ease-out',
-          isOpen ? 'max-h-[240px] scale-100 opacity-100' : 'max-h-0 scale-95 opacity-0 pointer-events-none',
+          isOpen
+            ? 'max-h-[240px] scale-100 opacity-100'
+            : 'pointer-events-none max-h-0 scale-95 opacity-0'
         )}
       >
         {options.map((option) => {
@@ -138,12 +147,14 @@ function Dropdown({
               className={clsx(
                 'mx-auto flex h-[48px] w-[calc(100%-10px)] items-center justify-between px-[11px] py-[10px]',
                 'gap-[16px] text-left',
-                'rounded-[4px] hover:bg-[#EFE6FC]',
-                isSelected ? 'text-[#6201E0] font-semibold' : 'text-black',
+                'hover:bg-primary-100 rounded-[4px]',
+                isSelected ? 'text-primary font-semibold' : 'text-black'
               )}
             >
               <span className="flex-1 truncate">{option.label}</span>
-              {isSelected && <img src={checkPurple} alt="" className="h-[11px] w-[13px]" />}
+              {isSelected && (
+                <img src={checkPurple} alt="" className="h-[11px] w-[13px]" />
+              )}
             </button>
           )
         })}

@@ -1,19 +1,19 @@
-import { useState } from "react"
+import { useState } from 'react'
 
 // src/components/layout/Header.tsx
 export default function Header() {
-    const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false)
 
-    const user = {
-      name: "유저네임",
-      email: "user@email.com",
+  const user = {
+    name: '유저네임',
+    email: 'user@email.com',
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 w-full">
+    <header className="fixed top-0 right-0 left-0 z-50 w-full">
       {/* 상단 알림 바 */}
       <div className="w-full bg-[#222222] text-center text-sm text-white">
-        <div className="mx-auto max-w-[1200px] font-[Pretendard] py-2">
+        <div className="mx-auto max-w-[1200px] py-2 font-[Pretendard]">
           🚨 선착순 모집! 국비지원 받고 4주 완성
         </div>
       </div>
@@ -63,16 +63,16 @@ export default function Header() {
             </a>
 
             {/* 메뉴 */}
-            <nav className="flex gap-10 text-[18px] font-[Pretendard] text-gray-700">
+            <nav className="flex gap-10 font-[Pretendard] text-[18px] text-gray-700">
               <a
                 href="#"
-                className="hover:text-black transition-colors duration-200"
+                className="transition-colors duration-200 hover:text-black"
               >
                 커뮤니티
               </a>
               <a
                 href="#"
-                className="hover:text-black transition-colors duration-200"
+                className="transition-colors duration-200 hover:text-black"
               >
                 질의응답
               </a>
@@ -83,14 +83,14 @@ export default function Header() {
           <div className="flex items-center gap-2 font-[Pretendard] text-[16px] text-gray-500">
             <a
               href="#"
-              className="hover:text-gray-900 transition-colors duration-200"
+              className="transition-colors duration-200 hover:text-gray-900"
             >
               로그인
             </a>
             <span className="text-gray-300">|</span>
             <a
               href="#"
-              className="hover:text-gray-900 transition-colors duration-200"
+              className="transition-colors duration-200 hover:text-gray-900"
             >
               회원가입
             </a>
@@ -106,33 +106,35 @@ export default function Header() {
               </button>
 
               {open && (
-                <div className="absolute right-0 top-17 w-[204px] h-[207px] rounded-[12px] bg-white px-[16px] py-[24px] shadow-[0_0_16px_0_#A0A0A040] z-50">
+                <div className="absolute top-17 right-0 z-50 h-[207px] w-[204px] rounded-[12px] bg-white px-[16px] py-[24px] shadow-[0_0_16px_0_#A0A0A040]">
                   {/* 유저 정보 */}
-                  <div className="items-start w-[172px] h-[53px] gap-[20px]">
-                    <p className="font-[Pretendard] font-semibold text-[16px] leading-[140%] tracking-[-0.03em] text-gray-900">{user.name}</p>
-                    <p className="font-[Pretendard] font-normal text-[14px] leading-[140%] tracking-[-0.03em] text-[#9D9D9D]">{user.email}</p>
+                  <div className="h-[53px] w-[172px] items-start gap-[20px]">
+                    <p className="font-[Pretendard] text-[16px] leading-[140%] font-semibold tracking-[-0.03em] text-gray-900">
+                      {user.name}
+                    </p>
+                    <p className="text-mono-600 font-[Pretendard] text-[14px] leading-[140%] font-normal tracking-[-0.03em]">
+                      {user.email}
+                    </p>
                   </div>
 
-                  <div className="border-t border-[#ECECEC] border-[1px]" />
+                  <div className="border-[1px] border-t border-[#ECECEC]" />
 
                   {/* 메뉴 */}
                   <a
                     href="/register"
-                    className="font-[pretendard] left-0 block py-3 text-sm hover:bg-[#EFE6FC] hover:text-[#6201E0]"
+                    className="hover:bg-primary-100 hover:text-primary left-0 block py-3 font-[pretendard] text-sm"
                   >
                     수강생 등록
                   </a>
 
                   <a
                     href="/mypage"
-                    className="font-[pretendard] left-0 block py-3 text-sm hover:bg-[#EFE6FC] hover:text-[#6201E0]"
+                    className="hover:bg-primary-100 hover:text-primary left-0 block py-3 font-[pretendard] text-sm"
                   >
                     마이페이지
                   </a>
 
-                  <button
-                    className="block w-full py-3 text-left text-sm hover:bg-[#EFE6FC] hover:text-[#6201E0]"
-                  >
+                  <button className="hover:bg-primary-100 hover:text-primary block w-full py-3 text-left text-sm">
                     로그아웃
                   </button>
                 </div>
