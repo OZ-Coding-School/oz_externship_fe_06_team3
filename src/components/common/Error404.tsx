@@ -1,9 +1,7 @@
-import { cloud404 } from '@/assets/icons'
-
 const Error404 = () => {
   return (
     <div className="flex h-[124px] w-[220px] flex-col items-center justify-center gap-5">
-      <img src={cloud404} alt="404" className="h-[58px] w-[74px]" />
+      <img src="/icons/cloud_404.svg" alt="404" className="h-[58px] w-[74px]" />
       <p className="text-mono-600 text-center text-[20px] leading-[140%] font-normal tracking-[-0.6px]">
         페이지를 불러올 수 없어요
         <br />

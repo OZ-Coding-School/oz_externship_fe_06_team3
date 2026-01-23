@@ -1,7 +1,4 @@
 import { forwardRef, useMemo, useState } from "react";
-import eyeOpen from "@/assets/icons/eyeOpen.svg";
-import eyeClose from "@/assets/icons/eyeClose.svg";
-import correctIcon from "@/assets/icons/correct.svg";
 import {
   CommonInput,
   type CommonInputProps,
@@ -64,7 +61,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
         rightSlot={
           <div className="flex items-center gap-2">
             {state === "success" && (
-              <img src={correctIcon} alt="검증 완료" className="w-4 h-4" />
+              <img src="/icons/correct.svg" alt="검증 완료" className="w-4 h-4" />
             )}
             <button
               type="button"
@@ -74,7 +71,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
               aria-label={show ? "비밀번호 숨기기" : "비밀번호 보기"}
               className="p-1 -mr-1 text-gray-400 hover:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:text-violet-600"
             >
-              <img src={show ? eyeOpen : eyeClose} alt="" className="w-5 h-5" />
+              <img src={show ? "/icons/eyeOpen.svg" : "/icons/eyeClose.svg"} alt="" className="w-5 h-5" />
             </button>
           </div>
         }

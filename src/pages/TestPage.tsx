@@ -3,7 +3,6 @@ import { useForm, FormProvider } from 'react-hook-form'
 import { Dropdown, Error404, Loading, NotFound } from '@/components/common'
 import { CommonInputField } from '@/components/common/CommonInputField'
 import { PasswordField } from '@/components/common/PasswordField'
-import correctIcon from '@/assets/icons/correct.svg'
 
 const options = [
   { label: '옵션 1', value: 'option-1' },
@@ -213,7 +212,7 @@ function TestPage() {
                 state={fieldStates.email}
                 rightSlot={
                   fieldStates.email === 'success' ? (
-                    <img src={correctIcon} alt="검증 완료" className="w-4 h-4" />
+                    <img src="/icons/correct.svg" alt="검증 완료" className="w-4 h-4" />
                   ) : undefined
                 }
                 rules={{
@@ -236,7 +235,7 @@ function TestPage() {
                 state={fieldStates.username}
                 rightSlot={
                   fieldStates.username === 'success' ? (
-                    <img src={correctIcon} alt="검증 완료" className="w-4 h-4" />
+                    <img src="/icons/correct.svg" alt="검증 완료" className="w-4 h-4" />
                   ) : undefined
                 }
                 rules={{
