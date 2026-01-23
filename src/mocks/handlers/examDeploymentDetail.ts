@@ -10,7 +10,7 @@ export const examDeploymentDetailHandler = http.get(
 
     if (!deployment) {
       return HttpResponse.json(
-        { error_detail: '?? ?? ??? ?? ? ????.' },
+        { error_detail: '해당 시험 정보를 찾을 수 없습니다' },
         { status: 404 }
       )
     }

@@ -64,12 +64,12 @@
       "question_id": 5006,
       "number": 6,
       "type": "fill_blank",
-      "question": "자바스크립트에서 배열 길이를 구하는 프로퍼티는 ____ 입니다.",
+      "question": "다음 빈칸을 채우세요.",
       "point": 5,
-      "prompt": null,
-      "blank_count": 1,
+      "prompt": "변수나 함수의 매개변수, 반환값에 타입을 명시하는 것을 __ 이라고 한다. interface 또는 type 키워드를 사용하여 객체의 구조를 정의할 수 있는데, 이렇게 만든 타입을 __ 이라고 부른다.",
+      "blank_count": 2,
       "options": null,
-      "answer_input": null
+      "answer_input": ["", ""]
     }
   ]
 }
