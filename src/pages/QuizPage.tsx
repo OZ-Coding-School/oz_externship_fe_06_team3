@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import { X, AlertCircle } from 'lucide-react'
+import { X } from 'lucide-react'
 import { Button } from '@/components/common/Button'
 import clsx from 'clsx'
 import QuizHeader from '@/components/QuizHeader'
 
 // 스타일 선언
-const warningTitleStyle = clsx('text-black font-semibold text-2xl mb-3')
-const warningContentStyle = clsx('text-black font-normal text-xl')
+const warningTitleStyle = clsx('text-black font-semibold text-[18px] mb-3')
+const warningContentStyle = clsx('text-black font-normal text-[14px]')
 
 function QuizPage() {
   const [showWarning, setShowWarning] = useState(true)
@@ -29,9 +29,13 @@ function QuizPage() {
 
         {/* 경고 박스 */}
         {showWarning && (
-          <div className="mb- w-[73%] flex items-start gap-3 rounded-lg border border-pink-200 bg-[#EFE6FC] p-8">
-            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-[#EC0037]">
-              <AlertCircle className="h-10 w-10 text-white" strokeWidth={2.5} />
+          <div className="min-w-[1200px] flex items-start gap-3 rounded-lg bg-[#EFE6FC] px-6 py-5">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#EC0037]">
+              <img
+                src="/alertCircle.svg"
+                alt="경고"
+                className="h-5 w-5"
+              />
             </div>
             <div className="flex-1">
               <h2 className={warningTitleStyle}>시험에만 집중해 주세요</h2>
@@ -42,7 +46,6 @@ function QuizPage() {
             <button
               type="button"
               onClick={handleCloseWarning}
-              className="flex-shrink-0 rounded-md p-1 transition-colors hover:bg-pink-200"
               aria-label="닫기"
             >
               <X className="h-5 w-5 text-[#0F172A]]" />
