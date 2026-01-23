@@ -1,0 +1,75 @@
+{
+  "exam_id": 9001,
+  "exam_name": "프론트엔드 쪽지시험",
+  "duration_time": 30,
+  "elapsed_time": 0,
+  "cheating_count": 0,
+  "questions": [
+    {
+      "question_id": 5001,
+      "number": 1,
+      "type": "single_choice",
+      "question": "HTML에서 올바른 제목 태그는 무엇인가요?",
+      "point": 5,
+      "prompt": null,
+      "blank_count": null,
+      "options": ["<h1>", "<p>", "<div>", "<span>"],
+      "answer_input": null
+    },
+    {
+      "question_id": 5002,
+      "number": 2,
+      "type": "multiple_choice",
+      "question": "CSS에서 박스 모델에 포함되는 요소를 모두 고르세요.",
+      "point": 5,
+      "prompt": null,
+      "blank_count": null,
+      "options": ["margin", "border", "padding", "content"],
+      "answer_input": null
+    },
+    {
+      "question_id": 5003,
+      "number": 3,
+      "type": "ox",
+      "question": "자바스크립트에서 const로 선언한 값은 재할당이 불가능하다.",
+      "point": 5,
+      "prompt": null,
+      "blank_count": null,
+      "options": ["O", "X"],
+      "answer_input": null
+    },
+    {
+      "question_id": 5004,
+      "number": 4,
+      "type": "short_answer",
+      "question": "React에서 상태를 관리하는 기본 훅 이름은?",
+      "point": 5,
+      "prompt": null,
+      "blank_count": null,
+      "options": null,
+      "answer_input": null
+    },
+    {
+      "question_id": 5005,
+      "number": 5,
+      "type": "ordering",
+      "question": "웹 페이지 렌더링 순서를 올바르게 배열하세요.",
+      "point": 5,
+      "prompt": null,
+      "blank_count": null,
+      "options": ["HTML 파싱", "CSSOM 생성", "렌더 트리 생성", "페인트"],
+      "answer_input": null
+    },
+    {
+      "question_id": 5006,
+      "number": 6,
+      "type": "fill_blank",
+      "question": "다음 빈칸을 채우세요.",
+      "point": 5,
+      "prompt": "변수나 함수의 매개변수, 반환값에 타입을 명시하는 것을 __ 이라고 한다. interface 또는 type 키워드를 사용하여 객체의 구조를 정의할 수 있는데, 이렇게 만든 타입을 __ 이라고 부른다.",
+      "blank_count": 2,
+      "options": null,
+      "answer_input": ["", ""]
+    }
+  ]
+}

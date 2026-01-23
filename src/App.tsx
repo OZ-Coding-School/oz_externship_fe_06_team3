@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import '@/App.css'
 import LandingPage from '@/pages/LandingPage'
 import TestPage from '@/pages/TestPage'
@@ -28,6 +29,7 @@ function App() {
         {/* 2. 헤더가 필요 없는 페이지 (레이아웃 밖으로 배치) */}
         <Route path="/quiz" element={<QuizPage />} />
       </Routes>
+      <ReactQueryDevtools initialIsOpen={false} />
     </BrowserRouter>
   );
 }

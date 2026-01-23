@@ -1,0 +1,577 @@
+[
+  {
+    "id": 101,
+    "submission_id": 333,
+    "exam": {
+      "id": 1,
+      "title": "HTML 기초",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 10,
+        "title": "HTML",
+        "thumbnail_img_url": "https://cdn.ozcoding/html.png"
+      }
+    },
+    "question_count": 10,
+    "total_score": 100,
+    "exam_info": {
+      "status": "done",
+      "score": 80,
+      "correct_answer_count": 8
+    },
+    "is_done": true,
+    "duration_time": 20
+  },
+  {
+    "id": 102,
+    "submission_id": null,
+    "exam": {
+      "id": 2,
+      "title": "CSS 선택자",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 11,
+        "title": "CSS",
+        "thumbnail_img_url": "https://cdn.ozcoding/css.png"
+      }
+    },
+    "question_count": 12,
+    "total_score": 120,
+    "exam_info": {
+      "status": "pending",
+      "score": null,
+      "correct_answer_count": null
+    },
+    "is_done": false,
+    "duration_time": 25
+  },
+  {
+    "id": 103,
+    "submission_id": 334,
+    "exam": {
+      "id": 3,
+      "title": "JavaScript 기본",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 12,
+        "title": "JavaScript",
+        "thumbnail_img_url": "https://cdn.ozcoding/js.png"
+      }
+    },
+    "question_count": 15,
+    "total_score": 150,
+    "exam_info": {
+      "status": "done",
+      "score": 120,
+      "correct_answer_count": 12
+    },
+    "is_done": true,
+    "duration_time": 30
+  },
+  {
+    "id": 104,
+    "submission_id": null,
+    "exam": {
+      "id": 4,
+      "title": "React 컴포넌트",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 13,
+        "title": "React",
+        "thumbnail_img_url": "https://cdn.ozcoding/react.png"
+      }
+    },
+    "question_count": 8,
+    "total_score": 80,
+    "exam_info": {
+      "status": "pending",
+      "score": null,
+      "correct_answer_count": null
+    },
+    "is_done": false,
+    "duration_time": 15
+  },
+  {
+    "id": 105,
+    "submission_id": 335,
+    "exam": {
+      "id": 5,
+      "title": "TypeScript 타입",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 14,
+        "title": "TypeScript",
+        "thumbnail_img_url": "https://cdn.ozcoding/ts.png"
+      }
+    },
+    "question_count": 14,
+    "total_score": 140,
+    "exam_info": {
+      "status": "done",
+      "score": 110,
+      "correct_answer_count": 11
+    },
+    "is_done": true,
+    "duration_time": 28
+  },
+  {
+    "id": 106,
+    "submission_id": null,
+    "exam": {
+      "id": 6,
+      "title": "HTTP 기초",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 15,
+        "title": "네트워크",
+        "thumbnail_img_url": "https://cdn.ozcoding/network.png"
+      }
+    },
+    "question_count": 9,
+    "total_score": 90,
+    "exam_info": {
+      "status": "pending",
+      "score": null,
+      "correct_answer_count": null
+    },
+    "is_done": false,
+    "duration_time": 18
+  },
+  {
+    "id": 107,
+    "submission_id": 336,
+    "exam": {
+      "id": 7,
+      "title": "Node.js 이벤트",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 16,
+        "title": "Node.js",
+        "thumbnail_img_url": "https://cdn.ozcoding/node.png"
+      }
+    },
+    "question_count": 11,
+    "total_score": 110,
+    "exam_info": {
+      "status": "done",
+      "score": 95,
+      "correct_answer_count": 9
+    },
+    "is_done": true,
+    "duration_time": 22
+  },
+  {
+    "id": 108,
+    "submission_id": null,
+    "exam": {
+      "id": 8,
+      "title": "웹 접근성",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 17,
+        "title": "웹",
+        "thumbnail_img_url": "https://cdn.ozcoding/web.png"
+      }
+    },
+    "question_count": 7,
+    "total_score": 70,
+    "exam_info": {
+      "status": "pending",
+      "score": null,
+      "correct_answer_count": null
+    },
+    "is_done": false,
+    "duration_time": 14
+  },
+  {
+    "id": 109,
+    "submission_id": 337,
+    "exam": {
+      "id": 9,
+      "title": "데이터베이스 기본",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 18,
+        "title": "DB",
+        "thumbnail_img_url": "https://cdn.ozcoding/db.png"
+      }
+    },
+    "question_count": 16,
+    "total_score": 160,
+    "exam_info": {
+      "status": "done",
+      "score": 130,
+      "correct_answer_count": 13
+    },
+    "is_done": true,
+    "duration_time": 32
+  },
+  {
+    "id": 110,
+    "submission_id": null,
+    "exam": {
+      "id": 10,
+      "title": "Git 브랜치",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 19,
+        "title": "Git",
+        "thumbnail_img_url": "https://cdn.ozcoding/git.png"
+      }
+    },
+    "question_count": 10,
+    "total_score": 100,
+    "exam_info": {
+      "status": "pending",
+      "score": null,
+      "correct_answer_count": null
+    },
+    "is_done": false,
+    "duration_time": 20
+  },
+  {
+    "id": 111,
+    "submission_id": 338,
+    "exam": {
+      "id": 11,
+      "title": "알고리즘 기초",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 20,
+        "title": "알고리즘",
+        "thumbnail_img_url": "https://cdn.ozcoding/algo.png"
+      }
+    },
+    "question_count": 13,
+    "total_score": 130,
+    "exam_info": {
+      "status": "done",
+      "score": 100,
+      "correct_answer_count": 10
+    },
+    "is_done": true,
+    "duration_time": 26
+  },
+  {
+    "id": 112,
+    "submission_id": null,
+    "exam": {
+      "id": 12,
+      "title": "운영체제 개요",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 21,
+        "title": "OS",
+        "thumbnail_img_url": "https://cdn.ozcoding/os.png"
+      }
+    },
+    "question_count": 9,
+    "total_score": 90,
+    "exam_info": {
+      "status": "pending",
+      "score": null,
+      "correct_answer_count": null
+    },
+    "is_done": false,
+    "duration_time": 18
+  },
+  {
+    "id": 113,
+    "submission_id": 339,
+    "exam": {
+      "id": 13,
+      "title": "자료구조",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 22,
+        "title": "CS",
+        "thumbnail_img_url": "https://cdn.ozcoding/cs.png"
+      }
+    },
+    "question_count": 12,
+    "total_score": 120,
+    "exam_info": {
+      "status": "done",
+      "score": 90,
+      "correct_answer_count": 9
+    },
+    "is_done": true,
+    "duration_time": 24
+  },
+  {
+    "id": 114,
+    "submission_id": null,
+    "exam": {
+      "id": 14,
+      "title": "네트워크 심화",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 23,
+        "title": "네트워크",
+        "thumbnail_img_url": "https://cdn.ozcoding/network.png"
+      }
+    },
+    "question_count": 11,
+    "total_score": 110,
+    "exam_info": {
+      "status": "pending",
+      "score": null,
+      "correct_answer_count": null
+    },
+    "is_done": false,
+    "duration_time": 22
+  },
+  {
+    "id": 115,
+    "submission_id": 340,
+    "exam": {
+      "id": 15,
+      "title": "테스트 전략",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 24,
+        "title": "테스트",
+        "thumbnail_img_url": "https://cdn.ozcoding/test.png"
+      }
+    },
+    "question_count": 10,
+    "total_score": 100,
+    "exam_info": {
+      "status": "done",
+      "score": 85,
+      "correct_answer_count": 8
+    },
+    "is_done": true,
+    "duration_time": 20
+  },
+  {
+    "id": 116,
+    "submission_id": null,
+    "exam": {
+      "id": 16,
+      "title": "프론트엔드 보안",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 25,
+        "title": "보안",
+        "thumbnail_img_url": "https://cdn.ozcoding/security.png"
+      }
+    },
+    "question_count": 8,
+    "total_score": 80,
+    "exam_info": {
+      "status": "pending",
+      "score": null,
+      "correct_answer_count": null
+    },
+    "is_done": false,
+    "duration_time": 16
+  },
+  {
+    "id": 117,
+    "submission_id": 341,
+    "exam": {
+      "id": 17,
+      "title": "디자인 시스템",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 26,
+        "title": "디자인",
+        "thumbnail_img_url": "https://cdn.ozcoding/design.png"
+      }
+    },
+    "question_count": 14,
+    "total_score": 140,
+    "exam_info": {
+      "status": "done",
+      "score": 115,
+      "correct_answer_count": 11
+    },
+    "is_done": true,
+    "duration_time": 28
+  },
+  {
+    "id": 118,
+    "submission_id": null,
+    "exam": {
+      "id": 18,
+      "title": "클라이언트 렌더링",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 27,
+        "title": "웹",
+        "thumbnail_img_url": "https://cdn.ozcoding/web.png"
+      }
+    },
+    "question_count": 9,
+    "total_score": 90,
+    "exam_info": {
+      "status": "pending",
+      "score": null,
+      "correct_answer_count": null
+    },
+    "is_done": false,
+    "duration_time": 18
+  },
+  {
+    "id": 119,
+    "submission_id": 342,
+    "exam": {
+      "id": 19,
+      "title": "상태 관리",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 28,
+        "title": "프론트엔드",
+        "thumbnail_img_url": "https://cdn.ozcoding/fe.png"
+      }
+    },
+    "question_count": 10,
+    "total_score": 100,
+    "exam_info": {
+      "status": "done",
+      "score": 92,
+      "correct_answer_count": 9
+    },
+    "is_done": true,
+    "duration_time": 21
+  },
+  {
+    "id": 120,
+    "submission_id": null,
+    "exam": {
+      "id": 20,
+      "title": "비동기 처리",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 29,
+        "title": "JavaScript",
+        "thumbnail_img_url": "https://cdn.ozcoding/js.png"
+      }
+    },
+    "question_count": 12,
+    "total_score": 120,
+    "exam_info": {
+      "status": "pending",
+      "score": null,
+      "correct_answer_count": null
+    },
+    "is_done": false,
+    "duration_time": 24
+  },
+  {
+    "id": 121,
+    "submission_id": 343,
+    "exam": {
+      "id": 21,
+      "title": "브라우저 렌더링",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 30,
+        "title": "브라우저",
+        "thumbnail_img_url": "https://cdn.ozcoding/browser.png"
+      }
+    },
+    "question_count": 11,
+    "total_score": 110,
+    "exam_info": {
+      "status": "done",
+      "score": 97,
+      "correct_answer_count": 10
+    },
+    "is_done": true,
+    "duration_time": 22
+  },
+  {
+    "id": 122,
+    "submission_id": null,
+    "exam": {
+      "id": 22,
+      "title": "웹 성능 최적화",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 31,
+        "title": "웹",
+        "thumbnail_img_url": "https://cdn.ozcoding/web.png"
+      }
+    },
+    "question_count": 13,
+    "total_score": 130,
+    "exam_info": {
+      "status": "pending",
+      "score": null,
+      "correct_answer_count": null
+    },
+    "is_done": false,
+    "duration_time": 26
+  },
+  {
+    "id": 123,
+    "submission_id": 344,
+    "exam": {
+      "id": 23,
+      "title": "배포 기초",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 32,
+        "title": "배포",
+        "thumbnail_img_url": "https://cdn.ozcoding/deploy.png"
+      }
+    },
+    "question_count": 10,
+    "total_score": 100,
+    "exam_info": {
+      "status": "done",
+      "score": 88,
+      "correct_answer_count": 9
+    },
+    "is_done": true,
+    "duration_time": 20
+  },
+  {
+    "id": 124,
+    "submission_id": null,
+    "exam": {
+      "id": 24,
+      "title": "웹 표준",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 33,
+        "title": "웹",
+        "thumbnail_img_url": "https://cdn.ozcoding/web.png"
+      }
+    },
+    "question_count": 9,
+    "total_score": 90,
+    "exam_info": {
+      "status": "pending",
+      "score": null,
+      "correct_answer_count": null
+    },
+    "is_done": false,
+    "duration_time": 18
+  },
+  {
+    "id": 125,
+    "submission_id": 345,
+    "exam": {
+      "id": 25,
+      "title": "React 훅",
+      "thumbnail_img_url": "default_img_url",
+      "subject": {
+        "id": 34,
+        "title": "React",
+        "thumbnail_img_url": "https://cdn.ozcoding/react.png"
+      }
+    },
+    "question_count": 12,
+    "total_score": 120,
+    "exam_info": {
+      "status": "done",
+      "score": 99,
+      "correct_answer_count": 10
+    },
+    "is_done": true,
+    "duration_time": 24
+  }
+]
