@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 
 // src/components/layout/Header.tsx
 export default function Header() {
@@ -81,12 +82,12 @@ export default function Header() {
 
           {/* 오른쪽 메뉴 */}
           <div className="flex items-center gap-2 font-[Pretendard] text-[16px] text-gray-500">
-            <a
-              href="#"
+            <Link
+              to="/login"
               className="transition-colors duration-200 hover:text-gray-900"
             >
               로그인
-            </a>
+            </Link>
             <span className="text-gray-300">|</span>
             <a
               href="#"
