@@ -3,7 +3,6 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import '@/App.css'
 import LandingPage from '@/pages/LandingPage'
 import TestPage from '@/pages/TestPage'
-import { Header } from '@/components/common'
 import LoginPage from '@/pages/LoginPage'
 import MyPage from '@/pages/MyPage'
 import MyPageQuiz from '@/components/MyPageQuiz'
@@ -19,7 +18,7 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/qna" element={<div>질의응답 페이지</div>} />
           <Route path="/test" element={<TestPage />} />
-          
+          <Route path="/login" element={<LoginPage />} />
           {/* 마이페이지와 그 하위 페이지 */}
           <Route path="/mypage" element={<MyPage />}>
             <Route path="quiz" element={<MyPageQuiz />} />
