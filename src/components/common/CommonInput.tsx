@@ -22,6 +22,7 @@ export interface CommonInputProps extends NativeInputProps {
   locked?: boolean;
   width?: number | string;
   rightSlot?: React.ReactNode;
+  inputClassName?: string;
 
   helperText?: React.ReactNode;
   helperTextByState?: Partial<Record<FieldState, React.ReactNode>>;
@@ -38,6 +39,7 @@ export const CommonInput = forwardRef<HTMLInputElement, CommonInputProps>(
       locked = false,
       width,
       rightSlot,
+      inputClassName,
       helperText,
       helperTextByState,
       helperVisibility = "never",
@@ -128,7 +130,8 @@ export const CommonInput = forwardRef<HTMLInputElement, CommonInputProps>(
             aria-describedby={shouldShowHelper ? helperId : undefined}
             className={clsx(
               "flex-1 bg-transparent outline-none text-sm sm:text-base placeholder-gray-400",
-              locked ? "text-gray-500" : "text-black"
+              locked ? "text-gray-500" : "text-black",
+              inputClassName
             )}
           />
 
@@ -146,7 +149,7 @@ export const CommonInput = forwardRef<HTMLInputElement, CommonInputProps>(
                 ? "text-red-500"
                 : state === "success"
                 ? "text-green-600"
-                : "text-gray-500"
+                : "text-gray-400"
             )}
           >
             {resolvedHelper}
