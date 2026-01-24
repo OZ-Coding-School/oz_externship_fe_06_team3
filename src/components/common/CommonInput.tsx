@@ -4,30 +4,30 @@ import {
   useMemo,
   useState,
   type InputHTMLAttributes,
-} from "react";
-import clsx from "clsx";
+} from 'react'
+import clsx from 'clsx'
 
-export type FieldState = "default" | "error" | "success";
-export type HelperVisibility = "always" | "focus" | "never";
+export type FieldState = 'default' | 'error' | 'success'
+export type HelperVisibility = 'always' | 'focus' | 'never'
 
 type NativeInputProps = Omit<
   InputHTMLAttributes<HTMLInputElement>,
-  "value" | "onChange" | "className"
->;
+  'value' | 'onChange' | 'className'
+>
 
 export interface CommonInputProps extends NativeInputProps {
-  value: string;
-  onChange: (value: string) => void;
-  state?: FieldState;
-  locked?: boolean;
-  width?: number | string;
-  rightSlot?: React.ReactNode;
-  placeholderVariant?: 'a' | 'b';
+  value: string
+  onChange: (value: string) => void
+  state?: FieldState
+  locked?: boolean
+  width?: number | string
+  rightSlot?: React.ReactNode
+  placeholderVariant?: 'a' | 'b'
 
-  helperText?: React.ReactNode;
-  helperTextByState?: Partial<Record<FieldState, React.ReactNode>>;
-  helperVisibility?: HelperVisibility;
-  persistHelperOnBlurWhenFilled?: boolean;
+  helperText?: React.ReactNode
+  helperTextByState?: Partial<Record<FieldState, React.ReactNode>>
+  helperVisibility?: HelperVisibility
+  persistHelperOnBlurWhenFilled?: boolean
 }
 
 export const CommonInput = forwardRef<HTMLInputElement, CommonInputProps>(
@@ -35,14 +35,14 @@ export const CommonInput = forwardRef<HTMLInputElement, CommonInputProps>(
     {
       value,
       onChange,
-      state = "default",
+      state = 'default',
       locked = false,
       width,
       rightSlot,
       placeholderVariant = 'a',
       helperText,
       helperTextByState,
-      helperVisibility = "never",
+      helperVisibility = 'never',
       persistHelperOnBlurWhenFilled = true,
       id,
       disabled,
@@ -51,35 +51,35 @@ export const CommonInput = forwardRef<HTMLInputElement, CommonInputProps>(
     },
     ref
   ) => {
-    const autoId = useId();
-    const inputId = id ?? `input-${autoId}`;
+    const autoId = useId()
+    const inputId = id ?? `input-${autoId}`
 
-    const [isFocused, setIsFocused] = useState(false);
+    const [isFocused, setIsFocused] = useState(false)
 
-    const isReadOnly = locked || !!readOnly;
-    const isDisabled = !!disabled;
+    const isReadOnly = locked || !!readOnly
+    const isDisabled = !!disabled
 
-    const hasValue = String(value ?? "").trim().length > 0;
+    const hasValue = String(value ?? '').trim().length > 0
 
     const resolvedHelper = useMemo(() => {
-      return helperTextByState?.[state] ?? helperText ?? null;
-    }, [helperTextByState, helperText, state]);
+      return helperTextByState?.[state] ?? helperText ?? null
+    }, [helperTextByState, helperText, state])
 
     const helperId = useMemo(() => {
-      return resolvedHelper ? `${inputId}-helper` : undefined;
-    }, [inputId, resolvedHelper]);
+      return resolvedHelper ? `${inputId}-helper` : undefined
+    }, [inputId, resolvedHelper])
 
     const shouldShowHelper = useMemo(() => {
-      if (!resolvedHelper) return false;
-      if (helperVisibility === "never") return false;
+      if (!resolvedHelper) return false
+      if (helperVisibility === 'never') return false
 
-      if (state === "error" || state === "success") return true;
+      if (state === 'error' || state === 'success') return true
 
-      if (helperVisibility === "always") return true;
-      if (isFocused) return true;
-      if (persistHelperOnBlurWhenFilled && hasValue) return true;
+      if (helperVisibility === 'always') return true
+      if (isFocused) return true
+      if (persistHelperOnBlurWhenFilled && hasValue) return true
 
-      return false;
+      return false
     }, [
       resolvedHelper,
       helperVisibility,
@@ -87,24 +87,25 @@ export const CommonInput = forwardRef<HTMLInputElement, CommonInputProps>(
       isFocused,
       persistHelperOnBlurWhenFilled,
       hasValue,
-    ]);
+    ])
 
     return (
       <div
         className="flex flex-col gap-1.5"
-        style={{ width: typeof width === "number" ? `${width}px` : width }}
+        style={{ width: typeof width === 'number' ? `${width}px` : width }}
       >
         <div
           className={clsx(
-            "flex items-center rounded-lg border px-4 gap-2.5 h-12 transition-colors duration-200",
-            state === "default" &&
-              "border-gray-300 bg-white focus-within:border-violet-600 focus-within:ring-1 focus-within:ring-violet-600",
-            state === "error" &&
-              "border-red-500 bg-white focus-within:border-red-600 focus-within:ring-1 focus-within:ring-red-600",
-            state === "success" &&
-              "border-green-500 bg-white focus-within:border-green-600 focus-within:ring-1 focus-within:ring-green-600",
-            locked && "bg-gray-100 border-gray-200",
-            isDisabled && "opacity-60 cursor-not-allowed"
+            'flex h-12 items-center gap-2.5 rounded-lg border px-4 transition-colors duration-200',
+            'focus-within:ring-1',
+            state === 'default' &&
+              'border-gray-300 bg-white focus-within:border-violet-600 focus-within:ring-violet-600',
+            state === 'error' &&
+              'border-red-500 bg-white focus-within:border-red-600 focus-within:ring-red-600',
+            state === 'success' &&
+              'border-green-500 bg-white focus-within:border-green-600 focus-within:ring-green-600',
+            locked && 'border-gray-200 bg-gray-100',
+            isDisabled && 'cursor-not-allowed opacity-60'
           )}
         >
           <input
@@ -115,28 +116,28 @@ export const CommonInput = forwardRef<HTMLInputElement, CommonInputProps>(
             readOnly={isReadOnly}
             disabled={isDisabled}
             onChange={(e) => {
-              if (isDisabled || isReadOnly) return;
-              onChange(e.currentTarget.value);
+              if (isDisabled || isReadOnly) return
+              onChange(e.currentTarget.value)
             }}
             onFocus={(e) => {
-              setIsFocused(true);
-              inputProps.onFocus?.(e);
+              setIsFocused(true)
+              inputProps.onFocus?.(e)
             }}
             onBlur={(e) => {
-              setIsFocused(false);
-              inputProps.onBlur?.(e);
+              setIsFocused(false)
+              inputProps.onBlur?.(e)
             }}
-            aria-invalid={state === "error" ? true : undefined}
+            aria-invalid={state === 'error' ? true : undefined}
             aria-describedby={shouldShowHelper ? helperId : undefined}
             className={clsx(
-              "flex-1 bg-transparent outline-none text-sm sm:text-base",
-              locked ? "text-gray-400" : "text-black",
+              'flex-1 bg-transparent text-sm outline-none sm:text-base',
+              locked ? 'text-gray-400' : 'text-black',
               placeholderVariant === 'a' ? 'placeholder-a' : 'placeholder-b'
             )}
           />
 
           {rightSlot && (
-            <div className="shrink-0 flex items-center">{rightSlot}</div>
+            <div className="flex shrink-0 items-center">{rightSlot}</div>
           )}
         </div>
 
@@ -144,20 +145,20 @@ export const CommonInput = forwardRef<HTMLInputElement, CommonInputProps>(
           <p
             id={helperId}
             className={clsx(
-              "text-xs font-medium px-1",
-              state === "error"
-                ? "text-red-500"
-                : state === "success"
-                ? "text-green-600"
-                : "text-gray-400"
+              'px-1 text-xs font-medium',
+              state === 'error'
+                ? 'text-red-500'
+                : state === 'success'
+                  ? 'text-green-600'
+                  : 'text-gray-400'
             )}
           >
             {resolvedHelper}
           </p>
         )}
       </div>
-    );
+    )
   }
-);
+)
 
-CommonInput.displayName = "CommonInput";
+CommonInput.displayName = 'CommonInput'
