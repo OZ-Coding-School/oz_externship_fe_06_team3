@@ -105,7 +105,7 @@ const LoginPage = () => {
                     <div className="flex w-5 flex-col items-center justify-center gap-2.5 px-[3px] py-1">
                       <img
                         className="h-3 w-[13px]"
-                        alt="Vector"
+                        alt="kakao_logo"
                         src="/LoginPage_img/kakao_logo.svg"
                       />
                     </div>
@@ -125,7 +125,7 @@ const LoginPage = () => {
                     <div className="flex w-5 flex-col items-center justify-center gap-2.5 px-[3px] py-1">
                       <img
                         className="h-[13px] w-[13px]"
-                        alt="Vector"
+                        alt="naver_logo"
                         src="/LoginPage_img/naver_logo.svg"
                       />
                     </div>
@@ -146,7 +146,6 @@ const LoginPage = () => {
                       type="email"
                       placeholder="아이디 (example@gmail.com)"
                       width="100%"
-                      inputClassName="placeholder-a tracking-[-0.42px]"
                       rules={{
                         required: '이메일을 입력해주세요.',
                         pattern: {
@@ -166,7 +165,6 @@ const LoginPage = () => {
                         name="password"
                         placeholder="비밀번호를 입력해주세요."
                         width="100%"
-                        inputClassName="placeholder-a tracking-[-0.42px]"
                         rules={{
                           required: '비밀번호를 입력해주세요.',
                         }}

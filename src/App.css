@@ -54,7 +54,7 @@
 /* Placeholder Font Styles */
 
 /* 로그인 페이지 용 */
-.placeholder-a {
+.placeholder-a::placeholder {
   @apply text-[14px] font-normal;
   color: #9D9D9D; 
 }
@@ -64,8 +64,9 @@
 }
 
 /* 마이페이지 / 쪽지 / 비밀번호 변경 용 */
-.placeholder-b {
+.placeholder-b::placeholder {
   @apply text-[16px] font-normal;
+  color: #9D9D9D; 
 }
 
 /* 비밀번호 찾기 모달 플레이스홀더 */
