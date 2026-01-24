@@ -22,7 +22,7 @@ export interface CommonInputProps extends NativeInputProps {
   locked?: boolean;
   width?: number | string;
   rightSlot?: React.ReactNode;
-  inputClassName?: string;
+  placeholderVariant?: 'a' | 'b';
 
   helperText?: React.ReactNode;
   helperTextByState?: Partial<Record<FieldState, React.ReactNode>>;
@@ -39,7 +39,7 @@ export const CommonInput = forwardRef<HTMLInputElement, CommonInputProps>(
       locked = false,
       width,
       rightSlot,
-      inputClassName,
+      placeholderVariant = 'a',
       helperText,
       helperTextByState,
       helperVisibility = "never",
@@ -129,9 +129,9 @@ export const CommonInput = forwardRef<HTMLInputElement, CommonInputProps>(
             aria-invalid={state === "error" ? true : undefined}
             aria-describedby={shouldShowHelper ? helperId : undefined}
             className={clsx(
-              "flex-1 bg-transparent outline-none text-sm sm:text-base placeholder-gray-400",
-              locked ? "text-gray-500" : "text-black",
-              inputClassName
+              "flex-1 bg-transparent outline-none text-sm sm:text-base",
+              locked ? "text-gray-400" : "text-black",
+              placeholderVariant === 'a' ? 'placeholder-a' : 'placeholder-b'
             )}
           />
 
