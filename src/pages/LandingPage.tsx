@@ -2,15 +2,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router";
 import clsx from "clsx";
 
-import main_banner from "@/assets/LandingPage_img/main_banner.png";
-import main_exam from "@/assets/LandingPage_img/main_exam.png";
-import main_qna from "@/assets/LandingPage_img/main_qna.png";
-import main_community from "@/assets/LandingPage_img/main_community.png";
-
 const TABS = [
-  { id: "exam", label: "쪽지시험", image: main_exam },
-  { id: "qna", label: "질의응답", image: main_qna },
-  { id: "community", label: "커뮤니티", image: main_community },
+  { id: "exam", label: "쪽지시험", image: "/LandingPage_img/main_exam.png" },
+  { id: "qna", label: "질의응답", image: "/LandingPage_img/main_qna.png" },
+  { id: "community", label: "커뮤니티", image: "/LandingPage_img/main_community.png" },
 ] as const;
 
 type TabType = (typeof TABS)[number]["id"];
@@ -115,7 +110,7 @@ function LandingPage() {
               className="block overflow-hidden rounded-2xl shadow-sm hover:shadow-md transition-shadow"
             >
               <img
-                src={main_banner}
+                src="/LandingPage_img/main_banner.png"
                 alt="Q&A 페이지 바로가기"
                 className="w-full h-auto"
               />

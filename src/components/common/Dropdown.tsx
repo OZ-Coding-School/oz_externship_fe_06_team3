@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import clsx from 'clsx'
-import { arrowDownBlack, arrowDownGray, checkPurple } from '@/assets/icons'
 
 /**
  * 드롭다운 옵션 항목
@@ -64,9 +63,9 @@ function Dropdown({
   if (disabled) textColor = '#BDBDBD'
   if (!disabled && (selectedOption || isOpen)) textColor = '#000000'
 
-  let iconSrc = arrowDownGray
+  let iconSrc = '/icons/arrow_down_gray.svg'
   if (!disabled && (selectedOption || isOpen)) {
-    iconSrc = arrowDownBlack
+    iconSrc = '/icons/arrow_down_black.svg'
   }
 
   useEffect(() => {
@@ -153,7 +152,7 @@ function Dropdown({
             >
               <span className="flex-1 truncate">{option.label}</span>
               {isSelected && (
-                <img src={checkPurple} alt="" className="h-[11px] w-[13px]" />
+                <img src="/icons/check_purple.svg" alt="" className="h-[11px] w-[13px]" />
               )}
             </button>
           )
