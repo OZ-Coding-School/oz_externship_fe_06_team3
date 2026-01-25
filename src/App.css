@@ -33,6 +33,10 @@
   @apply text-[20px] font-semibold;
 }
 
+.title-l-b {
+  @apply text-[20px] font-bold;
+}
+
 /* 로그인 페이지 용 */
 .title-m-a {
   @apply text-[18px] font-bold;
@@ -43,6 +47,10 @@
   @apply text-[18px] font-semibold;
 }
 
+.subTitle-l {
+  @apply text-[14px] text-[#4D4D4D];
+}
+
 /* Placeholder Font Styles */
 
 /* 로그인 페이지 용 */
@@ -50,9 +58,40 @@
   @apply text-[14px] font-normal;
 }
 
+.placeholder-a::placeholder {
+  @apply text-[14px] font-normal;
+}
+
 /* 마이페이지 / 쪽지 / 비밀번호 변경 용 */
 .placeholder-b {
   @apply text-[16px] font-normal;
+}
+
+/* 비밀번호 찾기 모달 플레이스홀더 */
+.find-password-input input::placeholder {
+  font-size: 14px;
+  font-weight: normal;
+  color: #BDBDBD;
+}
+
+/* 라벨 공통 스타일 */
+.label-common {
+  @apply text-[16px] font-normal text-[#121212];
+}
+
+/* 비밀번호 재설정 토스트 알림창 border-radius - 모든 경우 커버 */
+.reset-password-toast,
+div.reset-password-toast,
+[class*="reset-password-toast"],
+div[class*="reset-password-toast"],
+div[class*="fixed"] .reset-password-toast,
+div[class*="fixed"] div.reset-password-toast,
+div[class*="left-1/2"] .reset-password-toast,
+div[class*="left-1/2"] div.reset-password-toast {
+  border-radius: 12px !important;
+  -webkit-border-radius: 12px !important;
+  -moz-border-radius: 12px !important;
+  overflow: hidden !important;
 }
 
 
