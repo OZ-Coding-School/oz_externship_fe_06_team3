@@ -78,8 +78,6 @@ export function FindPasswordModal({
     setVerificationError('') // 에러 메시지 초기화
     setIsVerified(false) // 인증 상태 초기화
     setVerificationMessage('') // 인증 메시지 초기화
-    
-    // 기존 타이머가 있으면 정리
     if (toastTimerRef.current) {
       clearTimeout(toastTimerRef.current)
     }
