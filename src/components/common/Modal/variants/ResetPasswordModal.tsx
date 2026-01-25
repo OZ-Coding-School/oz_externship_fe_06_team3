@@ -37,7 +37,7 @@ export function ResetPasswordModal({
   useEffect(() => {
     return () => {
       if (timerRef.current) {
-        clearInterval(timerRef.current)
+        clearTimeout(timerRef.current)
       }
     }
   }, [])
@@ -47,7 +47,7 @@ export function ResetPasswordModal({
     if (!isOpen) {
       setShowToast(false)
       if (timerRef.current) {
-        clearInterval(timerRef.current)
+        clearTimeout(timerRef.current)
         timerRef.current = null
       }
     }

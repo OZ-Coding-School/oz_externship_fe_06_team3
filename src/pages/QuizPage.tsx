@@ -1,12 +1,6 @@
 import { useState } from 'react'
-import { X } from 'lucide-react'
 import { Button } from '@/components/common/Button'
-import clsx from 'clsx'
 import QuizHeader from '@/components/QuizHeader'
-
-// 스타일 선언
-const warningTitleStyle = clsx('text-black font-semibold text-[18px] mb-3')
-const warningContentStyle = clsx('text-black font-normal text-[14px]')
 
 function QuizPage() {
   const [showWarning, setShowWarning] = useState(true)
@@ -38,8 +32,8 @@ function QuizPage() {
               />
             </div>
             <div className="flex-1">
-              <h2 className={warningTitleStyle}>시험에만 집중해 주세요</h2>
-              <p className={warningContentStyle}>
+              <h2 className="text-black font-semibold text-[18px] mb-3">시험에만 집중해 주세요</h2>
+              <p className="text-black font-normal text-[14px]">
                 탭이나 창을 이동하면 부정행위로 처리돼 시험이 중단될 수 있어요. 안정적인 환경에서 시험을 이어가 주세요.
               </p>
             </div>
@@ -47,8 +41,21 @@ function QuizPage() {
               type="button"
               onClick={handleCloseWarning}
               aria-label="닫기"
+              className="flex items-center justify-center"
             >
-              <X className="h-5 w-5 text-[#0F172A]]" />
+              <svg
+                className="h-5 w-5 text-[#0F172A]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
             </button>
           </div>
         )}

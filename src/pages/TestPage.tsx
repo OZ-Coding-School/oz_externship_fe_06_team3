@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   FindIdModal,
   FindIdResultModal,
@@ -9,9 +10,8 @@ import {
   WithdrawalReasonModal,
   StartQuizModal,
   CheatingWarningModal,
+  Button,
 } from '@/components/common'
-import { useState } from 'react'
-import { Button } from '@/components/common'
 
 function TestPage() {
   // 각 모달의 열림 상태 관리

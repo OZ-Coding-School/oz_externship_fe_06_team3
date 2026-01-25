@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Modal } from '../Modal'
@@ -25,7 +25,24 @@ export function FindPasswordModal({
   const [isCodeSent, setIsCodeSent] = useState(false)
   const [verificationError, setVerificationError] = useState<string>('')
   const [sentCode, setSentCode] = useState<string>('') // 전송된 인증코드 저장
+  const toastTimerRef = useRef<NodeJS.Timeout | null>(null)
   const { isExpired, isActive, startTimer, formatTime } = useModalTimer(5)
+
+  // 모달이 닫힐 때 타이머 정리
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) {
+        clearTimeout(toastTimerRef.current)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!isOpen && toastTimerRef.current) {
+      clearTimeout(toastTimerRef.current)
+      toastTimerRef.current = null
+    }
+  }, [isOpen])
 
   const methods = useForm<FindPasswordFormData>({
     resolver: zodResolver(findPasswordSchema),
@@ -61,7 +78,12 @@ export function FindPasswordModal({
     setVerificationError('') // 에러 메시지 초기화
     setIsVerified(false) // 인증 상태 초기화
     setVerificationMessage('') // 인증 메시지 초기화
-    setTimeout(() => setShowToast(false), 5000) // 5초 후 사라짐
+    
+    // 기존 타이머가 있으면 정리
+    if (toastTimerRef.current) {
+      clearTimeout(toastTimerRef.current)
+    }
+    toastTimerRef.current = setTimeout(() => setShowToast(false), 5000) // 5초 후 사라짐
   }
 
   const handleVerifyCode = async () => {

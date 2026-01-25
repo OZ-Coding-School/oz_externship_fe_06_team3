@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Modal } from '../Modal'
@@ -30,6 +30,23 @@ export function WithdrawalReasonModal({
   onSuccess,
 }: WithdrawalReasonModalProps) {
   const [showToast, setShowToast] = useState(false)
+  const toastTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // 모달이 닫힐 때 타이머 정리
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) {
+        clearTimeout(toastTimerRef.current)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!isOpen && toastTimerRef.current) {
+      clearTimeout(toastTimerRef.current)
+      toastTimerRef.current = null
+    }
+  }, [isOpen])
 
   const methods = useForm<WithdrawalReasonFormData>({
     resolver: zodResolver(withdrawalReasonSchema),
@@ -48,9 +65,15 @@ export function WithdrawalReasonModal({
   const onSubmit = (data: WithdrawalReasonFormData) => {
     onSuccess?.(data)
     setShowToast(true)
-    setTimeout(() => {
+    
+    // 기존 타이머가 있으면 정리
+    if (toastTimerRef.current) {
+      clearTimeout(toastTimerRef.current)
+    }
+    toastTimerRef.current = setTimeout(() => {
       setShowToast(false)
       onClose()
+      toastTimerRef.current = null
     }, 5000) // 5초 후 토스트 사라지고 모달 닫기
   }
 

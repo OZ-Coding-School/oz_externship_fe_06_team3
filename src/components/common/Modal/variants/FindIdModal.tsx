@@ -11,7 +11,6 @@ import cn from '@/lib/cn'
 interface FindIdModalProps {
   isOpen: boolean
   onClose: () => void
-  onSuccess?: (data: FindIdFormData) => void
   onFindIdSuccess?: (email: string) => void
 }
 
