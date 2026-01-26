@@ -17,10 +17,10 @@ const sideNavClass = ({ isActive }: { isActive: boolean }) =>
 
 const MyPage = () => {
   return (
-    <div className="px-90 py-20">
-      <div className="flex">
+    <div className="w-full flex-center">
+      <div className="flex justify-center p-10 w-full">
         {/* 좌측 nav */}
-        <aside className="pt-2">
+        <aside className="pt-2 max-w-[180px]">
           <nav className="space-y-4">
             <NavLink to="quiz" className={sideNavClass}>
               쪽지시험
@@ -35,7 +35,7 @@ const MyPage = () => {
         </aside>
 
         {/* 우측 콘텐츠 */}
-        <main>
+        <main className="min-w-[744px]">
           <Outlet />
         </main>
       </div>

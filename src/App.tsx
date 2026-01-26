@@ -35,6 +35,7 @@ function App() {
         {/* 헤더가 필요 없는 페이지 (레이아웃 밖으로 배치) */}
         <Route element={<RequireAuth />}>
           <Route path="/quiz" element={<QuizPage />} />
+          <Route path="/quiz/:deploymentId" element={<QuizPage />} />
         </Route>
       </Routes>
       <ReactQueryDevtools initialIsOpen={false} />
