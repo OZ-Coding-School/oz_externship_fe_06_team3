@@ -85,15 +85,15 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <button
+              <Button
                 type="button"
-                className="inline-flex items-center justify-center gap-2.5"
+                variant="link"
+                size="auto"
+                className="text-primary gap-2.5 text-[16px] leading-[22.4px] font-normal tracking-[-0.48px] whitespace-nowrap"
                 onClick={() => console.log('회원가입 이동')}
               >
-                <div className="text-primary text-[16px] leading-[22.4px] font-normal tracking-[-0.48px] whitespace-nowrap">
-                  회원가입 하기
-                </div>
-              </button>
+                회원가입 하기
+              </Button>
             </div>
           </div>
 
@@ -157,31 +157,27 @@ export default function LoginPage() {
 
                   {/* 링크 */}
                   <div className="inline-flex items-center">
-                    <button
+                    <Button
                       type="button"
-                      className="inline-flex items-center justify-center gap-2.5 py-2"
+                      variant="link"
+                      size="auto"
+                      className="py-2 whitespace-nowrap"
                       onClick={() => console.log('아이디 찾기')}
                     >
-                      <div className="text-mono-600 text-sm whitespace-nowrap">
-                        아이디 찾기
-                      </div>
-                    </button>
+                      아이디 찾기
+                    </Button>
 
-                    <div className="inline-flex items-center justify-center gap-2 px-2 py-2">
-                      <div className="text-mono-600 text-sm whitespace-nowrap">
-                        |
-                      </div>
-                    </div>
+                    <span className="text-mono-600 px-2 py-2 text-sm">|</span>
 
-                    <button
+                    <Button
                       type="button"
-                      className="inline-flex items-center justify-center gap-2.5 py-2"
+                      variant="link"
+                      size="auto"
+                      className="py-2 whitespace-nowrap"
                       onClick={() => console.log('비밀번호 찾기')}
                     >
-                      <div className="text-mono-600 text-sm whitespace-nowrap">
-                        비밀번호 찾기
-                      </div>
-                    </button>
+                      비밀번호 찾기
+                    </Button>
                   </div>
 
                   {/* 제출 */}
