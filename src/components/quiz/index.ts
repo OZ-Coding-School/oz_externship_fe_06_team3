@@ -1,5 +1,1 @@
-export { default as SingleChoice } from './SingleChoice'
-export { default as OX } from './OX'
-export { default as FillBlank } from './FillBlank'
-export { default as Ordering } from './Ordering'
 export { default as QuizCard } from './QuizCard'
