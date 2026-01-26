@@ -32,7 +32,50 @@ function QuizPage() {
         <QuizWarningBox />
 
         <div className="min-h-[500px] min-w-[1200px]">
-          {/* 쪽지시험 유형별 컴포넌트가 들어갈 자리 */}
+          {data?.questions && data.questions.length > 0 ? (
+            <div className="space-y-8">
+              {data.questions
+                .sort((a, b) => a.number - b.number)
+                .map((question) => (
+                  <div
+                    key={question.questionId}
+                    className="bg-white border border-gray-200 rounded-lg p-6"
+                  >
+                    <div className="mb-4">
+                      <span className="text-lg font-semibold text-black">
+                        {question.number}. {question.question}
+                      </span>
+                      <span className="ml-2 text-sm text-gray-500">
+                        ({question.point}점)
+                      </span>
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      유형: {question.type}
+                      {question.options && (
+                        <div className="mt-2">
+                          <p className="font-medium">선택지:</p>
+                          <ul className="list-disc list-inside ml-4">
+                            {question.options.map((option, idx) => (
+                              <li key={idx}>{option}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {question.prompt && (
+                        <div className="mt-2">
+                          <p className="font-medium">문제:</p>
+                          <p>{question.prompt}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+            </div>
+          ) : (
+            <div className="flex justify-center items-center py-20">
+              <p className="text-gray-500">표시할 문제가 없습니다.</p>
+            </div>
+          )}
         </div>
       </main>
 
