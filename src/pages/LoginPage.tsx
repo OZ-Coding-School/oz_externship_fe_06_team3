@@ -6,6 +6,7 @@ import { CommonInputField } from '@/components/common/CommonInputField'
 import { PasswordField } from '@/components/common/PasswordField'
 import { Button } from '@/components/common/Button'
 import { useAuthStore } from '@/store/authStore'
+import SocialLoginSection from '@/components/auth/SocialLoginSection'
 
 type LoginFormData = {
   email: string
@@ -100,47 +101,11 @@ export default function LoginPage() {
           <div className="flex w-full flex-col items-center gap-9">
             <div className="flex w-full flex-col items-start gap-10">
               {/* 소셜 로그인 */}
-              <div className="flex w-full flex-col items-start gap-3">
-                <Button
-                  type="button"
-                  variant="kakao"
-                  onClick={() => console.log('카카오 로그인')}
-                  className="h-[52px] w-full gap-2.5 rounded px-2 py-2"
-                >
-                  <div className="inline-flex items-center gap-1">
-                    <div className="flex w-5 flex-col items-center justify-center gap-2.5 px-[3px] py-1">
-                      <img
-                        className="h-3 w-[13px]"
-                        alt="Kakao"
-                        src="/LoginPage_img/kakao_logo.svg"
-                      />
-                    </div>
-                    <p className="text-[16px] font-normal tracking-[-0.32px] whitespace-nowrap text-[#391C1A]">
-                      카카오 간편 로그인 / 가입
-                    </p>
-                  </div>
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="naver"
-                  onClick={() => console.log('네이버 로그인')}
-                  className="h-[52px] w-full gap-2.5 rounded px-2 py-2"
-                >
-                  <div className="inline-flex items-center gap-1">
-                    <div className="flex w-5 flex-col items-center justify-center gap-2.5 px-[3px] py-1">
-                      <img
-                        className="h-[13px] w-[13px]"
-                        alt="Naver"
-                        src="/LoginPage_img/naver_logo.svg"
-                      />
-                    </div>
-                    <p className="text-[16px] font-normal tracking-[-0.32px] whitespace-nowrap text-white">
-                      네이버 간편 로그인 / 가입
-                    </p>
-                  </div>
-                </Button>
-              </div>
+              <SocialLoginSection
+                onLogin={(provider) => {
+                  console.log(`${provider} 로그인`)
+                }}
+              />
 
               {/* 일반 로그인 */}
               <form onSubmit={onSubmit} className="w-full">
@@ -223,7 +188,9 @@ export default function LoginPage() {
                   <Button
                     type="submit"
                     disabled={!isFormFilled || isSubmitting}
-                    variant={!isFormFilled || isSubmitting ? 'disabled' : 'primary'}
+                    variant={
+                      !isFormFilled || isSubmitting ? 'disabled' : 'primary'
+                    }
                     className="h-[52px] w-full gap-2.5 rounded px-2 py-2"
                   >
                     <div className="whitespace-nowrap">
