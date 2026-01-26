@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
+
+import { Button } from '@/components/common/Button'
 
 export default function Header() {
   const [open, setOpen] = useState(false)
@@ -104,24 +106,33 @@ export default function Header() {
           <div className="flex items-center gap-2 font-[Pretendard] text-[16px] text-gray-500">
             {!isAuthenticated ? (
               <>
-                <Link
-                  to="/login"
-                  className="transition-colors duration-200 hover:text-gray-900"
+                <Button
+                  type="button"
+                  variant="link"
+                  size="auto"
+                  className="text-mono-600 hover:no-underline hover:text-mono-600 py-0 font-[Pretendard] text-[16px]"
+                  onClick={() => navigate('/login')}
                 >
                   로그인
-                </Link>
-                <span className="text-gray-300">|</span>
-                <a
-                  href="#"
-                  className="transition-colors duration-200 hover:text-gray-900"
+                </Button>
+                <span className="text-mono-400">|</span>
+                <Button
+                  type="button"
+                  variant="link"
+                  size="auto"
+                  className="text-mono-600 hover:no-underline hover:text-mono-600 py-0 font-[Pretendard] text-[16px]"
+                  onClick={() => navigate('/register')}
                 >
                   회원가입
-                </a>
+                </Button>
               </>
             ) : (
               <div className="relative" ref={dropdownRef}>
-                <button
+                <Button
                   type="button"
+                  variant="link"
+                  size="auto"
+                  className="p-0 min-w-0 hover:no-underline hover:opacity-80"
                   onClick={() => setOpen((prev) => !prev)}
                   aria-expanded={open}
                   aria-label="프로필 메뉴 열기"
@@ -131,7 +142,7 @@ export default function Header() {
                     alt="프로필"
                     className="h-[40px] w-[40px] rounded-full object-cover"
                   />
-                </button>
+                </Button>
 
                 {open && (
                   <div className="absolute top-17 right-0 z-50 w-[204px] rounded-[12px] bg-white px-[16px] py-[16px] shadow-[0_0_16px_0_#A0A0A040]">
@@ -144,31 +155,43 @@ export default function Header() {
                       </p>
                     </div>
 
-                    <div className="my-4 border-t border-[#ECECEC]" />
+                    <div className="my-4 border-t border-mono-200" />
 
-                    <a
-                      href="/register"
-                      className="hover:bg-primary-100 hover:text-primary block py-3 text-sm"
-                      onClick={() => setOpen(false)}
+                    <Button
+                      type="button"
+                      variant="link"
+                      size="auto"
+                      className="hover:no-underline hover:bg-primary-100 hover:text-primary block w-full justify-start py-3 text-left text-sm"
+                      onClick={() => {
+                        setOpen(false)
+                        navigate('/register')
+                      }}
                     >
                       수강생 등록
-                    </a>
+                    </Button>
 
-                    <a
-                      href="/mypage"
-                      className="hover:bg-primary-100 hover:text-primary block py-3 text-sm"
-                      onClick={() => setOpen(false)}
+                    <Button
+                      type="button"
+                      variant="link"
+                      size="auto"
+                      className="hover:no-underline hover:bg-primary-100 hover:text-primary block w-full justify-start py-3 text-left text-sm"
+                      onClick={() => {
+                        setOpen(false)
+                        navigate('/mypage')
+                      }}
                     >
                       마이페이지
-                    </a>
+                    </Button>
 
-                    <button
+                    <Button
                       type="button"
+                      variant="link"
+                      size="auto"
+                      className="hover:no-underline hover:bg-primary-100 hover:text-primary block w-full justify-start py-3 text-left text-sm"
                       onClick={handleLogout}
-                      className="hover:bg-primary-100 hover:text-primary block w-full py-3 text-left text-sm"
                     >
                       로그아웃
-                    </button>
+                    </Button>
                   </div>
                 )}
               </div>
