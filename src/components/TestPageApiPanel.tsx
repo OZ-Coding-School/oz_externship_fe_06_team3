@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import api from '@/api/api'
-import { CommonInput, Dropdown } from '@/components/common'
+import { Button, CommonInput, Dropdown } from '@/components/common'
 
 const getErrorPayload = (error: unknown) => {
   const maybeAxios = error as { response?: { data?: unknown }; message?: string }
@@ -19,6 +19,7 @@ const TestPageApiPanel = () => {
   const [status, setStatus] = useState('all')
   const [deploymentId, setDeploymentId] = useState('101')
   const [code, setCode] = useState('123456')
+  const [submissionId, setSubmissionId] = useState('350')
   const [apiResponse, setApiResponse] = useState('')
   const [apiError, setApiError] = useState('')
 
@@ -61,6 +62,37 @@ const TestPageApiPanel = () => {
     retry: false,
   })
 
+  const submissionMutation = useMutation({
+    mutationFn: async () => {
+      const payload = {
+        deployment_id: Number(deploymentId),
+        started_at: new Date().toISOString(),
+        cheating_count: 0,
+        answers: [
+          { question_id: 5001, type: 'single_choice', submitted_answer: 'option' },
+          { question_id: 5002, type: 'multiple_choice', submitted_answer: ['option1', 'option2'] },
+          { question_id: 5003, type: 'ox', submitted_answer: 'O' },
+          { question_id: 5004, type: 'short_answer', submitted_answer: 'answer' },
+          { question_id: 5005, type: 'ordering', submitted_answer: ['1', '2', '3'] },
+          { question_id: 5006, type: 'fill_blank', submitted_answer: ['A', 'B'] },
+        ],
+      }
+      const response = await api.post('/api/v1/exams/submissions', payload)
+      return response.data
+    },
+    retry: false,
+  })
+
+  const submissionResultQuery = useQuery({
+    queryKey: ['examSubmissionResult', submissionId],
+    queryFn: async () => {
+      const response = await api.get(`/api/v1/exams/submissions/${submissionId}`)
+      return response.data
+    },
+    enabled: false,
+    retry: false,
+  })
+
   const runQuery = async (fn: () => Promise<unknown>) => {
     setApiResponse('')
     setApiError('')
@@ -83,9 +115,16 @@ const TestPageApiPanel = () => {
   const handleDeployments = () => runQuery(() => runQueryFromRefetch(deploymentsQuery.refetch))
   const handleDetail = () => runQuery(() => runQueryFromRefetch(detailQuery.refetch))
   const handleCheckCode = () => runQuery(() => checkCodeMutation.mutateAsync())
+  const handleSubmission = () => runQuery(() => submissionMutation.mutateAsync())
+  const handleSubmissionResult = () =>
+    runQuery(() => runQueryFromRefetch(submissionResultQuery.refetch))
 
   const isLoading =
-    deploymentsQuery.isFetching || detailQuery.isFetching || checkCodeMutation.isPending
+    deploymentsQuery.isFetching ||
+    detailQuery.isFetching ||
+    checkCodeMutation.isPending ||
+    submissionMutation.isPending ||
+    submissionResultQuery.isFetching
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-6">
@@ -110,29 +149,31 @@ const TestPageApiPanel = () => {
           <label className="text-sm font-medium text-gray-700">code</label>
           <CommonInput value={code} onChange={setCode} placeholder="123456" width={240} />
         </div>
+        <div className="flex flex-col gap-3">
+          <label className="text-sm font-medium text-gray-700">submissionId</label>
+          <CommonInput value={submissionId} onChange={setSubmissionId} placeholder="350" width={240} />
+        </div>
       </div>
       <div className="mt-5 flex flex-wrap gap-3">
-        <button
-          type="button"
-          onClick={handleDeployments}
-          className="rounded-md bg-[#6201E0] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#5210be]"
-        >
+        <Button type="button" onClick={handleDeployments} className="w-fit">
           쪽지시험 목록
-        </button>
-        <button
-          type="button"
-          onClick={handleDetail}
-          className="rounded-md bg-[#111111] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#2a2a2a]"
-        >
+        </Button>
+        <Button type="button" onClick={handleDetail} className="w-fit bg-black text-white hover:bg-[#2a2a2a]">
           쪽지시험 문제
-        </button>
-        <button
-          type="button"
-          onClick={handleCheckCode}
-          className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
-        >
+        </Button>
+        <Button type="button" variant="secondary" onClick={handleCheckCode} className="w-fit">
           쪽지시험 입장 코드
-        </button>
+        </Button>
+        <Button
+          type="button"
+          onClick={handleSubmission}
+          className="w-fit bg-[#0f766e] text-white hover:bg-[#115e59]"
+        >
+          쪽지시험 제출
+        </Button>
+        <Button type="button" variant="secondary" onClick={handleSubmissionResult} className="w-fit">
+          결과 확인
+        </Button>
       </div>
       <div className="mt-5 grid gap-4 md:grid-cols-2">
         <div className="rounded-md bg-gray-50 p-4">
