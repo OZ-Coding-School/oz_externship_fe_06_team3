@@ -14,7 +14,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
  * rounded: default, full
  */
 export const buttonVariants = cva(
-  'inline-flex items-center justify-center border transition-colors px-[20px] text-base',
+  'inline-flex items-center justify-center border transition-colors px-[20px] text-base enabled:cursor-pointer disabled:cursor-not-allowed',
   {
     variants: {
       variant: {
@@ -28,6 +28,7 @@ export const buttonVariants = cva(
           'bg-[#fee500] text-[#391C1A] border-transparent hover:bg-[#fdd835] active:bg-[#fbc02d] transition-colors',
         naver:
           'bg-[#03c75a] text-white border-transparent hover:bg-[#02b350] active:bg-[#029f47] transition-colors',
+        link: 'bg-transparent border-transparent px-0 text-mono-600 text-sm hover:underline active:opacity-80 cursor-pointer',
       },
       size: {
         xxs: 'w-[78px] h-[42px]',
@@ -37,6 +38,7 @@ export const buttonVariants = cva(
         lg: 'w-[168px] h-[48px]',
         xl: 'w-[348px] h-[52px]',
         xxl: 'w-[480px] h-[52px]',
+        auto: 'w-auto h-auto',
       },
       rounded: {
         default: 'rounded-[4px]',
