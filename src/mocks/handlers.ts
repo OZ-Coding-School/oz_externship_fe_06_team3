@@ -1,4 +1,3 @@
-
 import { http, HttpResponse } from 'msw'
 import { checkCodeHandler } from './handlers/quiz/checkCode'
 import { examDeploymentDetailHandler } from './handlers/quiz/examDeploymentDetail'
@@ -6,6 +5,7 @@ import { examDeploymentStatusHandler } from './handlers/quiz/examDeploymentStatu
 import { examDeploymentsHandler } from './handlers/quiz/examDeployments'
 import { examSubmissionHandler } from './handlers/quiz/examSubmission'
 import { examSubmissionResultHandler } from './handlers/quiz/examSubmissionResult'
+import { loginHandler } from './auth.mock'
 
 export const helloHandler = http.get('/api/hello', () => {
   return HttpResponse.json({ message: 'Hello, world!', code: 200 })
@@ -19,4 +19,5 @@ export const handlers = [
   examDeploymentStatusHandler,
   examSubmissionHandler,
   examSubmissionResultHandler,
+  loginHandler,
 ]
