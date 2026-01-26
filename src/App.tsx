@@ -8,7 +8,6 @@ import LoginPage from '@/pages/LoginPage'
 import MyPage from '@/pages/MyPage'
 import MyPageQuiz from '@/components/MyPageQuiz'
 import QuizPage from '@/pages/QuizPage'
-import QuizWarningBox from '@/components/QuizWarningBox'
 import MainLayout from '@/components/layout/MainLayout'
 import { RequireAuth } from '@/components/auth/RequireAuth'
 
@@ -35,9 +34,8 @@ function App() {
 
         {/* 헤더가 필요 없는 페이지 (레이아웃 밖으로 배치) */}
         <Route element={<RequireAuth />}>
-          <Route path="/quiz" element={<QuizPage />}>
-            <Route path="warning" element={<QuizWarningBox />} />
-          </Route>
+          <Route path="/quiz" element={<QuizPage />} />
+          <Route path="/quiz/:deploymentId" element={<QuizPage />} />
         </Route>
       </Routes>
       <ReactQueryDevtools initialIsOpen={false} />

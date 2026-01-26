@@ -58,7 +58,7 @@ export function StartQuizModal({
   const courseImageFiles = [
     'check.svg',
     'css.svg',
-    'database.svg',
+    'DB.svg',
     'django.svg',
     'fastapi.svg',
     'flask.svg',
