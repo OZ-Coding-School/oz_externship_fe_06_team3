@@ -41,7 +41,7 @@ export default function LoginPage() {
   const email = watch('email')
   const password = watch('password')
 
-  const isFormFilled = email.trim().length > 0 && password.trim().length > 0
+  const isFormFilled = email.trim().length > 0 && password.trim().length > 5
 
   const onSubmit = handleSubmit(async (data) => {
     setFormError(null)
