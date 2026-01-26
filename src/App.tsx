@@ -1,13 +1,14 @@
-import { BrowserRouter, Routes, Route } from 'react-router'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+
 import '@/App.css'
 import LandingPage from '@/pages/LandingPage'
 import TestPage from '@/pages/TestPage'
 import LoginPage from '@/pages/LoginPage'
 import MyPage from '@/pages/MyPage'
 import MyPageQuiz from '@/components/MyPageQuiz'
-import QuizPage from './pages/QuizPage'
-import MainLayout from './components/layout/MainLayout'
+import QuizPage from '@/pages/QuizPage'
+import MainLayout from '@/components/layout/MainLayout'
 import { RequireAuth } from '@/components/auth/RequireAuth'
 
 function App() {
@@ -20,9 +21,9 @@ function App() {
           <Route path="/qna" element={<div>질의응답 페이지</div>} />
           <Route path="/test" element={<TestPage />} />
           <Route path="/login" element={<LoginPage />} />
+
           {/* 로그인이 필요한 페이지 */}
           <Route element={<RequireAuth />}>
-            {/* 마이페이지와 그 하위 페이지 */}
             <Route path="/mypage" element={<MyPage />}>
               <Route path="quiz" element={<MyPageQuiz />} />
               <Route path="profile" element={<div>내 정보</div>} />
@@ -40,5 +41,4 @@ function App() {
     </BrowserRouter>
   )
 }
-
 export default App

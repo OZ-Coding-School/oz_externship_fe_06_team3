@@ -1,10 +1,12 @@
 import type { LoginPayload, LoginResult } from '@/types/auth'
-import { mockLogin } from '@/mocks/auth.mock'
-
-// 백엔드 추가시 이 파일만 수정하면 됨
+import { apiClient } from '@/api/client'
 
 export async function login(payload: LoginPayload): Promise<LoginResult> {
-  return mockLogin(payload)
+  const { data } = await apiClient.post<LoginResult>(
+    '/api/v1/accounts/login/',
+    payload
+  )
+  return data
 }
 
 export async function logout(): Promise<void> {

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router'
-import { selectIsAuthenticated, useAuthStore } from '@/store/authStore'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuthStore } from '@/store/authStore'
 
 export default function Header() {
   const [open, setOpen] = useState(false)
@@ -8,21 +8,18 @@ export default function Header() {
 
   const navigate = useNavigate()
 
-  const isAuthenticated = useAuthStore(selectIsAuthenticated)
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
   const user = useAuthStore((s) => s.user)
   const logout = useAuthStore((s) => s.logout)
 
-  // 프로필 드롭다운 바깥 클릭하면 닫히기
+  // 드롭다운 바깥 클릭하면 닫히기
   useEffect(() => {
     if (!open) return
 
     const handleOutsideClick = (e: MouseEvent) => {
       const target = e.target as Node
       if (!dropdownRef.current) return
-
-      if (!dropdownRef.current.contains(target)) {
-        setOpen(false)
-      }
+      if (!dropdownRef.current.contains(target)) setOpen(false)
     }
 
     document.addEventListener('mousedown', handleOutsideClick)
@@ -49,7 +46,6 @@ export default function Header() {
         <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-5">
           {/* 왼쪽: 로고 + 메뉴 */}
           <div className="flex items-center gap-10">
-            {/* 로고 */}
             <a href="/" className="flex items-center">
               <svg
                 width="150"
@@ -88,7 +84,6 @@ export default function Header() {
               </svg>
             </a>
 
-            {/* 메뉴 */}
             <nav className="flex gap-10 font-[Pretendard] text-[18px] text-gray-700">
               <a
                 href="#"
@@ -125,7 +120,6 @@ export default function Header() {
               </>
             ) : (
               <div className="relative" ref={dropdownRef}>
-                {/* 프로필 이미지 버튼 */}
                 <button
                   type="button"
                   onClick={() => setOpen((prev) => !prev)}
@@ -138,10 +132,9 @@ export default function Header() {
                     className="h-[40px] w-[40px] rounded-full object-cover"
                   />
                 </button>
-                {/* 드롭다운 메뉴 */}
+
                 {open && (
-                  <div className="absolute top-17 right-0 z-50 h-[207px] w-[204px] rounded-[12px] bg-white px-[16px] py-[24px] shadow-[0_0_16px_0_#A0A0A040]">
-                    {/* 유저 정보 */}
+                  <div className="absolute top-17 right-0 z-50 w-[204px] rounded-[12px] bg-white px-[16px] py-[16px] shadow-[0_0_16px_0_#A0A0A040]">
                     <div className="h-[53px] w-[172px] items-start gap-[20px]">
                       <p className="font-[Pretendard] text-[16px] leading-[140%] font-semibold tracking-[-0.03em] text-gray-900">
                         {user?.name ?? '유저'}
@@ -151,12 +144,11 @@ export default function Header() {
                       </p>
                     </div>
 
-                    <div className="border-[1px] border-t border-[#ECECEC]" />
+                    <div className="my-4 border-t border-[#ECECEC]" />
 
-                    {/* 메뉴 */}
                     <a
                       href="/register"
-                      className="hover:bg-primary-100 hover:text-primary left-0 block py-3 font-[pretendard] text-sm"
+                      className="hover:bg-primary-100 hover:text-primary block py-3 text-sm"
                       onClick={() => setOpen(false)}
                     >
                       수강생 등록
@@ -164,7 +156,7 @@ export default function Header() {
 
                     <a
                       href="/mypage"
-                      className="hover:bg-primary-100 hover:text-primary left-0 block py-3 font-[pretendard] text-sm"
+                      className="hover:bg-primary-100 hover:text-primary block py-3 text-sm"
                       onClick={() => setOpen(false)}
                     >
                       마이페이지

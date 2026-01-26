@@ -1,34 +1,27 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
-import { useLocation, useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import { CommonInputField } from '@/components/common/CommonInputField'
 import { PasswordField } from '@/components/common/PasswordField'
 import { useAuthStore } from '@/store/authStore'
-
-// 가짜 아이디: test@example.com
-// 가짜 비밀번호: Test123!
 
 type LoginFormData = {
   email: string
   password: string
 }
 
-type LocationState = {
-  from?: string
-}
+type LocationState = { from?: string }
 
-const DEFAULT_PASSWORD_HELPER =
-  '* 6~15자의 영문 대/소문자, 숫자 및 특수문자 조합'
-
-const LoginPage = () => {
+export default function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const authLogin = useAuthStore((s) => s.login)
 
   const from = (location.state as LocationState | null)?.from ?? '/'
 
-  const [loginResult, setLoginResult] = useState<'idle' | 'error'>('idle')
+  const [formError, setFormError] = useState<string | null>(null)
+  const [loginFailed, setLoginFailed] = useState(false)
 
   const methods = useForm<LoginFormData>({
     defaultValues: { email: '', password: '' },
@@ -39,50 +32,41 @@ const LoginPage = () => {
 
   const {
     handleSubmit,
-    clearErrors,
-    setError,
-    formState: { errors, isSubmitting, isValid },
+    formState: { errors, isSubmitting },
+    watch,
   } = methods
 
-  const emailRegex = useMemo(() => /^[^\s@]+@[^\s@]+\.[^\s@]+$/, [])
+  const email = watch('email')
+  const password = watch('password')
 
-  const resetServerFeedbackIfNeeded = () => {
-    if (loginResult !== 'idle') setLoginResult('idle')
-    if (errors.root?.message) clearErrors('root')
-  }
-
-  const handleKakaoLogin = (): void => {
-    console.log('카카오 로그인')
-  }
-
-  const handleNaverLogin = (): void => {
-    console.log('네이버 로그인')
-  }
+  const isFormFilled = email.trim().length > 0 && password.trim().length > 0
 
   const onSubmit = handleSubmit(async (data) => {
-    clearErrors('root')
+    setFormError(null)
+    setLoginFailed(false)
 
     try {
       await authLogin(data)
       navigate(from, { replace: true })
     } catch {
-      setLoginResult('error')
-
-      setError('root', {
-        type: 'server',
-        message: '아이디 또는 비밀번호가 올바르지 않습니다.',
-      })
+      setLoginFailed(true)
+      setFormError('아이디 또는 비밀번호가 올바르지 않습니다.')
     }
   })
 
-  const emailFieldState = loginResult === 'error' ? 'error' : 'default'
-  const passwordFieldState = loginResult === 'error' ? 'error' : 'default'
+  const emailState = loginFailed ? 'error' : errors.email ? 'error' : 'default'
+
+  const passwordState = loginFailed
+    ? 'error'
+    : errors.password
+      ? 'error'
+      : 'default'
 
   return (
     <FormProvider {...methods}>
       <div className="flex h-[calc(100vh-96px)] items-center justify-center bg-white px-4 py-12">
         <div className="relative mb-50 flex w-[348px] flex-col items-center gap-16">
-          {/* 로고, 회원가입 영역 */}
+          {/* 로고/회원가입 */}
           <div className="flex w-full flex-col items-center gap-[27px]">
             <div className="flex w-[191px] flex-col items-center gap-4">
               <img
@@ -111,14 +95,14 @@ const LoginPage = () => {
             </div>
           </div>
 
-          {/* 소셜 로그인, 일반 로그인 영역 */}
+          {/* 로그인 폼 */}
           <div className="flex w-full flex-col items-center gap-9">
             <div className="flex w-full flex-col items-start gap-10">
               {/* 소셜 로그인 */}
               <div className="flex w-full flex-col items-start gap-3">
                 <button
                   type="button"
-                  onClick={handleKakaoLogin}
+                  onClick={() => console.log('카카오 로그인')}
                   className="flex h-[52px] w-full items-center justify-center gap-2.5 rounded bg-[#fee500] px-2 py-2"
                 >
                   <div className="inline-flex items-center gap-1">
@@ -137,7 +121,7 @@ const LoginPage = () => {
 
                 <button
                   type="button"
-                  onClick={handleNaverLogin}
+                  onClick={() => console.log('네이버 로그인')}
                   className="flex h-[52px] w-full items-center justify-center gap-2.5 rounded bg-[#03c75a] px-2 py-2"
                 >
                   <div className="inline-flex items-center gap-1">
@@ -168,43 +152,44 @@ const LoginPage = () => {
                     rules={{
                       required: '이메일을 입력해주세요.',
                       pattern: {
-                        value: emailRegex,
+                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                         message: '올바른 이메일 형식을 입력해주세요.',
                       },
-                      onChange: resetServerFeedbackIfNeeded,
                     }}
+                    state={emailState}
                     helperVisibility="focus"
-                    state={emailFieldState}
+                    helperTextByState={{
+                      default: null,
+                      // error는 래퍼가 RHF error.message로 덮어씀
+                    }}
                   />
 
                   {/* 비밀번호 */}
-                  <PasswordField<LoginFormData>
-                    name="password"
-                    placeholder="비밀번호를 입력해주세요."
-                    width="100%"
-                    placeholderVariant="a"
-                    rules={{
-                      required: '비밀번호를 입력해주세요.',
-                      minLength: {
-                        value: 6,
-                        message: '비밀번호는 최소 6자 이상 입력해주세요.',
-                      },
-                      onChange: resetServerFeedbackIfNeeded,
-                    }}
-                    helperTextByState={{ default: DEFAULT_PASSWORD_HELPER }}
-                    helperVisibility="focus"
-                    showDefaultHelper
-                    state={passwordFieldState}
-                  />
+                  <div className="flex w-full flex-col gap-1.5">
+                    <PasswordField<LoginFormData>
+                      name="password"
+                      placeholder="비밀번호를 입력해주세요."
+                      width="100%"
+                      placeholderVariant="a"
+                      rules={{ required: '비밀번호를 입력해주세요.' }}
+                      state={passwordState}
+                      helperVisibility="focus"
+                      showDefaultHelper={false}
+                      helperTextByState={{
+                        default:
+                          '* 6~15자의 영문 대/소문자, 숫자 및 특수문자 조합',
+                      }}
+                    />
 
-                  {/* 로그인 실패 메세지 */}
-                  {errors.root?.message && (
-                    <p className="px-1 text-xs font-medium text-red-500">
-                      {errors.root.message}
-                    </p>
-                  )}
+                    {/* ✅ 폼 레벨 에러(로그인 실패) — 딱 1번만 표시 (비밀번호 바로 아래) */}
+                    {formError && (
+                      <p className="px-1 text-xs font-medium text-red-500">
+                        {formError}
+                      </p>
+                    )}
+                  </div>
 
-                  {/* 아이디/비번 찾기 */}
+                  {/* 링크 */}
                   <div className="inline-flex items-center">
                     <button
                       type="button"
@@ -233,19 +218,19 @@ const LoginPage = () => {
                     </button>
                   </div>
 
-                  {/* 로그인 버튼 */}
+                  {/* 제출 */}
                   <button
                     type="submit"
-                    disabled={!isValid || isSubmitting}
+                    disabled={!isFormFilled || isSubmitting}
                     className={`flex h-[52px] w-full items-center justify-center gap-2.5 rounded px-2 py-2 ${
-                      isValid && !isSubmitting
+                      isFormFilled && !isSubmitting
                         ? 'bg-primary hover:bg-primary-hover'
                         : 'bg-mono-200 cursor-not-allowed'
                     }`}
                   >
                     <div
                       className={`whitespace-nowrap ${
-                        isValid && !isSubmitting
+                        isFormFilled && !isSubmitting
                           ? 'text-white'
                           : 'text-mono-400'
                       }`}
@@ -262,5 +247,3 @@ const LoginPage = () => {
     </FormProvider>
   )
 }
-
-export default LoginPage

@@ -1,3 +1,4 @@
+import { http, HttpResponse, delay } from 'msw'
 import type { LoginPayload, LoginResult, User } from '@/types/auth'
 
 const FAKE_USER: User = {
@@ -8,17 +9,28 @@ const FAKE_USER: User = {
 
 const FAKE_PASSWORD = 'Test123!'
 
-export async function mockLogin(payload: LoginPayload): Promise<LoginResult> {
-  const ok =
-    payload.email.trim().toLowerCase() === FAKE_USER.email &&
-    payload.password === FAKE_PASSWORD
+// ✅ MSW 핸들러: 실제 네트워크 요청을 가로채서 응답
+export const loginHandler = http.post(
+  /\/api\/v1\/accounts\/login\/?$/,
+  async ({ request }) => {
+    await delay(300)
 
-  if (!ok) {
-    throw new Error('INVALID_CREDENTIALS')
-  }
+    const body = (await request.json()) as LoginPayload
+    const emailOk = body.email.trim().toLowerCase() === FAKE_USER.email
+    const pwOk = body.password === FAKE_PASSWORD
 
-  return {
-    accessToken: 'fake-access-token',
-    user: FAKE_USER,
+    if (!emailOk || !pwOk) {
+      return HttpResponse.json(
+        { message: 'INVALID_CREDENTIALS' },
+        { status: 400 }
+      )
+    }
+
+    const result: LoginResult = {
+      accessToken: 'fake-access-token',
+      user: FAKE_USER,
+    }
+
+    return HttpResponse.json(result, { status: 200 })
   }
-}
+)
