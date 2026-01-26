@@ -24,11 +24,10 @@ export function FindPasswordModal({
   const [showToast, setShowToast] = useState(false)
   const [isCodeSent, setIsCodeSent] = useState(false)
   const [verificationError, setVerificationError] = useState<string>('')
-  const [sentCode, setSentCode] = useState<string>('') // 전송된 인증코드 저장
+  const [sentCode, setSentCode] = useState<string>('')
   const toastTimerRef = useRef<NodeJS.Timeout | null>(null)
   const { isExpired, isActive, startTimer, formatTime } = useModalTimer(5)
 
-  // 모달이 닫힐 때 타이머 정리
   useEffect(() => {
     return () => {
       if (toastTimerRef.current) {
@@ -36,13 +35,6 @@ export function FindPasswordModal({
       }
     }
   }, [])
-
-  useEffect(() => {
-    if (!isOpen && toastTimerRef.current) {
-      clearTimeout(toastTimerRef.current)
-      toastTimerRef.current = null
-    }
-  }, [isOpen])
 
   const methods = useForm<FindPasswordFormData>({
     resolver: zodResolver(findPasswordSchema),
@@ -52,24 +44,33 @@ export function FindPasswordModal({
     },
   })
 
-  const handleSendCode = () => {
+  useEffect(() => {
+    if (!isOpen) {
+      setIsVerified(false)
+      setVerificationMessage('')
+      setShowToast(false)
+      setIsCodeSent(false)
+      setVerificationError('')
+      methods.reset()
+      if (toastTimerRef.current) {
+        clearTimeout(toastTimerRef.current)
+        toastTimerRef.current = null
+      }
+    }
+  }, [isOpen, methods])
+
+  const handleSendCode = async () => {
+    const isValid = await methods.trigger('email')
+    if (!isValid) return
+
     const email = methods.getValues('email')
 
-    if (!email) {
-      methods.setError('email', { message: '이메일을 입력해주세요.' })
-      return
-    }
+    // 인증번호 생성 , 여기서는 성공으로 가정, 실제로는 API 호출,목데이터는 123456 반환
+    const mockCode = '123456'
+    setSentCode(mockCode)
 
-    // 인증번호 생성 (개발 환경용 Mock)
-    const mockCode = '123456' // 실제로는 API에서 받아옴
-    setSentCode(mockCode) // 전송된 인증코드 저장
-
-    // 개발 환경에서 콘솔에 인증번호 출력
-    console.log('📱 인증번호 전송:', {
-      이메일: email,
-      인증번호: mockCode,
-      메시지: '개발 환경: 인증번호를 콘솔에서 확인하세요.',
-    })
+    // 개발 환경에서 콘솔에 인증번호 출력,목데이터는 123456 반환
+    console.log('📱 인증번호 전송:', { 이메일: email, 인증번호: mockCode })
 
     // 인증번호 전송 로직
     startTimer()
@@ -94,20 +95,21 @@ export function FindPasswordModal({
       return
     }
 
-    const verificationCode = methods.getValues('verificationCode')
-    if (!verificationCode) {
-      methods.setError('verificationCode', { message: '인증번호를 입력해주세요.' })
+    const isValid = await methods.trigger('verificationCode')
+    if (!isValid) {
       setVerificationMessage('')
       setVerificationError('')
       return
     }
 
-    // 인증번호 확인 로직 (목데이터 - 실제로는 API 호출)
-    // TODO: API 연동 시 아래 코드를 실제 API 호출로 변경
-    const isValid = verificationCode === sentCode
+    const verificationCode = methods.getValues('verificationCode')
 
-    if (!isValid) {
-      // 인증코드가 일치하지 않는 경우
+    // 인증번호 확인 로직 , 여기서는 성공으로 가정, 실제로는 API 호출,목데이터는 123456 반환 
+    // 실패 시 인증코드가 일치하지 않습니다. 반환
+    // 성공 시 인증번호가 확인되었습니다. 반환
+    const codeIsValid = verificationCode === sentCode
+
+    if (!codeIsValid) {
       setVerificationError('*인증코드가 일치하지 않습니다.')
       setVerificationMessage('')
       setIsVerified(false)
@@ -117,14 +119,13 @@ export function FindPasswordModal({
       return
     }
 
-    // 인증코드가 일치하는 경우
     setIsVerified(true)
     setVerificationMessage('인증번호가 확인되었습니다.')
     setVerificationError('')
     methods.clearErrors('verificationCode')
   }
 
-  const handleFindPassword = async () => {
+  const onSubmit = async (data: FindPasswordFormData) => {
     if (!isVerified) {
       methods.setError('verificationCode', {
         message: '인증번호를 먼저 확인해주세요.',
@@ -132,10 +133,7 @@ export function FindPasswordModal({
       return
     }
 
-    // 인증번호 확인 메시지 제거
     setVerificationMessage('')
-
-    const data = methods.getValues()
     onSuccess?.(data)
     onClose()
   }
@@ -147,8 +145,7 @@ export function FindPasswordModal({
       toastPosition="top-far"
       toast={
         showToast ? (
-          <div className="bg-white border border-gray-200 text-black px-5 py-4 gap-3 rounded-lg shadow-lg flex-center min-w-[270px] min-h-[60px]">
-            {/* 초록색 원형 체크마크 아이콘 */}
+            <div className="bg-white border border-gray-200 text-black px-5 py-4 gap-3 rounded-lg shadow-lg flex-center min-w-[270px] min-h-[60px]">
             <div className="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
               <svg
                 width="14"
@@ -191,7 +188,7 @@ export function FindPasswordModal({
 
       <Modal.Body>
         <FormProvider {...methods}>
-          <form className="space-y-4">
+          <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-4">
             <Modal.InputRow label="이메일" required>
               <div className="flex flex-col gap-2">
                 {/* 첫 번째 줄: 이메일 입력창 + 인증코드전송 버튼 */}
@@ -280,11 +277,10 @@ export function FindPasswordModal({
 
             <div className="pt-4">
               <Button
-                type="button"
+                type="submit"
                 variant="primary"
                 size="xl"
                 className="w-full max-w-[370px]"
-                onClick={handleFindPassword}
                 disabled={!isVerified}
               >
                 비밀번호 찾기

@@ -25,15 +25,17 @@ export function ResetPasswordModal({
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   const navigate = useNavigate()
 
+  // 비밀번호 재설정 스키마 검증
   const methods = useForm<ResetPasswordFormData>({
     resolver: zodResolver(resetPasswordSchema),
-    mode: 'onChange', // 입력할 때마다 실시간 validation
+    mode: 'onChange',
     defaultValues: {
       newPassword: '',
       confirmPassword: '',
     },
   })
 
+  // 타이머 cleanup
   useEffect(() => {
     return () => {
       if (timerRef.current) {
@@ -42,29 +44,29 @@ export function ResetPasswordModal({
     }
   }, [])
 
-  // 모달이 닫힐 때 토스트도 함께 닫기
+  // 모달 닫힐 때 상태 초기화
   useEffect(() => {
     if (!isOpen) {
       setShowToast(false)
+      methods.reset()
       if (timerRef.current) {
         clearTimeout(timerRef.current)
         timerRef.current = null
       }
     }
-  }, [isOpen])
+  }, [isOpen, methods])
 
+  // 비밀번호 재설정 제출 핸들러
   const onSubmit = async (data: ResetPasswordFormData) => {
-    // 비밀번호 재설정 로직
+    setShowToast(true)
+    // 스키마 검증을 통과한 데이터만 여기 도달 (비밀번호 일치 검증 포함)
     console.log('비밀번호 일치 확인 완료, 토스트 표시')
     
-    // 상태 업데이트를 먼저 하고, 콜백은 useEffect에서 처리
-    setShowToast(true)
-
     // onSuccess 콜백은 다음 렌더링 사이클에서 실행되도록 setTimeout 사용
     setTimeout(() => {
       onSuccess?.(data)
     }, 0)
-
+    
     // 10초 후 토스트 숨기고 로그인 페이지로 이동
     timerRef.current = setTimeout(() => {
       setShowToast(false)
@@ -72,30 +74,6 @@ export function ResetPasswordModal({
       navigate('/')
       timerRef.current = null
     }, 10000)
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    // 모든 필드 validation 확인
-    const isValid = await methods.trigger()
-    
-    if (!isValid) {
-      // validation 오류가 있으면 오류 메시지가 자동으로 표시됨
-      return
-    }
-
-    // 비밀번호 일치 확인 (스키마에서도 체크하지만 명시적으로 한번 더)
-    const data = methods.getValues()
-    if (data.newPassword !== data.confirmPassword) {
-      methods.setError('confirmPassword', {
-        message: '비밀번호가 일치하지 않습니다.',
-      })
-      return
-    }
-
-    // 모든 validation을 통과한 경우에만 onSubmit 호출
-    await onSubmit(data)
   }
 
   return (
@@ -114,7 +92,6 @@ export function ResetPasswordModal({
                 minHeight: '128px'
               }}
             >
-              {/* 초록색 원형 체크마크 아이콘 */}
               <div className="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
                 <svg
                   width="14"
@@ -164,7 +141,7 @@ export function ResetPasswordModal({
 
       <Modal.Body>
         <FormProvider {...methods}>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-4">
 
             <Modal.InputRow
               label={
@@ -185,7 +162,6 @@ export function ResetPasswordModal({
                   helperVisibility="always"
                   width={348}
                 />
-                {/* 새 비밀번호 에러 메시지 */}
                 {methods.formState.errors.newPassword && (
                   <p
                     className="text-[12px] font-normal text-left"
@@ -211,7 +187,6 @@ export function ResetPasswordModal({
                   helperVisibility="always"
                   width={348}
                 />
-                {/* 비밀번호 확인 에러 메시지 */}
                 {methods.formState.errors.confirmPassword && (
                   <p
                     className="text-[12px] font-normal text-left"
