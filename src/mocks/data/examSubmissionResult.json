@@ -1,0 +1,31 @@
+{
+  "id": 350,
+  "submitter_id": 5,
+  "deployment_id": 101,
+  "exam": {
+    "id": 1,
+    "title": "중간고사",
+    "thumbnail_img_url": "https://img.com"
+  },
+  "questions": [
+    {
+      "id": 3,
+      "question": "배고픈 사람은?",
+      "prompt": "string",
+      "blank_count": 0,
+      "options": ["string"],
+      "type": "single_choice",
+      "answer": ["나"],
+      "point": 10,
+      "explanation": "아임 스틸 헝그리",
+      "is_correct": true,
+      "submitted_answer": ["나"]
+    }
+  ],
+  "cheating_count": 0,
+  "total_score": 10,
+  "correct_answer_count": 1,
+  "elapsed_time": 15,
+  "started_at": "2025-12-31T14:18:40.762Z",
+  "submitted_at": "2025-12-31T14:33:40.762Z"
+}
