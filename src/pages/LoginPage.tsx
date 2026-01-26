@@ -1,17 +1,21 @@
-import { useState } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
+import { useEffect, useState } from 'react'
+import { FormProvider, useForm, useWatch } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 import { CommonInputField } from '@/components/common/CommonInputField'
 import { PasswordField } from '@/components/common/PasswordField'
 import { Button } from '@/components/common/Button'
 import { useAuthStore } from '@/store/authStore'
-import SocialLoginSection from '@/components/auth/SocialLoginSection'
 
-type LoginFormData = {
-  email: string
-  password: string
-}
+import SocialLoginSection from '@/components/auth/SocialLoginSection'
+import type { SocialProviderId } from '@/types/social'
+
+import {
+  loginSchema,
+  type LoginFormData,
+  PASSWORD_HELPER,
+} from '@/schemas/auth'
 
 type LocationState = { from?: string }
 
@@ -26,22 +30,20 @@ export default function LoginPage() {
   const [loginFailed, setLoginFailed] = useState(false)
 
   const methods = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
     defaultValues: { email: '', password: '' },
-    mode: 'onChange',
+    mode: 'onSubmit',
     reValidateMode: 'onChange',
-    shouldFocusError: true,
   })
 
   const {
     handleSubmit,
-    formState: { errors, isSubmitting },
-    watch,
+    control,
+    formState: { errors, isSubmitting, isValid },
   } = methods
 
-  const email = watch('email')
-  const password = watch('password')
-
-  const isFormFilled = email.trim().length > 0 && password.trim().length > 5
+  const email = useWatch({ control, name: 'email' }) ?? ''
+  const password = useWatch({ control, name: 'password' }) ?? ''
 
   const onSubmit = handleSubmit(async (data) => {
     setFormError(null)
@@ -56,19 +58,24 @@ export default function LoginPage() {
     }
   })
 
-  const emailState = loginFailed ? 'error' : errors.email ? 'error' : 'default'
+  const handleSocialLogin = (provider: SocialProviderId) => {
+    console.log(`${provider} 로그인`)
+  }
 
-  const passwordState = loginFailed
-    ? 'error'
-    : errors.password
-      ? 'error'
-      : 'default'
+  useEffect(() => {
+    if (!loginFailed && !formError) return
+    setLoginFailed(false)
+    setFormError(null)
+  }, [email, password, loginFailed, formError])
+
+  const emailState = loginFailed || errors.email ? 'error' : 'default'
+  const passwordState = loginFailed || errors.password ? 'error' : 'default'
 
   return (
     <FormProvider {...methods}>
       <div className="flex h-[calc(100vh-96px)] items-center justify-center bg-white px-4 py-12">
         <div className="relative mb-50 flex w-[348px] flex-col items-center gap-16">
-          {/* 로고/회원가입 */}
+          {/* 로고, 회원가입 */}
           <div className="flex w-full flex-col items-center gap-[27px]">
             <div className="flex w-[191px] flex-col items-center gap-4">
               <img
@@ -101,11 +108,7 @@ export default function LoginPage() {
           <div className="flex w-full flex-col items-center gap-9">
             <div className="flex w-full flex-col items-start gap-10">
               {/* 소셜 로그인 */}
-              <SocialLoginSection
-                onLogin={(provider) => {
-                  console.log(`${provider} 로그인`)
-                }}
-              />
+              <SocialLoginSection onLogin={handleSocialLogin} />
 
               {/* 일반 로그인 */}
               <form onSubmit={onSubmit} className="w-full">
@@ -117,18 +120,9 @@ export default function LoginPage() {
                     placeholder="아이디 (example@gmail.com)"
                     width="100%"
                     placeholderVariant="a"
-                    rules={{
-                      required: '이메일을 입력해주세요.',
-                      pattern: {
-                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                        message: '올바른 이메일 형식을 입력해주세요.',
-                      },
-                    }}
                     state={emailState}
                     helperVisibility="focus"
-                    helperTextByState={{
-                      default: null,
-                    }}
+                    helperTextByState={{ default: null }}
                   />
 
                   {/* 비밀번호 */}
@@ -138,14 +132,10 @@ export default function LoginPage() {
                       placeholder="비밀번호를 입력해주세요."
                       width="100%"
                       placeholderVariant="a"
-                      rules={{ required: '비밀번호를 입력해주세요.' }}
                       state={passwordState}
                       helperVisibility="focus"
                       showDefaultHelper={false}
-                      helperTextByState={{
-                        default:
-                          '* 6~15자의 영문 대/소문자, 숫자 및 특수문자 조합',
-                      }}
+                      helperTextByState={{ default: PASSWORD_HELPER }}
                     />
 
                     {formError && (
@@ -183,10 +173,8 @@ export default function LoginPage() {
                   {/* 제출 */}
                   <Button
                     type="submit"
-                    disabled={!isFormFilled || isSubmitting}
-                    variant={
-                      !isFormFilled || isSubmitting ? 'disabled' : 'primary'
-                    }
+                    disabled={!isValid || isSubmitting}
+                    variant={!isValid || isSubmitting ? 'disabled' : 'primary'}
                     className="h-[52px] w-full gap-2.5 rounded px-2 py-2"
                   >
                     <div className="whitespace-nowrap">
