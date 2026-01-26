@@ -16,6 +16,7 @@ interface WithdrawalReasonModalProps {
   onSuccess?: (data: WithdrawalReasonFormData) => void
 }
 
+// 탈퇴 사유 목록 목데이터
 const withdrawalReasons = [
   { label: '서비스 이용 불편', value: 'inconvenience' },
   { label: '콘텐츠 부족', value: 'lack_of_content' },
@@ -32,7 +33,6 @@ export function WithdrawalReasonModal({
   const [showToast, setShowToast] = useState(false)
   const toastTimerRef = useRef<NodeJS.Timeout | null>(null)
 
-  // 모달이 닫힐 때 타이머 정리
   useEffect(() => {
     return () => {
       if (toastTimerRef.current) {
@@ -41,6 +41,7 @@ export function WithdrawalReasonModal({
     }
   }, [])
 
+  // 탈퇴 사유 모달 닫힐 때 타이머 정리
   useEffect(() => {
     if (!isOpen && toastTimerRef.current) {
       clearTimeout(toastTimerRef.current)
@@ -48,6 +49,7 @@ export function WithdrawalReasonModal({
     }
   }, [isOpen])
 
+  // 탈퇴 사유 모달 스키마 검증 메서드
   const methods = useForm<WithdrawalReasonFormData>({
     resolver: zodResolver(withdrawalReasonSchema),
     defaultValues: {

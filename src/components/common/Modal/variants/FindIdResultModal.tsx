@@ -19,20 +19,18 @@ export function FindIdResultModal({
     onClose()
     onFindPasswordClick?.()
   }
-  // 이메일 마스킹 처리: 뒤에 4글자는 보여지고 그 바로 앞에 4글자를 ****로 처리
+  // 이메일 마스킹 처리
   const maskEmail = (email: string) => {
     if (email.length <= 4) return email
 
-    // 뒤에 4글자는 보여지고 그 바로 앞에 4글자를 ****로 처리
-    const last4 = email.slice(-4) // 뒤 4글자
-    const beforeLast4 = email.slice(0, -4) // 나머지 부분
-
+    // .com 제외 4글자를 ****로 처리
+    const last4 = email.slice(-4)
+    const beforeLast4 = email.slice(0, -4) 
+    // 앞 부분이 4글자 이하면 모두 ****로 처리
     if (beforeLast4.length <= 4) {
-      // 앞 부분이 4글자 이하면 모두 ****로 처리
       return `${'*'.repeat(beforeLast4.length)}${last4}`
     }
-
-    // 앞 부분에서 뒤 4글자를 제외한 나머지 + **** + 뒤 4글자
+    // .com 제외 4글자를 ****로 처리
     const frontPart = beforeLast4.slice(0, -4)
     return `${frontPart}****${last4}`
   }
@@ -55,7 +53,6 @@ export function FindIdResultModal({
 
       <Modal.Body>
         <div className="flex flex-col items-center gap-6">
-          {/* 이메일 박스 */}
           <div
             className={cn(
               'w-full min-w-[348px] max-w-[348px] rounded-[4px] border',
@@ -81,7 +78,6 @@ export function FindIdResultModal({
             </p>
           </div>
 
-          {/* 버튼들 - 한 줄에 나란히 */}
           <div className="flex gap-3 w-full max-w-[348px]">
             <Link to="/" className="flex-1">
               <button
