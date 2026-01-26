@@ -1,4 +1,3 @@
-// src/schemas/auth.ts
 import { z } from 'zod'
 
 const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{6,15}$/
