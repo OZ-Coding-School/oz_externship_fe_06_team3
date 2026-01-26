@@ -16,13 +16,13 @@ interface RegisterStudentModalProps {
   onSuccess?: (data: RegisterStudentFormData) => void
 }
 
-// Mock 데이터 - 나중에 API에서 가져올 데이터 구조
+// Mock 데이터 , 나중에 API에서 가져올 데이터 구조
 type CourseData = {
   id: string
   name: string
-  batches: number[] // 기수 목록
+  batches: number[] 
 }
-
+// 과정 목록
 const mockCourses: CourseData[] = [
   {
     id: 'frontend-bootcamp',
@@ -51,13 +51,11 @@ const mockCourses: CourseData[] = [
   },
 ]
 
-// 드롭다운용 옵션 변환
 const courseOptions = mockCourses.map((course) => ({
   label: course.name,
   value: course.id,
 }))
 
-// RegisterStudentModal 전용 드롭다운 컴포넌트 (모달 외부에 표시)
 type ModalDropdownOption = {
   label: string
   value: string
@@ -101,7 +99,6 @@ function ModalDropdown({
   if (!disabled && (selectedOption || isOpen)) {
     iconSrc = '/icons/arrow_down_black.svg'
   }
-
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
       const target = event.target as Node
@@ -131,8 +128,6 @@ function ModalDropdown({
     setIsOpen(false)
   }
 
-  // 항목 개수에 따라 동적으로 높이 계산
-  // 각 항목: 48px, gap: 5px, py: 10px (위아래 각 5px)
   const itemCount = options.length
   const maxVisibleItems = 4
   const visibleItems = Math.min(itemCount, maxVisibleItems)
