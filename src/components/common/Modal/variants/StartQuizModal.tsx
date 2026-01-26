@@ -6,6 +6,7 @@ import { Button } from '../../Button'
 import { CommonInputField } from '../../CommonInputField'
 import { startQuizSchema, type StartQuizFormData } from '@/schemas/modalSchemas'
 
+// 시험 시작 모달 props 타입
 interface StartQuizModalProps {
   isOpen: boolean
   onClose: () => void
@@ -25,6 +26,7 @@ const mockQuizData = {
   verificationCode: 'Base62',        // 참가 코드 (Base62 인코딩된 값, 나중에 API로 받아올 예정)
 }
 
+// 시험 시작 모달 컴포넌트
 export function StartQuizModal({
   isOpen,
   onClose,

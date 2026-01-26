@@ -18,7 +18,7 @@ export function CheatingWarningModal({
 }: CheatingWarningModalProps) {
   const isThirdWarning = warningLevel === 3
 
-  // 제목 텍스트 생성 (회수 부분만 색상 적용)
+  // 제목 텍스트 생성,횟수 부분만 색상 적용,목데이터는 1회, 2회, 3회 반환
   const renderTitle = () => {
     const countText = `${warningLevel}회`
     const countColor = isThirdWarning ? '#EC0037' : '#FFAE00'

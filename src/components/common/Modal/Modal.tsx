@@ -6,9 +6,9 @@ import cn from '@/lib/cn'
 interface ModalContextValue {
   onClose?: () => void
 }
-
+//
 const ModalContext = createContext<ModalContextValue>({})
-
+//
 export const useModalContext = () => useContext(ModalContext)
 
 // 모달 스택 관리
@@ -39,10 +39,7 @@ interface ModalProps {
   useBackdropV2?: boolean
 }
 
-/**
- * Modal Root Component
- * Compound Component Pattern의 기본 컨테이너
- */
+// 모달 컴포넌트 props 타입
 export function Modal({
   isOpen,
   onClose,
