@@ -29,11 +29,12 @@ export function RestoreAccountModal({
   const [showSuccessToast, setShowSuccessToast] = useState(false)
   const [isCodeSent, setIsCodeSent] = useState(false)
   const [verificationError, setVerificationError] = useState<string>('')
-  const [sentCode, setSentCode] = useState<string>('') // 전송된 인증코드 저장
+  const [sentCode, setSentCode] = useState<string>('')
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   const navigate = useNavigate()
   const { isExpired, isActive, startTimer, formatTime } = useModalTimer(5)
 
+  // 계정 복구 스키마 검증
   const methods = useForm<RestoreAccountFormData>({
     resolver: zodResolver(restoreAccountSchema),
     defaultValues: {
@@ -45,41 +46,41 @@ export function RestoreAccountModal({
   useEffect(() => {
     return () => {
       if (timerRef.current) {
-        clearTimeout(timerRef.current)
+        clearTimeout(timerRef.current) //
       }
     }
   }, [])
 
-  // 모달이 닫힐 때 토스트도 함께 닫기
+// 모달 닫힐 때 상태 초기화
   useEffect(() => {
     if (!isOpen) {
+      setIsVerified(false)
+      setVerificationMessage('')
       setShowToast(false)
       setShowSuccessToast(false)
+      setIsCodeSent(false)
+      setVerificationError('')
+      methods.reset()
       if (timerRef.current) {
         clearTimeout(timerRef.current)
         timerRef.current = null
       }
     }
-  }, [isOpen])
+  }, [isOpen, methods])
 
-  const handleSendCode = () => {
+  // 인증번호 전송 핸들러
+  const handleSendCode = async () => {
+    const isValid = await methods.trigger('email')
+    if (!isValid) return
+
     const email = methods.getValues('email')
 
-    if (!email) {
-      methods.setError('email', { message: '이메일을 입력해주세요.' })
-      return
-    }
-
-    // 인증번호 생성 (개발 환경용 Mock)
-    const mockCode = '123456' // 실제로는 API에서 받아옴
-    setSentCode(mockCode) // 전송된 인증코드 저장
+    // 인증번호 생성 , 여기서는 성공으로 가정, 실제로는 API 호출,목데이터는 123456 반환
+    const mockCode = '123456'
+    setSentCode(mockCode)
 
     // 개발 환경에서 콘솔에 인증번호 출력
-    console.log('📱 인증번호 전송:', {
-      이메일: email,
-      인증번호: mockCode,
-      메시지: '개발 환경: 인증번호를 콘솔에서 확인하세요.',
-    })
+    console.log('📱 인증번호 전송:', { 이메일: email, 인증번호: mockCode })
 
     // 인증번호 전송 로직
     startTimer()
@@ -91,6 +92,7 @@ export function RestoreAccountModal({
     setTimeout(() => setShowToast(false), 5000) // 5초 후 사라짐
   }
 
+  // 인증번호 확인 핸들러
   const handleVerifyCode = async () => {
     if (isExpired) {
       methods.setError('verificationCode', {
@@ -101,19 +103,21 @@ export function RestoreAccountModal({
       return
     }
 
-    const verificationCode = methods.getValues('verificationCode')
-    if (!verificationCode) {
-      methods.setError('verificationCode', { message: '인증번호를 입력해주세요.' })
+    const isValid = await methods.trigger('verificationCode')
+    if (!isValid) {
       setVerificationMessage('')
       setVerificationError('')
       return
     }
 
-    // 인증번호 확인 로직 (목데이터 - 실제로는 API 호출)
-    const isValid = verificationCode === sentCode
+    const verificationCode = methods.getValues('verificationCode')
 
-    if (!isValid) {
-      // 인증코드가 일치하지 않는 경우
+    // 인증번호 확인 로직 , 여기서는 성공으로 가정, 실제로는 API 호출,목데이터는 123456 반환
+    // 실패 시 인증코드가 일치하지 않습니다. 반환
+    // 성공 시 인증번호가 확인되었습니다. 반환
+    const codeIsValid = verificationCode === sentCode
+
+    if (!codeIsValid) {
       setVerificationError('*인증코드가 일치하지 않습니다.')
       setVerificationMessage('')
       setIsVerified(false)
@@ -123,28 +127,23 @@ export function RestoreAccountModal({
       return
     }
 
-    // 인증코드가 일치하는 경우
     setIsVerified(true)
     setVerificationMessage('인증번호가 확인되었습니다.')
     setVerificationError('')
     methods.clearErrors('verificationCode')
   }
 
-  const handleConfirm = async () => {
+  // 계정 복구 제출 핸들러
+  const onSubmit = async (data: RestoreAccountFormData) => {
     if (!isVerified) {
       methods.setError('verificationCode', {
         message: '인증번호를 먼저 확인해주세요.',
       })
       return
     }
-
-    // 인증번호 확인 메시지 제거
-    setVerificationMessage('')
-
-    const data = methods.getValues()
-    onSuccess?.(data)
     
-    // 계정 복구 완료 토스트 표시
+    setVerificationMessage('')
+    onSuccess?.(data)
     setShowSuccessToast(true)
 
     // 5초 후 토스트 숨기고 로그인 페이지로 이동
@@ -172,7 +171,6 @@ export function RestoreAccountModal({
                 minHeight: '128px'
               }}
             >
-              {/* 초록색 원형 체크마크 아이콘 */}
               <div className="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
                 <svg
                   width="14"
@@ -201,7 +199,6 @@ export function RestoreAccountModal({
             </div>
           ) : showToast ? (
             <div className="bg-white border border-gray-200 text-black px-5 py-4 gap-3 rounded-lg shadow-lg flex-center min-w-[270px] min-h-[60px]">
-              {/* 초록색 원형 체크마크 아이콘 */}
               <div className="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
                 <svg
                   width="14"
@@ -251,7 +248,7 @@ export function RestoreAccountModal({
 
         <Modal.Body>
           <FormProvider {...methods}>
-            <form className="space-y-4">
+            <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-4">
               <Modal.InputRow label="이메일" required>
                 <div className="flex flex-col gap-2">
                   {/* 첫 번째 줄: 이메일 입력창 + 인증코드전송 버튼 */}
@@ -340,12 +337,11 @@ export function RestoreAccountModal({
 
               <div className="pt-4">
                 <Button
-                  type="button"
+                  type="submit"
                   variant="primary"
                   size="xl"
                   className="w-full"
                   style={{ minWidth: '348px' }}
-                  onClick={handleConfirm}
                   disabled={!isVerified}
                 >
                   확인
