@@ -160,7 +160,6 @@ export default function LoginPage() {
                     helperVisibility="focus"
                     helperTextByState={{
                       default: null,
-                      // error는 래퍼가 RHF error.message로 덮어씀
                     }}
                   />
 
@@ -181,7 +180,6 @@ export default function LoginPage() {
                       }}
                     />
 
-                    {/* ✅ 폼 레벨 에러(로그인 실패) — 딱 1번만 표시 (비밀번호 바로 아래) */}
                     {formError && (
                       <p className="px-1 text-xs font-medium text-red-500">
                         {formError}

@@ -9,7 +9,6 @@ const FAKE_USER: User = {
 
 const FAKE_PASSWORD = 'Test123!'
 
-// ✅ MSW 핸들러: 실제 네트워크 요청을 가로채서 응답
 export const loginHandler = http.post(
   /\/api\/v1\/accounts\/login\/?$/,
   async ({ request }) => {
