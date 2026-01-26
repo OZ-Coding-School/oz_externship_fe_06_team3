@@ -1,75 +1,31 @@
-import { useEffect, useState } from 'react'
-import { FormProvider, useForm, useWatch } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { FormProvider } from 'react-hook-form'
 
 import { CommonInputField } from '@/components/common/CommonInputField'
 import { PasswordField } from '@/components/common/PasswordField'
 import { Button } from '@/components/common/Button'
-import { useAuthStore } from '@/store/authStore'
-
 import SocialLoginSection from '@/components/auth/SocialLoginSection'
 import type { SocialProviderId } from '@/types/social'
+import { PASSWORD_HELPER, type LoginFormData } from '@/schemas/auth'
 
-import {
-  loginSchema,
-  type LoginFormData,
-  PASSWORD_HELPER,
-} from '@/schemas/auth'
-
-type LocationState = { from?: string }
+import { useLoginPage } from '@/hooks/useLoginPage'
 
 export default function LoginPage() {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const authLogin = useAuthStore((s) => s.login)
-
-  const from = (location.state as LocationState | null)?.from ?? '/'
-
-  const [formError, setFormError] = useState<string | null>(null)
-  const [loginFailed, setLoginFailed] = useState(false)
-
-  const methods = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: { email: '', password: '' },
-    mode: 'onSubmit',
-    reValidateMode: 'onChange',
-  })
-
   const {
-    handleSubmit,
-    control,
-    formState: { errors, isSubmitting, isValid },
-  } = methods
-
-  const email = useWatch({ control, name: 'email' }) ?? ''
-  const password = useWatch({ control, name: 'password' }) ?? ''
-
-  const onSubmit = handleSubmit(async (data) => {
-    setFormError(null)
-    setLoginFailed(false)
-
-    try {
-      await authLogin(data)
-      navigate(from, { replace: true })
-    } catch {
-      setLoginFailed(true)
-      setFormError('아이디 또는 비밀번호가 올바르지 않습니다.')
-    }
-  })
+    methods,
+    onSubmit,
+    formError,
+    isSubmitting,
+    isValid,
+    emailState,
+    passwordState,
+    goSignup,
+    goFindId,
+    goFindPw,
+  } = useLoginPage()
 
   const handleSocialLogin = (provider: SocialProviderId) => {
     console.log(`${provider} 로그인`)
   }
-
-  useEffect(() => {
-    if (!loginFailed && !formError) return
-    setLoginFailed(false)
-    setFormError(null)
-  }, [email, password, loginFailed, formError])
-
-  const emailState = loginFailed || errors.email ? 'error' : 'default'
-  const passwordState = loginFailed || errors.password ? 'error' : 'default'
 
   return (
     <FormProvider {...methods}>
@@ -97,7 +53,7 @@ export default function LoginPage() {
                 variant="link"
                 size="auto"
                 className="text-primary gap-2.5 text-[16px] leading-[22.4px] font-normal tracking-[-0.48px] whitespace-nowrap"
-                onClick={() => console.log('회원가입 이동')}
+                onClick={goSignup}
               >
                 회원가입 하기
               </Button>
@@ -107,13 +63,11 @@ export default function LoginPage() {
           {/* 로그인 폼 */}
           <div className="flex w-full flex-col items-center gap-9">
             <div className="flex w-full flex-col items-start gap-10">
-              {/* 소셜 로그인 */}
               <SocialLoginSection onLogin={handleSocialLogin} />
 
-              {/* 일반 로그인 */}
               <form onSubmit={onSubmit} className="w-full">
                 <div className="flex w-full flex-col items-start gap-3">
-                  {/* 아이디 */}
+                  {/* 이메일 */}
                   <CommonInputField<LoginFormData>
                     name="email"
                     type="email"
@@ -135,7 +89,9 @@ export default function LoginPage() {
                       state={passwordState}
                       helperVisibility="focus"
                       showDefaultHelper={false}
-                      helperTextByState={{ default: PASSWORD_HELPER }}
+                      helperTextByState={{
+                        default: PASSWORD_HELPER,
+                      }}
                     />
 
                     {formError && (
@@ -152,7 +108,7 @@ export default function LoginPage() {
                       variant="link"
                       size="auto"
                       className="py-2 whitespace-nowrap"
-                      onClick={() => console.log('아이디 찾기')}
+                      onClick={goFindId}
                     >
                       아이디 찾기
                     </Button>
@@ -164,7 +120,7 @@ export default function LoginPage() {
                       variant="link"
                       size="auto"
                       className="py-2 whitespace-nowrap"
-                      onClick={() => console.log('비밀번호 찾기')}
+                      onClick={goFindPw}
                     >
                       비밀번호 찾기
                     </Button>
