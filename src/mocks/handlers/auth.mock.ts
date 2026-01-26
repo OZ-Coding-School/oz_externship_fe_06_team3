@@ -10,7 +10,7 @@ const FAKE_USER: User = {
 const FAKE_PASSWORD = 'Test123!'
 
 export const loginHandler = http.post(
-  /\/api\/v1\/accounts\/login\/?$/,
+  '/api/v1/accounts/login/',
   async ({ request }) => {
     await delay(300)
 
