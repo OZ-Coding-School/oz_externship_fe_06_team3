@@ -1,13 +1,38 @@
-import { useState } from 'react'
-import { Link } from 'react-router'
+import { useEffect, useRef, useState } from 'react'
+import { Link, useNavigate } from 'react-router'
+import { selectIsAuthenticated, useAuthStore } from '@/store/authStore'
 
-// src/components/layout/Header.tsx
 export default function Header() {
   const [open, setOpen] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement | null>(null)
 
-  const user = {
-    name: '유저네임',
-    email: 'user@email.com',
+  const navigate = useNavigate()
+
+  const isAuthenticated = useAuthStore(selectIsAuthenticated)
+  const user = useAuthStore((s) => s.user)
+  const logout = useAuthStore((s) => s.logout)
+
+  // 프로필 드롭다운 바깥 클릭하면 닫히기
+  useEffect(() => {
+    if (!open) return
+
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as Node
+      if (!dropdownRef.current) return
+
+      if (!dropdownRef.current.contains(target)) {
+        setOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleOutsideClick)
+    return () => document.removeEventListener('mousedown', handleOutsideClick)
+  }, [open])
+
+  const handleLogout = async () => {
+    setOpen(false)
+    await logout()
+    navigate('/', { replace: true })
   }
 
   return (
@@ -82,65 +107,80 @@ export default function Header() {
 
           {/* 오른쪽 메뉴 */}
           <div className="flex items-center gap-2 font-[Pretendard] text-[16px] text-gray-500">
-            <Link
-              to="/login"
-              className="transition-colors duration-200 hover:text-gray-900"
-            >
-              로그인
-            </Link>
-            <span className="text-gray-300">|</span>
-            <a
-              href="#"
-              className="transition-colors duration-200 hover:text-gray-900"
-            >
-              회원가입
-            </a>
+            {!isAuthenticated ? (
+              <>
+                <Link
+                  to="/login"
+                  className="transition-colors duration-200 hover:text-gray-900"
+                >
+                  로그인
+                </Link>
+                <span className="text-gray-300">|</span>
+                <a
+                  href="#"
+                  className="transition-colors duration-200 hover:text-gray-900"
+                >
+                  회원가입
+                </a>
+              </>
+            ) : (
+              <div className="relative" ref={dropdownRef}>
+                {/* 프로필 이미지 버튼 */}
+                <button
+                  type="button"
+                  onClick={() => setOpen((prev) => !prev)}
+                  aria-expanded={open}
+                  aria-label="프로필 메뉴 열기"
+                >
+                  <img
+                    src="/프로필 사진.svg"
+                    alt="프로필"
+                    className="h-[40px] w-[40px] rounded-full object-cover"
+                  />
+                </button>
+                {/* 드롭다운 메뉴 */}
+                {open && (
+                  <div className="absolute top-17 right-0 z-50 h-[207px] w-[204px] rounded-[12px] bg-white px-[16px] py-[24px] shadow-[0_0_16px_0_#A0A0A040]">
+                    {/* 유저 정보 */}
+                    <div className="h-[53px] w-[172px] items-start gap-[20px]">
+                      <p className="font-[Pretendard] text-[16px] leading-[140%] font-semibold tracking-[-0.03em] text-gray-900">
+                        {user?.name ?? '유저'}
+                      </p>
+                      <p className="text-mono-600 font-[Pretendard] text-[14px] leading-[140%] font-normal tracking-[-0.03em]">
+                        {user?.email ?? ''}
+                      </p>
+                    </div>
 
-            {/* 👇 프로필 이미지 버튼 */}
-            <div className="relative">
-              <button onClick={() => setOpen((prev) => !prev)}>
-                <img
-                  src="public/프로필 사진.svg"
-                  alt="프로필"
-                  className="h-[40px] w-[40px] rounded-full object-cover"
-                />
-              </button>
+                    <div className="border-[1px] border-t border-[#ECECEC]" />
 
-              {open && (
-                <div className="absolute top-17 right-0 z-50 h-[207px] w-[204px] rounded-[12px] bg-white px-[16px] py-[24px] shadow-[0_0_16px_0_#A0A0A040]">
-                  {/* 유저 정보 */}
-                  <div className="h-[53px] w-[172px] items-start gap-[20px]">
-                    <p className="font-[Pretendard] text-[16px] leading-[140%] font-semibold tracking-[-0.03em] text-gray-900">
-                      {user.name}
-                    </p>
-                    <p className="text-mono-600 font-[Pretendard] text-[14px] leading-[140%] font-normal tracking-[-0.03em]">
-                      {user.email}
-                    </p>
+                    {/* 메뉴 */}
+                    <a
+                      href="/register"
+                      className="hover:bg-primary-100 hover:text-primary left-0 block py-3 font-[pretendard] text-sm"
+                      onClick={() => setOpen(false)}
+                    >
+                      수강생 등록
+                    </a>
+
+                    <a
+                      href="/mypage"
+                      className="hover:bg-primary-100 hover:text-primary left-0 block py-3 font-[pretendard] text-sm"
+                      onClick={() => setOpen(false)}
+                    >
+                      마이페이지
+                    </a>
+
+                    <button
+                      type="button"
+                      onClick={handleLogout}
+                      className="hover:bg-primary-100 hover:text-primary block w-full py-3 text-left text-sm"
+                    >
+                      로그아웃
+                    </button>
                   </div>
-
-                  <div className="border-[1px] border-t border-[#ECECEC]" />
-
-                  {/* 메뉴 */}
-                  <a
-                    href="/register"
-                    className="hover:bg-primary-100 hover:text-primary left-0 block py-3 font-[pretendard] text-sm"
-                  >
-                    수강생 등록
-                  </a>
-
-                  <a
-                    href="/mypage"
-                    className="hover:bg-primary-100 hover:text-primary left-0 block py-3 font-[pretendard] text-sm"
-                  >
-                    마이페이지
-                  </a>
-
-                  <button className="hover:bg-primary-100 hover:text-primary block w-full py-3 text-left text-sm">
-                    로그아웃
-                  </button>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
