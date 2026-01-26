@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 
 import { CommonInputField } from '@/components/common/CommonInputField'
 import { PasswordField } from '@/components/common/PasswordField'
+import { Button } from '@/components/common/Button'
 import { useAuthStore } from '@/store/authStore'
 
 type LoginFormData = {
@@ -100,10 +101,11 @@ export default function LoginPage() {
             <div className="flex w-full flex-col items-start gap-10">
               {/* 소셜 로그인 */}
               <div className="flex w-full flex-col items-start gap-3">
-                <button
+                <Button
                   type="button"
+                  variant="kakao"
                   onClick={() => console.log('카카오 로그인')}
-                  className="flex h-[52px] w-full items-center justify-center gap-2.5 rounded bg-[#fee500] px-2 py-2"
+                  className="h-[52px] w-full gap-2.5 rounded px-2 py-2"
                 >
                   <div className="inline-flex items-center gap-1">
                     <div className="flex w-5 flex-col items-center justify-center gap-2.5 px-[3px] py-1">
@@ -117,12 +119,13 @@ export default function LoginPage() {
                       카카오 간편 로그인 / 가입
                     </p>
                   </div>
-                </button>
+                </Button>
 
-                <button
+                <Button
                   type="button"
+                  variant="naver"
                   onClick={() => console.log('네이버 로그인')}
-                  className="flex h-[52px] w-full items-center justify-center gap-2.5 rounded bg-[#03c75a] px-2 py-2"
+                  className="h-[52px] w-full gap-2.5 rounded px-2 py-2"
                 >
                   <div className="inline-flex items-center gap-1">
                     <div className="flex w-5 flex-col items-center justify-center gap-2.5 px-[3px] py-1">
@@ -136,7 +139,7 @@ export default function LoginPage() {
                       네이버 간편 로그인 / 가입
                     </p>
                   </div>
-                </button>
+                </Button>
               </div>
 
               {/* 일반 로그인 */}
@@ -217,25 +220,16 @@ export default function LoginPage() {
                   </div>
 
                   {/* 제출 */}
-                  <button
+                  <Button
                     type="submit"
                     disabled={!isFormFilled || isSubmitting}
-                    className={`flex h-[52px] w-full items-center justify-center gap-2.5 rounded px-2 py-2 ${
-                      isFormFilled && !isSubmitting
-                        ? 'bg-primary hover:bg-primary-hover'
-                        : 'bg-mono-200 cursor-not-allowed'
-                    }`}
+                    variant={!isFormFilled || isSubmitting ? 'disabled' : 'primary'}
+                    className="h-[52px] w-full gap-2.5 rounded px-2 py-2"
                   >
-                    <div
-                      className={`whitespace-nowrap ${
-                        isFormFilled && !isSubmitting
-                          ? 'text-white'
-                          : 'text-mono-400'
-                      }`}
-                    >
+                    <div className="whitespace-nowrap">
                       {isSubmitting ? '로그인 중...' : '일반회원 로그인'}
                     </div>
-                  </button>
+                  </Button>
                 </div>
               </form>
             </div>

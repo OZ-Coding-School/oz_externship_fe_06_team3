@@ -12,6 +12,8 @@ import cn from '@/lib/cn'
  * - primary   : 보라색 버튼
  * - secondary : active 시 색상 변경
  * - disabled  : 비활성 전용 버튼
+ * - kakao     : 카카오 로그인 버튼 (노란색)
+ * - naver     : 네이버 로그인 버튼 (초록색)
  *
  * size
  * 사이즈에 맞는걸로 사용해주세요
@@ -35,6 +37,12 @@ export const buttonVariants = cva(
 
         disabled:
           'bg-gray-200 text-gray-400 border-transparent cursor-not-allowed pointer-events-none',
+
+        kakao:
+          'bg-[#fee500] text-[#391C1A] border-transparent hover:bg-[#fdd835] active:bg-[#fbc02d] transition-colors',
+
+        naver:
+          'bg-[#03c75a] text-white border-transparent hover:bg-[#02b350] active:bg-[#029f47] transition-colors',
       },
 
       /**
