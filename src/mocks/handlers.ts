@@ -5,6 +5,7 @@ import { examDeploymentDetailHandler } from './handlers/examDeploymentDetail'
 import { examDeploymentStatusHandler } from './handlers/examDeploymentStatus'
 import { examDeploymentsHandler } from './handlers/examDeployments'
 import { examSubmissionHandler } from './handlers/examSubmission'
+import { examSubmissionResultHandler } from './handlers/examSubmissionResult'
 
 export const helloHandler = http.get('/api/hello', () => {
     return HttpResponse.json({ message: 'Hello, world!', code: 200 })
@@ -17,4 +18,5 @@ export const handlers = [
   examDeploymentDetailHandler,
   examDeploymentStatusHandler,
   examSubmissionHandler,
+  examSubmissionResultHandler,
 ]
