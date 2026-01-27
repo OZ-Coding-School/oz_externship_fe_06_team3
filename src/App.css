@@ -81,3 +81,16 @@
   @apply text-[16px] font-normal text-[#121212];
 }
 
+/* 문제 헤더 공통 스타일 */
+.quiz-header {
+  @apply mb-4 flex items-center gap-2;
+}
+
+.quiz-header-title {
+  @apply text-[20px] font-bold text-[#121212];
+}
+
+.quiz-header-badge {
+  @apply bg-[#ECECEC] rounded-[2px] text-[12px] font-normal text-[#121212] px-2 py-[2px];
+}
+

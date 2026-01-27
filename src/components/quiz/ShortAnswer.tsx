@@ -9,16 +9,13 @@ interface ShortAnswerProps {
 export default function ShortAnswer({ question, answer, onAnswerChange }: ShortAnswerProps) {
   return (
     <div className="mb-20">
-      <div className="mb-4 flex items-center gap-2">
-        <span className="text-[20px] font-bold text-[#121212]">
+      {/* 문제 헤더 */}
+      <div className="quiz-header">
+        <span className="quiz-header-title">
           {question.number}. {question.question}
         </span>
-        <span className="rounded-[2px] bg-[#ECECEC] px-2 py-[2px] text-[12px] font-normal text-[#121212]">
-          {question.point}점
-        </span>
-        <span className="rounded-[2px] bg-[#ECECEC] px-2 py-[2px] text-[12px] font-normal text-[#121212]">
-          단답형
-        </span>
+        <span className="quiz-header-badge">{question.point}점</span>
+        <span className="quiz-header-badge">단답형</span>
       </div>
 
       <div className="ml-6">
