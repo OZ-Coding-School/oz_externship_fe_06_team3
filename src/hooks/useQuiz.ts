@@ -46,6 +46,7 @@ export const useExamDeploymentStatusQuery = (deploymentId: number, enabled = tru
     queryKey: ['examDeploymentStatus', deploymentId],
     queryFn: () => fetchExamDeploymentStatus(deploymentId),
     enabled,
+    refetchInterval: 1000,
   })
 }
 
