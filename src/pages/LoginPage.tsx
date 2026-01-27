@@ -43,7 +43,7 @@ export default function LoginPage() {
 
             <div className="flex w-full items-start justify-center gap-3">
               <div className="inline-flex items-center justify-center gap-2.5">
-                <div className="truncate whitespace-nowrap text-black/20">
+                <div className="text-mono-600 truncate whitespace-nowrap">
                   아직 회원이 아니신가요?
                 </div>
               </div>

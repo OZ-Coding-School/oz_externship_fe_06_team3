@@ -110,7 +110,7 @@ export default function Header() {
                   type="button"
                   variant="link"
                   size="auto"
-                  className="text-mono-600 hover:no-underline hover:text-mono-600 py-0 font-[Pretendard] text-[16px]"
+                  className="text-mono-600 hover:text-mono-600 py-0 font-[Pretendard] text-[16px] hover:no-underline"
                   onClick={() => navigate('/login')}
                 >
                   로그인
@@ -120,8 +120,8 @@ export default function Header() {
                   type="button"
                   variant="link"
                   size="auto"
-                  className="text-mono-600 hover:no-underline hover:text-mono-600 py-0 font-[Pretendard] text-[16px]"
-                  onClick={() => navigate('/register')}
+                  className="text-mono-600 hover:text-mono-600 py-0 font-[Pretendard] text-[16px] hover:no-underline"
+                  onClick={() => navigate('/signup')}
                 >
                   회원가입
                 </Button>
@@ -132,7 +132,7 @@ export default function Header() {
                   type="button"
                   variant="link"
                   size="auto"
-                  className="p-0 min-w-0 hover:no-underline hover:opacity-80"
+                  className="min-w-0 p-0 hover:no-underline hover:opacity-80"
                   onClick={() => setOpen((prev) => !prev)}
                   aria-expanded={open}
                   aria-label="프로필 메뉴 열기"
@@ -155,13 +155,13 @@ export default function Header() {
                       </p>
                     </div>
 
-                    <div className="my-4 border-t border-mono-200" />
+                    <div className="border-mono-200 my-4 border-t" />
 
                     <Button
                       type="button"
                       variant="link"
                       size="auto"
-                      className="hover:no-underline hover:bg-primary-100 hover:text-primary block w-full justify-start py-3 text-left text-sm"
+                      className="hover:bg-primary-100 hover:text-primary block w-full justify-start py-3 text-left text-sm hover:no-underline"
                       onClick={() => {
                         setOpen(false)
                         navigate('/register')
@@ -174,7 +174,7 @@ export default function Header() {
                       type="button"
                       variant="link"
                       size="auto"
-                      className="hover:no-underline hover:bg-primary-100 hover:text-primary block w-full justify-start py-3 text-left text-sm"
+                      className="hover:bg-primary-100 hover:text-primary block w-full justify-start py-3 text-left text-sm hover:no-underline"
                       onClick={() => {
                         setOpen(false)
                         navigate('/mypage')
@@ -187,7 +187,7 @@ export default function Header() {
                       type="button"
                       variant="link"
                       size="auto"
-                      className="hover:no-underline hover:bg-primary-100 hover:text-primary block w-full justify-start py-3 text-left text-sm"
+                      className="hover:bg-primary-100 hover:text-primary block w-full justify-start py-3 text-left text-sm hover:no-underline"
                       onClick={handleLogout}
                     >
                       로그아웃

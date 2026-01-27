@@ -77,7 +77,7 @@ export function useLoginPage() {
     emailState,
     passwordState,
 
-    goSignup: () => console.log('회원가입 이동'),
+    goSignup: () => navigate('/signup'),
     goFindId: () => console.log('아이디 찾기'),
     goFindPw: () => console.log('비밀번호 찾기'),
   }

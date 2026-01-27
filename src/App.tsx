@@ -5,6 +5,7 @@ import '@/App.css'
 import LandingPage from '@/pages/LandingPage'
 import TestPage from '@/pages/TestPage'
 import LoginPage from '@/pages/LoginPage'
+import SignupPage from '@/pages/SignupPage'
 import MyPage from '@/pages/MyPage'
 import MyPageQuiz from '@/components/MyPageQuiz'
 import QuizPage from '@/pages/QuizPage'
@@ -21,6 +22,7 @@ function App() {
           <Route path="/qna" element={<div>질의응답 페이지</div>} />
           <Route path="/test" element={<TestPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
 
           {/* 로그인이 필요한 페이지 */}
           <Route element={<RequireAuth />}>
