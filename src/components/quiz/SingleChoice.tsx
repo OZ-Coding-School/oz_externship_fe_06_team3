@@ -74,16 +74,14 @@ export default function SingleChoice({ question, answer, onAnswerChange }: Singl
       </div>
 
       {/* 지문 및 옵션 */}
-      {question.prompt ? (
-        <div className="w-[648px] min-h-[96px] bg-[#F2F3F5]/50 p-4 rounded-lg ml-6">
+      <div className="w-[648px] min-h-[96px] p-4 rounded-lg ml-6">
+        {question.prompt && (
           <p className="text-[16px] font-normal text-[#222222] mb-[26px]">
             {question.prompt}
           </p>
-          {renderOptions()}
-        </div>
-      ) : (
-        <div className="ml-6">{renderOptions()}</div>
-      )}
+        )}
+        {renderOptions()}
+      </div>
     </div>
   )
 }
