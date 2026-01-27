@@ -1,16 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Button, Loading, Modal } from '@/components/common'
+import { Button, Loading, Modal, NotFound } from '@/components/common'
 import QuizHeader from '@/components/QuizHeader'
 import QuizWarningBox from '@/components/QuizWarningBox'
 import { useExamDeploymentDetailQuery, useExamDeploymentStatusQuery } from '@/hooks/useQuiz'
 import {
   SingleChoice,
-  MultipleChoice,
   OX,
   FillBlank,
   Ordering,
-  ShortAnswer,
 } from '@/components/quiz'
 import type { ExamDeploymentDetailResult } from '@/mappers/examDeploymentDetail'
 
@@ -58,22 +56,6 @@ function QuizPage() {
       case 'single_choice': // 단일선택 (라디오 버튼)
         return (
           <SingleChoice
-            question={question}
-            answer={answer as string | null}
-            onAnswerChange={handleAnswerChange}
-          />
-        )
-      case 'multiple_choice': // 다중선택
-        return (
-          <MultipleChoice
-            question={question}
-            answer={answer as string[] | null}
-            onAnswerChange={handleAnswerChange}
-          />
-        )
-      case 'short_answer': // short answer
-        return (
-          <ShortAnswer
             question={question}
             answer={answer as string | null}
             onAnswerChange={handleAnswerChange}
@@ -185,17 +167,15 @@ function QuizPage() {
         <div className="min-h-[500px] min-w-[1200px]">
           {data?.questions && data.questions.length > 0 ? (
             <div className="space-y-8">
-              {data.questions
-                .sort((a, b) => a.number - b.number)
-                .map((question) => (
-                  <div key={question.questionId}>
-                    {renderQuestion(question)}
-                  </div>
-                ))}
+              {data.questions.map((question) => (
+                <div key={question.questionId}>
+                  {renderQuestion(question)}
+                </div>
+              ))}
             </div>
           ) : (
             <div className="flex justify-center items-center py-20">
-              <p className="text-gray-500">표시할 문제가 없습니다.</p>
+              <NotFound detail="표시할 문제가 없습니다." />
             </div>
           )}
         </div>

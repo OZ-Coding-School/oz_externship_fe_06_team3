@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import {
   DndContext,
   closestCenter,
@@ -11,6 +11,7 @@ import {
   useDroppable,
 } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
+import { Button } from '@/components/common/Button'
 import type { ExamDeploymentDetailResult } from '@/mappers/examDeploymentDetail'
 
 interface OrderingProps {
@@ -20,6 +21,26 @@ interface OrderingProps {
 }
 
 const OPTION_LABELS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'] as const
+
+// 슬롯 초기화 헬퍼 함수
+function initializeSlots(
+  options: string[],
+  answer: string[] | null,
+  optionLabels: readonly string[]
+): (string | null)[] {
+  const slots = Array(options.length).fill(null)
+  if (answer && answer.length > 0) {
+    answer.forEach((item, idx) => {
+      if (idx < slots.length) {
+        const index = options.findIndex((opt) => opt === item)
+        if (index !== -1) {
+          slots[idx] = optionLabels[index]
+        }
+      }
+    })
+  }
+  return slots
+}
 
 interface DraggableLabelProps {
   id: string
@@ -75,16 +96,19 @@ function DroppableSlot({ id, index, label, onRemove }: DroppableSlotProps) {
     >
       {label ? (
         <div className="relative w-full h-full flex items-center justify-center">
-          <button
+          <Button
             type="button"
+            variant="link"
+            size="auto"
             onClick={(e) => {
               e.stopPropagation()
               onRemove()
             }}
-            className="absolute -top-1 -right-1 w-4 h-4 flex items-center justify-center text-gray-400 hover:text-gray-600 text-xs bg-white rounded-full border border-gray-300"
+            className="absolute -top-1 -right-1 w-4 h-4 min-w-0 h-auto p-0 flex items-center justify-center text-gray-400 hover:text-gray-600 text-xs bg-white rounded-full border border-gray-300 hover:no-underline"
+            aria-label="제거"
           >
             ×
-          </button>
+          </Button>
           <span className="text-[18px] font-normal text-[#6201E0] bg-[#EFE6FC] w-8 h-8 flex items-center justify-center rounded-[4px]">
             {label}
           </span>
@@ -98,43 +122,15 @@ function DroppableSlot({ id, index, label, onRemove }: DroppableSlotProps) {
 
 export default function Ordering({ question, answer, onAnswerChange }: OrderingProps) {
   const options = question.options || []
-  const optionLabels = useMemo(
-    () => OPTION_LABELS.slice(0, options.length),
-    [options.length]
+  const optionLabels = OPTION_LABELS.slice(0, options.length)
+
+  const [slots, setSlots] = useState<(string | null)[]>(() =>
+    initializeSlots(options, answer, optionLabels)
   )
 
-  const initializeSlots = (): (string | null)[] => {
-    const initialSlots = Array(options.length).fill(null)
-    if (answer && answer.length > 0) {
-      answer.forEach((item, idx) => {
-        if (idx < initialSlots.length) {
-          const index = options.findIndex((opt) => opt === item)
-          if (index !== -1) {
-            initialSlots[idx] = optionLabels[index]
-          }
-        }
-      })
-    }
-    return initialSlots
-  }
-
-  const [slots, setSlots] = useState<(string | null)[]>(initializeSlots)
-
   useEffect(() => {
-    const newSlots = Array(options.length).fill(null)
-    if (answer && answer.length > 0) {
-      answer.forEach((item, idx) => {
-        if (idx < newSlots.length) {
-          const index = options.findIndex((opt) => opt === item)
-          if (index !== -1) {
-            newSlots[idx] = optionLabels[index]
-          }
-        }
-      })
-    }
-    setSlots(newSlots)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [answer, options.length])
+    setSlots(initializeSlots(options, answer, optionLabels))
+  }, [answer, options, optionLabels])
 
   const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor))
 
@@ -195,16 +191,12 @@ export default function Ordering({ question, answer, onAnswerChange }: OrderingP
   return (
     <div className="mb-20">
       {/* 문제 헤더 */}
-      <div className="mb-4 flex items-center gap-2">
-        <span className="text-[20px] font-bold text-[#121212]">
+      <div className="quiz-header">
+        <span className="quiz-header-title">
           {question.number}. {question.question}
         </span>
-        <span className="bg-[#ECECEC] rounded-[2px] text-[12px] font-normal text-[#121212] px-2 py-[2px]">
-          {question.point}점
-        </span>
-        <span className="bg-[#ECECEC] rounded-[2px] text-[12px] font-normal text-[#121212] px-2 py-[2px]">
-          순서배열
-        </span>
+        <span className="quiz-header-badge">{question.point}점</span>
+        <span className="quiz-header-badge">순서배열</span>
       </div>
 
       <DndContext

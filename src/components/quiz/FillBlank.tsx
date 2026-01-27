@@ -55,16 +55,12 @@ export default function FillBlank({ question, answer, onAnswerChange }: FillBlan
   return (
     <div className="mb-20">
       {/* 문제 헤더 */}
-      <div className="mb-4 flex items-center gap-2">
-        <span className="text-[20px] font-bold text-[#121212]">
+      <div className="quiz-header">
+        <span className="quiz-header-title">
           {question.number}. {question.question}
         </span>
-        <span className="bg-[#ECECEC] rounded-[2px] text-[12px] font-normal text-[#121212] px-2 py-[2px]">
-          {question.point}점
-        </span>
-        <span className="bg-[#ECECEC] rounded-[2px] text-[12px] font-normal text-[#121212] px-2 py-[2px]">
-          빈칸식
-        </span>
+        <span className="quiz-header-badge">{question.point}점</span>
+        <span className="quiz-header-badge">빈칸식</span>
       </div>
 
       {/* 지문 박스 */}

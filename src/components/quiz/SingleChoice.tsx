@@ -65,29 +65,23 @@ export default function SingleChoice({ question, answer, onAnswerChange }: Singl
   return (
     <div className="mb-20">
       {/* 문제 헤더 */}
-      <div className="mb-4 flex items-center gap-2">
-        <span className="text-[20px] font-bold text-[#121212]">
+      <div className="quiz-header">
+        <span className="quiz-header-title">
           {question.number}. {question.question}
         </span>
-        <span className="bg-[#ECECEC] rounded-[2px] text-[12px] font-normal text-[#121212] px-2 py-[2px]">
-          {question.point}점
-        </span>
-        <span className="bg-[#ECECEC] rounded-[2px] text-[12px] font-normal text-[#121212] px-2 py-[2px]">
-          단일선택
-        </span>
+        <span className="quiz-header-badge">{question.point}점</span>
+        <span className="quiz-header-badge">단일선택</span>
       </div>
 
       {/* 지문 및 옵션 */}
-      {question.prompt ? (
-        <div className="w-[648px] min-h-[96px] bg-[#F2F3F5]/50 p-4 rounded-lg ml-6">
+      <div className="w-[648px] min-h-[96px] p-4 rounded-lg ml-6">
+        {question.prompt && (
           <p className="text-[16px] font-normal text-[#222222] mb-[26px]">
             {question.prompt}
           </p>
-          {renderOptions()}
-        </div>
-      ) : (
-        <div className="ml-6">{renderOptions()}</div>
-      )}
+        )}
+        {renderOptions()}
+      </div>
     </div>
   )
 }
