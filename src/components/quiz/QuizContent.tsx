@@ -29,7 +29,7 @@ export default function QuizContent({ quizzes, isLoading, isError, currentTab }:
   if (isError) {
     return (
       <div className="flex justify-center items-center py-20">
-        <p className="text-red-500">데이터를 불러오는 중 오류가 발생했습니다.</p>
+        <p className="text-gray-200">데이터를 불러오는 중 오류가 발생했습니다.</p>
       </div>
     )
   }

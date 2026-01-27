@@ -1,8 +1,18 @@
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Button, Loading } from '@/components/common'
 import QuizHeader from '@/components/QuizHeader'
 import QuizWarningBox from '@/components/QuizWarningBox'
 import { useExamDeploymentDetailQuery } from '@/hooks/useQuiz'
+import {
+  SingleChoice,
+  OX,
+  FillBlank,
+  Ordering,
+} from '@/components/quiz'
+import type { ExamDeploymentDetailResult } from '@/mappers/examDeploymentDetail'
+
+type Question = ExamDeploymentDetailResult['questions'][0]
 
 function QuizPage() {
   const { deploymentId } = useParams<{ deploymentId: string }>()
@@ -13,8 +23,68 @@ function QuizPage() {
     !!deploymentId
   )
 
+  // 답변 상태 관리
+  const [answers, setAnswers] = useState<
+    Record<number, string | string[] | null>
+  >({})
+
+  // 답변 변경 핸들러
+  const handleAnswerChange = (
+    questionId: number,
+    answer: string | string[]
+  ) => {
+    setAnswers((prev) => ({
+      ...prev,
+      [questionId]: answer,
+    }))
+  }
+
+  // 문제 유형별 컴포넌트 렌더링
+  // 남은 문제 유형 2가지 추가 예정 :  ⭐️ 다중선택(체크박스), 단답형(텍스트 입력) ⭐️
+  const renderQuestion = (question: Question) => {
+    const answer = answers[question.questionId] || null
+
+    switch (question.type) {
+      case 'single_choice': // 단일선택 (라디오 버튼)
+        return (
+          <SingleChoice
+            question={question}
+            answer={answer as string | null}
+            onAnswerChange={handleAnswerChange}
+          />
+        )
+      case 'ox': // O/X 선택
+        return (
+          <OX
+            question={question}
+            answer={answer as string | null}
+            onAnswerChange={handleAnswerChange}
+          />
+        )
+      case 'fill_blank':  // 빈칸 채우기
+        return (
+          <FillBlank
+            question={question}
+            answer={answer as string[] | null}
+            onAnswerChange={handleAnswerChange}
+          />
+        )
+      case 'ordering':  // 순서 맞추기
+        return (
+          <Ordering
+            question={question}
+            answer={answer as string[] | null}
+            onAnswerChange={handleAnswerChange}
+          />
+        )
+      default:
+        return null
+    }
+  }
+
   const handleSubmit = () => {
     // 제출 로직은 추후 구현 예정
+    console.log('제출된 답변:', answers)
     alert('시험이 제출되었습니다.')
   }
 
@@ -26,9 +96,7 @@ function QuizPage() {
     <div>
       <QuizHeader subjectName={data?.examName || '쪽지시험'} />
 
-      {/* 메인 영역 */}
       <main className="flex flex-col items-center px-10 py-6">
-        {/* 경고 박스 */}
         <QuizWarningBox />
 
         <div className="min-h-[500px] min-w-[1200px]">
@@ -37,37 +105,8 @@ function QuizPage() {
               {data.questions
                 .sort((a, b) => a.number - b.number)
                 .map((question) => (
-                  <div
-                    key={question.questionId}
-                    className="bg-white border border-gray-200 rounded-lg p-6"
-                  >
-                    <div className="mb-4">
-                      <span className="text-lg font-semibold text-black">
-                        {question.number}. {question.question}
-                      </span>
-                      <span className="ml-2 text-sm text-gray-500">
-                        ({question.point}점)
-                      </span>
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      유형: {question.type}
-                      {question.options && (
-                        <div className="mt-2">
-                          <p className="font-medium">선택지:</p>
-                          <ul className="list-disc list-inside ml-4">
-                            {question.options.map((option, idx) => (
-                              <li key={idx}>{option}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                      {question.prompt && (
-                        <div className="mt-2">
-                          <p className="font-medium">문제:</p>
-                          <p>{question.prompt}</p>
-                        </div>
-                      )}
-                    </div>
+                  <div key={question.questionId}>
+                    {renderQuestion(question)}
                   </div>
                 ))}
             </div>

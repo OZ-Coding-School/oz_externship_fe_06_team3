@@ -19,16 +19,16 @@ const MyPageQuiz = () => {
     [currentTab]
   )
 
-  // 쪽지시험 목록 조회
+  // 쪽지시험 목록 조회 : 탭(전체/응시완료/미응시)에 따라 status 바꿔서 조회
   const { data, isLoading, isError } = useExamDeploymentsQuery(
     {
       page: INITIAL_PAGE,
-      status: currentStatus,
+      status: currentStatus, // 'all' | 'done' | 'pending'
     },
     true
   )
 
-  // 쪽지시험 데이터 추출
+  // QuizContent에 전달해서 카드 목록 렌더링 하기 위해 데이터 추출
   const quizzes = useMemo(() => data?.results || [], [data?.results])
 
   return (
