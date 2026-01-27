@@ -40,7 +40,7 @@ function QuizHeader({
             >
               ←
             </Link>
-            <h1 className={titleStyle}>{subjectName}</h1>
+            <h1 className={titleStyle}>{subjectName} 쪽지시험</h1>
           </div>
           <p className={contentStyle}>{message}</p>
         </div>
