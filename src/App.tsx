@@ -11,6 +11,7 @@ import MyPageQuiz from '@/components/MyPageQuiz'
 import QuizPage from '@/pages/QuizPage'
 import MainLayout from '@/components/layout/MainLayout'
 import { RequireAuth } from '@/components/auth/RequireAuth'
+import MyInfo from './components/MyInfo'
 
 function App() {
   return (
@@ -28,7 +29,7 @@ function App() {
           <Route element={<RequireAuth />}>
             <Route path="/mypage" element={<MyPage />}>
               <Route path="quiz" element={<MyPageQuiz />} />
-              <Route path="profile" element={<div>내 정보</div>} />
+              <Route path="profile" element={<MyInfo />} />
               <Route path="password" element={<div>비밀번호 변경</div>} />
             </Route>
           </Route>
