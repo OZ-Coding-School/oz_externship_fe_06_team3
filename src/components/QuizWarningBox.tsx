@@ -12,7 +12,7 @@ function QuizWarningBox() {
   }
 
   return (
-    <div className="min-w-[1200px] flex items-start gap-3 rounded-lg bg-[#EFE6FC] px-6 py-5">
+    <div className="min-w-[1200px] flex items-start gap-3 rounded-lg bg-[#EFE6FC] px-6 py-5 mb-10">
       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
         <img
           src="/alertCircle.svg"
