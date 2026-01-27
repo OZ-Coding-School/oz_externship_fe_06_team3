@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 
 import { Button } from '@/components/common/Button'
+import { RegisterStudentModal } from '@/components/common/Modal/variants'
 
 export default function Header() {
   const [open, setOpen] = useState(false)
+  const [registerStudentModalOpen, setRegisterStudentModalOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement | null>(null)
 
   const navigate = useNavigate()
@@ -164,7 +166,7 @@ export default function Header() {
                       className="hover:no-underline hover:bg-primary-100 hover:text-primary block w-full justify-start py-3 text-left text-sm"
                       onClick={() => {
                         setOpen(false)
-                        navigate('/register')
+                        setRegisterStudentModalOpen(true)
                       }}
                     >
                       수강생 등록
@@ -199,6 +201,15 @@ export default function Header() {
           </div>
         </div>
       </div>
+
+      <RegisterStudentModal
+        isOpen={registerStudentModalOpen}
+        onClose={() => setRegisterStudentModalOpen(false)}
+        onSuccess={(data) => {
+          console.log('수강생 등록 성공:', data)
+          setRegisterStudentModalOpen(false)
+        }}
+      />
     </header>
   )
 }
