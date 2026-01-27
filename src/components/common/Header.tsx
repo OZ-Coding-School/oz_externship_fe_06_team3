@@ -122,7 +122,7 @@ export default function Header() {
                   type="button"
                   variant="link"
                   size="auto"
-                  className="text-mono-600 hover:no-underline hover:text-mono-600 py-0 font-[Pretendard] text-[16px]"
+                  className="text-mono-600 hover:text-mono-600 py-0 font-[Pretendard] text-[16px] hover:no-underline"
                   onClick={() => navigate('/login')}
                 >
                   로그인
@@ -132,8 +132,8 @@ export default function Header() {
                   type="button"
                   variant="link"
                   size="auto"
-                  className="text-mono-600 hover:no-underline hover:text-mono-600 py-0 font-[Pretendard] text-[16px]"
-                  onClick={() => navigate('/register')}
+                  className="text-mono-600 hover:text-mono-600 py-0 font-[Pretendard] text-[16px] hover:no-underline"
+                  onClick={() => navigate('/signup')}
                 >
                   회원가입
                 </Button>
@@ -144,7 +144,7 @@ export default function Header() {
                   type="button"
                   variant="link"
                   size="auto"
-                  className="p-0 min-w-0 hover:no-underline hover:opacity-80"
+                  className="min-w-0 p-0 hover:no-underline hover:opacity-80"
                   onClick={() => setOpen((prev) => !prev)}
                   aria-expanded={open}
                   aria-label="프로필 메뉴 열기"

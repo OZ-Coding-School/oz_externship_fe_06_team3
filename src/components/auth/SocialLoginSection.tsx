@@ -2,7 +2,7 @@ import { Button } from '@/components/common/Button'
 
 export type SocialProviderId = 'kakao' | 'naver'
 
-const SOCIAL_PROVIDERS = [
+const SOCIAL_PROVIDERS_LOGIN = [
   {
     id: 'kakao' as const,
     variant: 'kakao' as const,
@@ -23,14 +23,31 @@ const SOCIAL_PROVIDERS = [
   },
 ]
 
+const SOCIAL_PROVIDERS_SIGNUP = [
+  {
+    ...SOCIAL_PROVIDERS_LOGIN[0],
+    label: '카카오로 3초만에 가입하기',
+  },
+  {
+    ...SOCIAL_PROVIDERS_LOGIN[1],
+    label: '네이버로 가입하기',
+  },
+]
+
 type Props = {
   onLogin: (provider: SocialProviderId) => void
+  mode?: 'login' | 'signup'
 }
 
-export default function SocialLoginSection({ onLogin }: Props) {
+export default function SocialLoginSection({
+  onLogin,
+  mode = 'login',
+}: Props) {
+  const providers =
+    mode === 'signup' ? SOCIAL_PROVIDERS_SIGNUP : SOCIAL_PROVIDERS_LOGIN
   return (
     <div className="flex w-full flex-col items-start gap-3">
-      {SOCIAL_PROVIDERS.map((p) => (
+      {providers.map((p) => (
         <Button
           key={p.id}
           type="button"
