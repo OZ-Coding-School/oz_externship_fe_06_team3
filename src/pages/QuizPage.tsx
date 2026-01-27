@@ -6,6 +6,7 @@ import QuizWarningBox from '@/components/QuizWarningBox'
 import { useExamDeploymentDetailQuery, useExamDeploymentStatusQuery } from '@/hooks/useQuiz'
 import {
   SingleChoice,
+  MultipleChoice,
   OX,
   FillBlank,
   Ordering,
@@ -58,6 +59,14 @@ function QuizPage() {
           <SingleChoice
             question={question}
             answer={answer as string | null}
+            onAnswerChange={handleAnswerChange}
+          />
+        )
+      case 'multiple_choice': // 다중선택
+        return (
+          <MultipleChoice
+            question={question}
+            answer={answer as string[] | null}
             onAnswerChange={handleAnswerChange}
           />
         )
