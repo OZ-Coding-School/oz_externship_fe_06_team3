@@ -5,6 +5,16 @@ import { useAuthStore } from '@/store/authStore'
 import { Button } from '@/components/common/Button'
 import { RegisterStudentModal } from '@/components/common/Modal/variants'
 
+// 드롭다운 스타일
+const dropdownContainerClass =
+  'absolute top-17 right-0 z-50 w-[204px] rounded-[12px] bg-white px-[16px] py-[16px] shadow-[0_0_16px_0_#A0A0A040]'
+const userInfoContainerClass = 'h-[53px] w-[172px] items-start gap-[20px]'
+const userNameClass = 'text-[16px] font-semibold text-black py-2'
+const userEmailClass = 'text-[14px] font-normal text-gray-400 mb-2'
+const dividerClass = 'my-4 border-t border-mono-200'
+const dropdownButtonClass =
+  'hover:no-underline hover:bg-primary-100 hover:text-primary block w-full justify-start p-2 text-left text-sm'
+
 export default function Header() {
   const [open, setOpen] = useState(false)
   const [registerStudentModalOpen, setRegisterStudentModalOpen] = useState(false)
@@ -147,23 +157,19 @@ export default function Header() {
                 </Button>
 
                 {open && (
-                  <div className="absolute top-17 right-0 z-50 w-[204px] rounded-[12px] bg-white px-[16px] py-[16px] shadow-[0_0_16px_0_#A0A0A040]">
-                    <div className="h-[53px] w-[172px] items-start gap-[20px]">
-                      <p className="font-[Pretendard] text-[16px] leading-[140%] font-semibold tracking-[-0.03em] text-gray-900">
-                        {user?.name ?? '유저'}
-                      </p>
-                      <p className="text-mono-600 font-[Pretendard] text-[14px] leading-[140%] font-normal tracking-[-0.03em]">
-                        {user?.email ?? ''}
-                      </p>
+                  <div className={dropdownContainerClass}>
+                    <div className={userInfoContainerClass}>
+                      <p className={userNameClass}>{user?.name ?? '유저'}</p>
+                      <p className={userEmailClass}>{user?.email ?? ''}</p>
                     </div>
 
-                    <div className="my-4 border-t border-mono-200" />
+                    <div className={dividerClass} />
 
                     <Button
                       type="button"
                       variant="link"
                       size="auto"
-                      className="hover:no-underline hover:bg-primary-100 hover:text-primary block w-full justify-start py-3 text-left text-sm"
+                      className={dropdownButtonClass}
                       onClick={() => {
                         setOpen(false)
                         setRegisterStudentModalOpen(true)
@@ -176,7 +182,7 @@ export default function Header() {
                       type="button"
                       variant="link"
                       size="auto"
-                      className="hover:no-underline hover:bg-primary-100 hover:text-primary block w-full justify-start py-3 text-left text-sm"
+                      className={dropdownButtonClass}
                       onClick={() => {
                         setOpen(false)
                         navigate('/mypage')
@@ -189,7 +195,7 @@ export default function Header() {
                       type="button"
                       variant="link"
                       size="auto"
-                      className="hover:no-underline hover:bg-primary-100 hover:text-primary block w-full justify-start py-3 text-left text-sm"
+                      className={dropdownButtonClass}
                       onClick={handleLogout}
                     >
                       로그아웃
