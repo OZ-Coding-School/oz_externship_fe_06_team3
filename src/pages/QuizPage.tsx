@@ -10,6 +10,7 @@ import {
   OX,
   FillBlank,
   Ordering,
+  ShortAnswer,
 } from '@/components/quiz'
 import type { ExamDeploymentDetailResult } from '@/mappers/examDeploymentDetail'
 
@@ -67,6 +68,14 @@ function QuizPage() {
           <MultipleChoice
             question={question}
             answer={answer as string[] | null}
+            onAnswerChange={handleAnswerChange}
+          />
+        )
+      case 'short_answer': // short answer
+        return (
+          <ShortAnswer
+            question={question}
+            answer={answer as string | null}
             onAnswerChange={handleAnswerChange}
           />
         )
