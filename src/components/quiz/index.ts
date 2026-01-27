@@ -1,1 +1,7 @@
 export { default as QuizCard } from './QuizCard'
+export { default as SingleChoice } from './SingleChoice'
+export { default as OX } from './OX'
+export { default as Ordering } from './Ordering'
+export { default as FillBlank } from './FillBlank'
+export { default as QuizContent } from './QuizContent'
+export { default as QuizTabs } from './QuizTabs'
