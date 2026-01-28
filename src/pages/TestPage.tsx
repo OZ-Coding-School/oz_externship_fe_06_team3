@@ -224,6 +224,13 @@ function TestPage() {
           console.log('쪽지시험 시작:', data)
           setStartQuizOpen(false)
         }}
+        // 테스트 페이지용 더미 데이터 (실제 화면에서는 QuizCard에서 전달)
+        deploymentId={101}
+        imageUrl="/icons/Course/React.svg"
+        subjectName="React"
+        quizName="React 기초 쪽지시험"
+        questionCount={10}
+        timeLimit={30}
       />
 
       <CheatingWarningModal
