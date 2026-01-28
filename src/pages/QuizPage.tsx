@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Button, Loading, Modal, NotFound } from '@/components/common'
-import QuizHeader from '@/components/QuizHeader'
+import QuizHeader from '@/components/quiz/QuizHeader'
 import QuizWarningBox from '@/components/QuizWarningBox'
 import { useExamDeploymentDetailQuery, useExamDeploymentStatusQuery } from '@/hooks/useQuiz'
 import {
@@ -182,7 +182,7 @@ function QuizPage() {
       </main>
 
       <footer>
-        <div className="flex justify-center">
+        <div className="flex justify-center mb-10">
           <Button variant="primary" size="md" rounded="default" onClick={handleSubmit}>
             제출하기
           </Button>

@@ -23,7 +23,7 @@ export default function QuizCard({ quiz }: QuizCardProps) {
   const handleFallbackImageError = () => setFallbackImageError(true)
   const handleButtonClick = () => {
     if (isDone && quiz.submissionId) {
-      navigate(`/quiz/${quiz.id}/result`)
+      navigate(`/quiz/result/${quiz.submissionId}`)
     } else {
       navigate(`/quiz/${quiz.id}`)
     }
