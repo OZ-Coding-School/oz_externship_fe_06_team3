@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/common/Button'
+import { StartQuizModal } from '@/components/common/Modal'
 import type { ExamDeploymentsResult } from '@/mappers/examDeployments'
 
 interface QuizCardProps {
@@ -11,6 +12,7 @@ export default function QuizCard({ quiz }: QuizCardProps) {
   const navigate = useNavigate()
   const [imageError, setImageError] = useState(false)
   const [fallbackImageError, setFallbackImageError] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const isDone = quiz.isDone
   const imageUrl = quiz.exam.subject.thumbnailImgUrl || quiz.exam.thumbnailImgUrl
   const subjectName = quiz.exam.subject.title
@@ -19,6 +21,7 @@ export default function QuizCard({ quiz }: QuizCardProps) {
     ? `${quiz.examInfo.score}점/${quiz.totalScore}점 ㆍ ${quiz.examInfo.correctAnswerCount}/${quiz.questionCount}개 정답`
     : '응시하고 점수를 확인해보세요!'
   const buttonText = isDone ? '상세보기' : '응시하기'
+
   const handleImageError = () => setImageError(true)
   const handleFallbackImageError = () => setFallbackImageError(true)
   const requestFullscreen = async () => {
@@ -34,11 +37,21 @@ export default function QuizCard({ quiz }: QuizCardProps) {
   }
   const handleButtonClick = async () => {
     await requestFullscreen()
+  
+  const handleButtonClick = () => {
     if (isDone && quiz.submissionId) {
       navigate(`/quiz/result/${quiz.submissionId}`)
     } else {
-      navigate(`/quiz/${quiz.id}`)
+      setIsModalOpen(true)
     }
+  }
+
+  const handleModalClose = () => {
+    setIsModalOpen(false)
+  }
+
+  const handleModalSuccess = () => {
+    navigate(`/quiz/${quiz.id}`)
   }
 
   // 스타일 클래스
@@ -92,6 +105,21 @@ export default function QuizCard({ quiz }: QuizCardProps) {
           {buttonText}
         </Button>
       </div>
+
+      {/* 응시코드 입력 모달 */}
+      {!isDone && (
+        <StartQuizModal
+          isOpen={isModalOpen}
+          onClose={handleModalClose}
+          onSuccess={handleModalSuccess}
+          deploymentId={quiz.id}
+          imageUrl={imageUrl || fallbackImageUrl}
+          subjectName={quiz.exam.subject.title}
+          quizName={quiz.exam.title}
+          questionCount={quiz.questionCount}
+          timeLimit={quiz.durationTime}
+        />
+      )}
     </div>
   )
 }
