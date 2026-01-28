@@ -24,6 +24,7 @@ export default function QuizCard({ quiz }: QuizCardProps) {
 
   const handleImageError = () => setImageError(true)
   const handleFallbackImageError = () => setFallbackImageError(true)
+
   const requestFullscreen = async () => {
     if (document.fullscreenElement) return
     const element = document.documentElement
@@ -35,10 +36,10 @@ export default function QuizCard({ quiz }: QuizCardProps) {
       }
     }
   }
+
   const handleButtonClick = async () => {
     await requestFullscreen()
-  
-  const handleButtonClick = () => {
+
     if (isDone && quiz.submissionId) {
       navigate(`/quiz/result/${quiz.submissionId}`)
     } else {
