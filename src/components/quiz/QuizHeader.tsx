@@ -28,7 +28,7 @@ function QuizHeader({
   const maxCheatingCount = 3
 
   return (
-    <header className="border-b border-gray-200 bg-[#FAFAFA] px-6 py-6">
+    <header className="border-b border-gray-200 bg-[#FAFAFA] px-6 py-6 border-b-4 border-[#BDBDBD] shadow-lg">
       <div className="mx-auto flex max-w-[1200px] items-center justify-between">
         {/* 좌측 영역 */}
         <div className="flex flex-col">

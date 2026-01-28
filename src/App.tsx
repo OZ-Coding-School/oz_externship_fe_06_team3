@@ -9,6 +9,7 @@ import SignupPage from '@/pages/SignupPage'
 import MyPage from '@/pages/MyPage'
 import MyPageQuiz from '@/components/MyPageQuiz'
 import QuizPage from '@/pages/QuizPage'
+import QuizResultPage from '@/pages/QuizResultPage'
 import MainLayout from '@/components/layout/MainLayout'
 import { RequireAuth } from '@/components/auth/RequireAuth'
 import MyInfo from './components/MyInfo'
@@ -40,6 +41,7 @@ function App() {
         <Route element={<RequireAuth />}>
           <Route path="/quiz" element={<QuizPage />} />
           <Route path="/quiz/:deploymentId" element={<QuizPage />} />
+          <Route path="/quiz/result/:submissionId" element={<QuizResultPage />} />
         </Route>
       </Routes>
       <ReactQueryDevtools initialIsOpen={false} />
