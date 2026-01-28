@@ -11,6 +11,8 @@ import {
   Ordering,
 } from '@/components/quiz'
 import type { ExamDeploymentDetailResult } from '@/mappers/examDeploymentDetail'
+import MultipleChoice from '@/components/quiz/MultipleChoice'
+import ShortAnswer from '@/components/quiz/ShortAnswer'
 
 type Question = ExamDeploymentDetailResult['questions'][0]
 
@@ -56,6 +58,22 @@ function QuizPage() {
       case 'single_choice': // 단일선택 (라디오 버튼)
         return (
           <SingleChoice
+            question={question}
+            answer={answer as string | null}
+            onAnswerChange={handleAnswerChange}
+          />
+        )
+      case 'multiple_choice': // 다중선택
+        return (
+          <MultipleChoice
+            question={question}
+            answer={answer as string[] | null}
+            onAnswerChange={handleAnswerChange}
+          />
+        )
+      case 'short_answer': // 단답형
+        return (
+          <ShortAnswer
             question={question}
             answer={answer as string | null}
             onAnswerChange={handleAnswerChange}
