@@ -1,4 +1,4 @@
-import api from '@/api/api'
+import { apiClient } from '@/api/client'
 import {
   mapExamDeploymentsResult,
   type ExamDeploymentsResponse,
@@ -32,7 +32,7 @@ export interface FetchExamDeploymentsParams {
  * const data = await fetchExamDeployments({ page: 1, status: 'all' })
  */
 export const fetchExamDeployments = async (params: FetchExamDeploymentsParams = {}) => {
-  const response = await api.get<ExamDeploymentsResponse>('/api/v1/exams/deployments', {
+  const response = await apiClient.get<ExamDeploymentsResponse>('/api/v1/exams/deployments', {
     params: {
       page: params.page ?? 1,
       status: params.status ?? 'all',
@@ -47,7 +47,7 @@ export const fetchExamDeployments = async (params: FetchExamDeploymentsParams = 
  * const data = await fetchExamDeploymentDetail(101)
  */
 export const fetchExamDeploymentDetail = async (deploymentId: number) => {
-  const response = await api.get<ExamDeploymentDetailResponse>(
+  const response = await apiClient.get<ExamDeploymentDetailResponse>(
     `/api/v1/exams/deplayments/${deploymentId}`
   )
   return mapExamDeploymentDetail(response.data)
@@ -59,7 +59,7 @@ export const fetchExamDeploymentDetail = async (deploymentId: number) => {
  * const data = await fetchExamDeploymentStatus(101)
  */
 export const fetchExamDeploymentStatus = async (deploymentId: number) => {
-  const response = await api.get<ExamDeploymentStatusResponse>(
+  const response = await apiClient.get<ExamDeploymentStatusResponse>(
     `/api/v1/exams/deplayments/${deploymentId}/status`
   )
   return mapExamDeploymentStatus(response.data)
@@ -71,9 +71,12 @@ export const fetchExamDeploymentStatus = async (deploymentId: number) => {
  * const data = await checkExamCode(101, '123456')
  */
 export const checkExamCode = async (deploymentId: number, code: string) => {
-  const response = await api.post(`/api/v1/exams/deployments/${deploymentId}/check-code`, {
-    code,
-  })
+  const response = await apiClient.post(
+    `/api/v1/exams/deployments/${deploymentId}/check-code`,
+    {
+      code,
+    }
+  )
   return mapCheckCodeResult(response.data)
 }
 
@@ -96,7 +99,10 @@ export interface ExamSubmissionPayload {
  * const data = await submitExam(payload)
  */
 export const submitExam = async (payload: ExamSubmissionPayload) => {
-  const response = await api.post<ExamSubmissionResponse>('/api/v1/exams/submissions', payload)
+  const response = await apiClient.post<ExamSubmissionResponse>(
+    '/api/v1/exams/submissions',
+    payload
+  )
   return mapExamSubmissionResult(response.data)
 }
 
@@ -106,7 +112,7 @@ export const submitExam = async (payload: ExamSubmissionPayload) => {
  * const data = await fetchExamSubmissionResult(350)
  */
 export const fetchExamSubmissionResult = async (submissionId: number) => {
-  const response = await api.get<ExamSubmissionResultResponse>(
+  const response = await apiClient.get<ExamSubmissionResultResponse>(
     `/api/v1/exams/submissions/${submissionId}`
   )
   return mapExamSubmissionResultDetail(response.data)
