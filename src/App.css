@@ -83,7 +83,9 @@
 .infoText {
   @apply mr-[85px] w-[100px] text-[18px];
 }
-
+.infoborder {
+  @apply rounded-[7px] border border-[#D1D1D1] px-[44px] py-[52px];
+}
 /* 문제 헤더 공통 스타일 */
 .quiz-header {
   @apply mb-4 flex items-center gap-2;
@@ -94,6 +96,5 @@
 }
 
 .quiz-header-badge {
-  @apply bg-[#ECECEC] rounded-[2px] text-[12px] font-normal text-[#121212] px-2 py-[2px];
+  @apply rounded-[2px] bg-[#ECECEC] px-2 py-[2px] text-[12px] font-normal text-[#121212];
 }
-
