@@ -1,4 +1,4 @@
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 
 // 스타일 선언명 정의
 const titleStyle = 'text-black font-semibold text-[20px]'
@@ -7,8 +7,11 @@ const infoBoxStyle = 'flex items-center gap-2 rounded-[30px] bg-white border bor
 const timerTextStyle = 'text-[#6201E0] text-[18px]'
 const timerNumberStyle = 'text-[#6201E0] font-semibold text-[18px]'
 const warningLabelStyle = 'text-gray-700 font-semibold text-[18px] px-1'
-const warningIconBoxStyle = 'h-6 w-4 rounded border border-gray-300 bg-white flex items-center justify-center'
+const warningIconBoxStyle = 'h-6 w-4 rounded flex items-center justify-center'
+const warningIconDefaultStyle = 'border border-gray-300 bg-white'
 const warningIconTextStyle = 'text-gray-400 text-sm'
+const warningActiveStyle = 'border-[#FFAE00] bg-[#FFAE00]'
+const dangerActiveStyle = 'border-[#EC0037] bg-[#EC0037]'
 
 interface QuizHeaderProps {
   subjectName?: string
@@ -26,6 +29,18 @@ function QuizHeader({
   cheatingCount: _cheatingCount = 0,
 }: QuizHeaderProps) {
   const maxCheatingCount = 3
+  const cheatingCount = Math.min(Math.max(_cheatingCount, 0), maxCheatingCount)
+
+  const getWarningBoxClass = (index: number) => {
+    if (cheatingCount <= index) return `${warningIconBoxStyle} ${warningIconDefaultStyle}`
+    if (index === maxCheatingCount - 1) {
+      return `${warningIconBoxStyle} ${dangerActiveStyle}`
+    }
+    return `${warningIconBoxStyle} ${warningActiveStyle}`
+  }
+
+  const getWarningTextClass = (index: number) =>
+    cheatingCount > index ? 'text-white text-sm' : warningIconTextStyle
 
   return (
     <header className="border-b border-gray-200 bg-[#FAFAFA] px-6 py-6 border-b-4 border-[#BDBDBD] shadow-lg">
@@ -57,8 +72,8 @@ function QuizHeader({
             <span className={warningLabelStyle}>부정행위</span>
             <div className="flex gap-1">
               {Array.from({ length: maxCheatingCount }).map((_, index) => (
-                <div key={index} className={warningIconBoxStyle}>
-                  <span className={warningIconTextStyle}>!</span>
+                <div key={index} className={getWarningBoxClass(index)}>
+                  <span className={getWarningTextClass(index)}>!</span>
                 </div>
               ))}
             </div>
