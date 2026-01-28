@@ -89,15 +89,25 @@ export const CommonInput = forwardRef<HTMLInputElement, CommonInputProps>(
       hasValue,
     ])
 
+    const widthStyle =
+      typeof width === 'number'
+        ? `${width}px`
+        : typeof width === 'string'
+          ? width
+          : undefined
+
     return (
       <div
-        className="flex flex-col gap-1.5"
-        style={{ width: typeof width === 'number' ? `${width}px` : width }}
+        className="flex w-full min-w-0 flex-col gap-1.5"
+        style={{
+          width: widthStyle,
+          minWidth: 0,
+        }}
       >
         <div
           className={clsx(
-            'flex h-12 items-center gap-2.5 rounded-lg border px-4 transition-colors duration-200',
-            'focus-within:ring-1',
+            'flex h-12 min-w-0 items-center gap-2.5 rounded-lg border px-4 transition-colors duration-200',
+            'focus-within:ring-1 focus-within:ring-inset',
             state === 'default' &&
               'border-gray-300 bg-white focus-within:border-violet-600 focus-within:ring-violet-600',
             state === 'error' &&
@@ -130,7 +140,8 @@ export const CommonInput = forwardRef<HTMLInputElement, CommonInputProps>(
             aria-invalid={state === 'error' ? true : undefined}
             aria-describedby={shouldShowHelper ? helperId : undefined}
             className={clsx(
-              'flex-1 bg-transparent text-sm outline-none sm:text-base',
+              'w-full min-w-0 flex-1 bg-transparent text-sm outline-none sm:text-base',
+              'overflow-hidden text-ellipsis whitespace-nowrap',
               locked ? 'text-gray-400' : 'text-black',
               placeholderVariant === 'a' ? 'placeholder-a' : 'placeholder-b'
             )}
