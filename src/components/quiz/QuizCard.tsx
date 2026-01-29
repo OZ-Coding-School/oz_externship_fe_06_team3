@@ -25,21 +25,7 @@ export default function QuizCard({ quiz }: QuizCardProps) {
   const handleImageError = () => setImageError(true)
   const handleFallbackImageError = () => setFallbackImageError(true)
 
-  const requestFullscreen = async () => {
-    if (document.fullscreenElement) return
-    const element = document.documentElement
-    if (element.requestFullscreen) {
-      try {
-        await element.requestFullscreen()
-      } catch {
-        throw new Error('전체화면 모드로 전환하지 못했습니다. 전체화면 모드를 허용해 주세요.')
-      }
-    }
-  }
-
-  const handleButtonClick = async () => {
-    await requestFullscreen()
-
+  const handleButtonClick = () => {
     if (isDone && quiz.submissionId) {
       navigate(`/quiz/result/${quiz.submissionId}`)
     } else {
@@ -49,10 +35,6 @@ export default function QuizCard({ quiz }: QuizCardProps) {
 
   const handleModalClose = () => {
     setIsModalOpen(false)
-  }
-
-  const handleModalSuccess = () => {
-    navigate(`/quiz/${quiz.id}`)
   }
 
   // 스타일 클래스
@@ -112,7 +94,6 @@ export default function QuizCard({ quiz }: QuizCardProps) {
         <StartQuizModal
           isOpen={isModalOpen}
           onClose={handleModalClose}
-          onSuccess={handleModalSuccess}
           deploymentId={quiz.id}
           imageUrl={imageUrl || fallbackImageUrl}
           subjectName={quiz.exam.subject.title}

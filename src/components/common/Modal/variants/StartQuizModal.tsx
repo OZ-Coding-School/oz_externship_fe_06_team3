@@ -36,6 +36,18 @@ export function StartQuizModal({
   const [imageError, setImageError] = useState(false)
   const checkCodeMutation = useCheckExamCodeMutation()
 
+  const requestFullscreen = async () => {
+    if (document.fullscreenElement) return
+    const element = document.documentElement
+    if (element.requestFullscreen) {
+      try {
+        await element.requestFullscreen()
+      } catch {
+        // ignore
+      }
+    }
+  }
+
   const methods = useForm<StartQuizFormData>({
     resolver: zodResolver(startQuizSchema),
     defaultValues: {
@@ -62,6 +74,7 @@ export function StartQuizModal({
 
       onSuccess?.(data)
       onClose()
+      await requestFullscreen()
       navigate(`/quiz/${deploymentId}`)
     } catch (error) {
       methods.setError('code', {
