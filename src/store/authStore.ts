@@ -13,11 +13,12 @@ type AuthState = {
 
   login: (payload: LoginPayload) => Promise<void>
   logout: () => Promise<void>
+  restore: () => Promise<void>
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       accessToken: null,
       user: null,
       isAuthenticated: false,
@@ -31,16 +32,12 @@ export const useAuthStore = create<AuthState>()(
       login: async (payload) => {
         try {
           const res = await authApi.login(payload)
+          if (!res?.access_token) throw new Error('LOGIN_FAILED')
 
-          if (!res?.accessToken || !res?.user) {
-            throw new Error('LOGIN_FAILED')
-          }
+          set({ accessToken: res.access_token, isAuthenticated: true })
 
-          set({
-            accessToken: res.accessToken,
-            user: res.user,
-            isAuthenticated: true,
-          })
+          const user = await authApi.me()
+          set({ user, isAuthenticated: true })
         } catch (err) {
           set({ accessToken: null, user: null, isAuthenticated: false })
           throw err
@@ -48,8 +45,23 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: async () => {
-        await authApi.logout()
-        set({ accessToken: null, user: null, isAuthenticated: false })
+        try {
+          await authApi.logout()
+        } finally {
+          get().clearAuth()
+        }
+      },
+
+      restore: async () => {
+        const token = get().accessToken
+        if (!token) return
+
+        try {
+          const user = await authApi.me()
+          set({ user, isAuthenticated: true })
+        } catch {
+          get().clearAuth()
+        }
       },
     }),
     {

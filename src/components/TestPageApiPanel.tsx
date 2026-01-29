@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import api from '@/api/api'
+import { apiClient } from '@/api/client'
 import { Button, CommonInput, Dropdown } from '@/components/common'
 
 const getErrorPayload = (error: unknown) => {
@@ -32,7 +32,7 @@ const TestPageApiPanel = () => {
   const deploymentsQuery = useQuery({
     queryKey: ['examDeployments', page, status],
     queryFn: async () => {
-      const response = await api.get('/api/v1/exams/deployments', {
+      const response = await apiClient.get('/api/v1/exams/deployments', {
         params: { page: Number(page) || 1, status },
       })
       return response.data
@@ -44,7 +44,7 @@ const TestPageApiPanel = () => {
   const detailQuery = useQuery({
     queryKey: ['examDeploymentDetail', deploymentId],
     queryFn: async () => {
-      const response = await api.get(`/api/v1/exams/deplayments/${deploymentId}`)
+      const response = await apiClient.get(`/api/v1/exams/deplayments/${deploymentId}`)
       return response.data
     },
     enabled: false,
@@ -53,7 +53,7 @@ const TestPageApiPanel = () => {
 
   const checkCodeMutation = useMutation({
     mutationFn: async () => {
-      const response = await api.post(
+      const response = await apiClient.post(
         `/api/v1/exams/deployments/${deploymentId}/check-code`,
         code ? { code } : {}
       )
@@ -77,7 +77,7 @@ const TestPageApiPanel = () => {
           { question_id: 5006, type: 'fill_blank', submitted_answer: ['A', 'B'] },
         ],
       }
-      const response = await api.post('/api/v1/exams/submissions', payload)
+      const response = await apiClient.post('/api/v1/exams/submissions', payload)
       return response.data
     },
     retry: false,
@@ -86,7 +86,7 @@ const TestPageApiPanel = () => {
   const submissionResultQuery = useQuery({
     queryKey: ['examSubmissionResult', submissionId],
     queryFn: async () => {
-      const response = await api.get(`/api/v1/exams/submissions/${submissionId}`)
+      const response = await apiClient.get(`/api/v1/exams/submissions/${submissionId}`)
       return response.data
     },
     enabled: false,

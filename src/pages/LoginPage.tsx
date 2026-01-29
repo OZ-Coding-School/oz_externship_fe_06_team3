@@ -5,7 +5,7 @@ import { PasswordField } from '@/components/common/PasswordField'
 import { Button } from '@/components/common/Button'
 import SocialLoginSection from '@/components/auth/SocialLoginSection'
 import type { SocialProviderId } from '@/types/social'
-import { PASSWORD_HELPER, type LoginFormData } from '@/schemas/auth'
+import { type LoginFormData } from '@/schemas/auth'
 
 import { useLoginPage } from '@/hooks/useLoginPage'
 
@@ -23,8 +23,8 @@ export default function LoginPage() {
     goFindPw,
   } = useLoginPage()
 
-  const handleSocialLogin = (provider: SocialProviderId) => {
-    console.log(`${provider} 로그인`)
+  const handleSocialLogin = (_provider: SocialProviderId) => {
+    // TODO: 소셜 로그인 구현
   }
 
   return (
@@ -90,7 +90,7 @@ export default function LoginPage() {
                       helperVisibility="focus"
                       showDefaultHelper={false}
                       helperTextByState={{
-                        default: PASSWORD_HELPER,
+                        default: '* 6~15자의 영문/숫자/특수문자 조합',
                       }}
                     />
 
