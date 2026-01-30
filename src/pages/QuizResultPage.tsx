@@ -90,6 +90,10 @@ function QuizResultPage() {
             question={mapped as any}
             answer={(submitted?.[0] ?? null) as string | null}
             onAnswerChange={() => { }}
+            isResult
+            correctAnswer={(question.answer?.[0] ?? null) as string | null}
+            isCorrect={question.isCorrect}
+            explanation={question.explanation}
           />
         )
       case 'fill_blank':
