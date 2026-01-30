@@ -35,7 +35,7 @@ export function PasswordSection({
         placeholder="비밀번호를 입력해주세요"
         width="100%"
         placeholderVariant="a"
-        state={passwordFieldState} 
+        state={passwordFieldState}
         showDefaultHelper
         helperVisibility="focus"
         helperTextByState={{
