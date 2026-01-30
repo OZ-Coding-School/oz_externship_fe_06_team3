@@ -1,7 +1,6 @@
 import { useVerificationFlow } from '@/hooks/useVerificationFlow'
 import * as authApi from '@/api/auth'
-import { pickMessageFromAxios } from '@/utils/signupUtils'
-import { emailZ } from '@/utils/signupUtils'
+import { pickMessageFromAxios, emailZ } from '@/utils/signupUtils'
 
 const TTL_SEC = 5 * 60
 

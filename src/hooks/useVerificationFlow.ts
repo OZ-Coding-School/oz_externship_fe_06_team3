@@ -42,6 +42,51 @@ type UseVerificationFlowArgs<TVerifyRes> = {
   }
 }
 
+type ComputeUIParams = {
+  verified: boolean
+  sendStatus: Status
+  verifyStatus: Status
+  codeSent: boolean
+  identity: string
+  code: string
+  busy: boolean
+  validateIdentity: (identity: string) => ValidationResult
+}
+
+function toFieldState(s: Status): 'success' | 'error' | 'default' {
+  return s === 'success' ? 'success' : s === 'error' ? 'error' : 'default'
+}
+
+function computeUI(params: ComputeUIParams) {
+  const {
+    verified,
+    sendStatus,
+    verifyStatus,
+    codeSent,
+    identity,
+    code,
+    busy,
+    validateIdentity,
+  } = params
+  const sendLabel = codeSent ? '재전송' : '전송'
+  const canSend = validateIdentity(identity).ok && !busy && !verified
+  const canVerify =
+    !!codeSent && !!code?.trim() && !busy && !verified
+  const fieldState = verified
+    ? 'success'
+    : sendStatus === 'error'
+      ? 'error'
+      : sendStatus === 'success'
+        ? 'success'
+        : 'default'
+  const codeFieldState = verified
+    ? 'success'
+    : verifyStatus === 'error'
+      ? 'error'
+      : 'default'
+  return { sendLabel, canSend, canVerify, fieldState, codeFieldState }
+}
+
 export function useVerificationFlow<TVerifyRes>({
   identity,
   code,
@@ -63,103 +108,111 @@ export function useVerificationFlow<TVerifyRes>({
   const timer = useCountdown(ttlSec)
 
   const [token, setToken] = useState<string | null>(null)
-
   const [codeSent, setCodeSent] = useState(false)
-
   const [sendStatus, setSendStatus] = useState<Status>('idle')
   const [sendMsg, setSendMsg] = useState<string | null>(null)
-
   const [verified, setVerified] = useState(false)
   const [verifyStatus, setVerifyStatus] = useState<Status>('idle')
   const [verifyMsg, setVerifyMsg] = useState<string | null>(null)
 
-  // 식별자 바뀌면 상태 초기화
-  useEffect(() => {
+  function resetOnIdentityChange() {
     setSendStatus('idle')
     setSendMsg(null)
-
     setVerified(false)
     setToken(null)
-
     setVerifyStatus('idle')
     setVerifyMsg(null)
-
     setCodeSent(false)
     timer.reset()
+  }
+
+  function resetVerification() {
+    setVerified(false)
+    setToken(null)
+    setVerifyStatus('idle')
+    setVerifyMsg(null)
+  }
+
+  function applyIdentityValidationError(v: ValidationResult) {
+    const msg = v.message ?? text.identityInvalid
+    setSendStatus('error')
+    setSendMsg(msg)
+    if (v.fieldErrors) {
+      Object.entries(v.fieldErrors).forEach(([k, m]) => setFieldError(k, m))
+    } else {
+      identityFields.forEach((f) => setFieldError(f, msg))
+    }
+  }
+
+  async function withBusy<T>(fn: () => Promise<T>): Promise<T> {
+    setBusy(true)
+    try {
+      return await fn()
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  useEffect(() => {
+    resetOnIdentityChange()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [identity])
 
-  const toFieldState = (s: Status) =>
-    s === 'success' ? 'success' : s === 'error' ? 'error' : 'default'
-
-  const fieldState = useMemo(() => {
-    // 식별자 input border 색 변경
-    return verified
-      ? 'success'
-      : sendStatus === 'error'
-        ? 'error'
-        : sendStatus === 'success'
-          ? 'success'
-          : 'default'
-  }, [verified, sendStatus])
-
-  const codeFieldState = useMemo(() => {
-    // 인증코드 input border 색 변경
-    return verified ? 'success' : verifyStatus === 'error' ? 'error' : 'default'
-  }, [verified, verifyStatus])
-
-  const sendLabel = codeSent ? '재전송' : '전송'
-  const canSend = useMemo(() => {
-    return validateIdentity(identity).ok && !busy && !verified
-  }, [identity, busy, verified, validateIdentity])
-
-  const canVerify = useMemo(() => {
-    return !!codeSent && !!code?.trim() && !busy && !verified
-  }, [codeSent, code, busy, verified])
+  const ui = useMemo(
+    () =>
+      ({
+        ...computeUI({
+          verified,
+          sendStatus,
+          verifyStatus,
+          codeSent,
+          identity,
+          code,
+          busy,
+          validateIdentity,
+        }),
+        toFieldState,
+      }) as ReturnType<typeof computeUI> & { toFieldState: typeof toFieldState },
+    [
+      verified,
+      sendStatus,
+      verifyStatus,
+      codeSent,
+      identity,
+      code,
+      busy,
+      validateIdentity,
+    ]
+  )
 
   const onSendCode = async () => {
     clearErrors([...identityFields, codeField])
-
-    // 재전송/변경 시 인증 상태 초기화
-    setVerified(false)
-    setToken(null)
-    setVerifyStatus('idle')
-    setVerifyMsg(null)
+    resetVerification()
 
     const v = validateIdentity(identity)
     if (!v.ok) {
-      const msg = v.message ?? text.identityInvalid
-      setSendStatus('error')
-      setSendMsg(msg)
-
-      if (v.fieldErrors) {
-        Object.entries(v.fieldErrors).forEach(([k, m]) => setFieldError(k, m))
-      } else {
-        identityFields.forEach((f) => setFieldError(f, msg))
-      }
-
+      applyIdentityValidationError(v)
       setCodeSent(false)
       timer.reset()
       return
     }
 
-    setBusy(true)
-    try {
-      await send(identity)
-      setSendStatus('success')
-      setSendMsg(codeSent ? text.resent : text.sent)
-      setCodeSent(true)
-      timer.start()
-    } catch (err) {
-      const msg = getSendErrorMessage(err)
-      setSendStatus('error')
-      setSendMsg(msg)
-      identityFields.forEach((f) => setFieldError(f, msg))
-      setCodeSent(false)
-      timer.reset()
-    } finally {
-      setBusy(false)
-    }
+    await withBusy(async () => {
+      try {
+        await send(identity)
+        setSendStatus('success')
+        setSendMsg(codeSent ? text.resent : text.sent)
+        setCodeSent(true)
+        timer.start()
+      } catch (err) {
+        const msg = getSendErrorMessage(err)
+        setSendStatus('error')
+        setSendMsg(msg)
+        identityFields.forEach((f) => setFieldError(f, msg))
+        setCodeSent(false)
+        timer.reset()
+      }
+    })
   }
 
   const onVerifyCode = async () => {
@@ -171,31 +224,28 @@ export function useVerificationFlow<TVerifyRes>({
     }
 
     if (!timer.isRunning) {
-      setVerified(false)
-      setToken(null)
+      resetVerification()
       setVerifyStatus('error')
       setVerifyMsg(text.expired)
       return
     }
 
-    setBusy(true)
-    try {
-      const res = await verify(identity, code.trim())
-      setToken(getToken(res))
-      setVerified(true)
-      setVerifyStatus('success')
-      setVerifyMsg(text.verifySuccess)
-      timer.reset()
-    } catch (err) {
-      const msg = getVerifyErrorMessage(err)
-      setVerified(false)
-      setToken(null)
-      setVerifyStatus('error')
-      setVerifyMsg(msg)
-      setFieldError(codeField, msg)
-    } finally {
-      setBusy(false)
-    }
+    await withBusy(async () => {
+      try {
+        const res = await verify(identity, code.trim())
+        setToken(getToken(res))
+        setVerified(true)
+        setVerifyStatus('success')
+        setVerifyMsg(text.verifySuccess)
+        timer.reset()
+      } catch (err) {
+        const msg = getVerifyErrorMessage(err)
+        resetVerification()
+        setVerifyStatus('error')
+        setVerifyMsg(msg)
+        setFieldError(codeField, msg)
+      }
+    })
   }
 
   return {
@@ -210,14 +260,7 @@ export function useVerificationFlow<TVerifyRes>({
 
     timer,
 
-    ui: {
-      sendLabel,
-      canSend,
-      canVerify,
-      fieldState,
-      codeFieldState,
-      toFieldState,
-    },
+    ui,
 
     actions: {
       onSendCode,
