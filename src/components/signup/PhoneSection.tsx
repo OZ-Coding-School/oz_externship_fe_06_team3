@@ -52,6 +52,8 @@ export function PhoneSection({
   onSendSmsCode,
   onVerifySmsCode,
 }: Props) {
+  const canTypeSmsCode = smsCodeSent && !smsVerified
+
   const SmsCodeRightSlot = (
     <div className="flex items-center gap-2">
       {smsVerified ? (
@@ -164,6 +166,7 @@ export function PhoneSection({
             }}
             rightSlot={SmsCodeRightSlot}
             locked={smsVerified}
+            disabled={!canTypeSmsCode}
           />
         </div>
 
