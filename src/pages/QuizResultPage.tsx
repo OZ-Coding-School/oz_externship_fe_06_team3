@@ -82,6 +82,9 @@ function QuizResultPage() {
             question={mapped as any}
             answer={(submitted?.[0] ?? '') as string}
             onAnswerChange={() => { }}
+            isResult
+            isCorrect={question.isCorrect}
+            explanation={question.explanation}
           />
         )
       case 'ox':
