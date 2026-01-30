@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useReducer, useCallback, useRef } from 'react'
 import { useCountdown } from '@/hooks/useCountdown'
 
-export type Status = 'idle' | 'error' | 'success'
+export type Status = 'idle' | 'pending' | 'error' | 'success'
 
 type FieldErrorMap = Record<string, string>
 
@@ -47,44 +47,158 @@ type ComputeUIParams = {
   sendStatus: Status
   verifyStatus: Status
   codeSent: boolean
-  identity: string
   code: string
   busy: boolean
-  validateIdentity: (identity: string) => ValidationResult
+  identityValid: boolean
+}
+
+type ComputeUIResult = {
+  sendLabel: string
+  canSend: boolean
+  canVerify: boolean
+  fieldState: 'success' | 'error' | 'default'
+  codeFieldState: 'success' | 'error' | 'default'
 }
 
 function toFieldState(s: Status): 'success' | 'error' | 'default' {
-  return s === 'success' ? 'success' : s === 'error' ? 'error' : 'default'
+  switch (s) {
+    case 'success':
+      return 'success'
+    case 'error':
+      return 'error'
+    case 'idle':
+    case 'pending':
+    default:
+      return 'default'
+  }
 }
 
-function computeUI(params: ComputeUIParams) {
+function computeUI(params: ComputeUIParams): ComputeUIResult {
   const {
     verified,
     sendStatus,
     verifyStatus,
     codeSent,
-    identity,
     code,
     busy,
-    validateIdentity,
+    identityValid,
   } = params
   const sendLabel = codeSent ? '재전송' : '전송'
-  const canSend = validateIdentity(identity).ok && !busy && !verified
+  const canSend =
+    identityValid && !busy && !verified && sendStatus !== 'pending'
   const canVerify =
-    !!codeSent && !!code?.trim() && !busy && !verified
-  const fieldState = verified
-    ? 'success'
-    : sendStatus === 'error'
-      ? 'error'
-      : sendStatus === 'success'
-        ? 'success'
-        : 'default'
-  const codeFieldState = verified
-    ? 'success'
-    : verifyStatus === 'error'
-      ? 'error'
-      : 'default'
+    !!codeSent &&
+    !!code?.trim() &&
+    !busy &&
+    !verified &&
+    verifyStatus !== 'pending'
+
+  const fieldState = verified ? 'success' : toFieldState(sendStatus)
+  const codeFieldState = verified ? 'success' : toFieldState(verifyStatus)
   return { sendLabel, canSend, canVerify, fieldState, codeFieldState }
+}
+
+type VerificationState = {
+  token: string | null
+  verified: boolean
+  codeSent: boolean
+  sendStatus: Status
+  sendMsg: string | null
+  verifyStatus: Status
+  verifyMsg: string | null
+}
+
+const INITIAL_STATE: VerificationState = {
+  token: null,
+  verified: false,
+  codeSent: false,
+  sendStatus: 'idle',
+  sendMsg: null,
+  verifyStatus: 'idle',
+  verifyMsg: null,
+}
+
+type VerificationAction =
+  | { type: 'IDENTITY_CHANGED' }
+  | { type: 'RESET_VERIFY_STATE' }
+  | { type: 'SEND_REQUEST' }
+  | {
+      type: 'SEND_SUCCESS'
+      payload: { mode: 'first' | 'resend'; sent: string; resent: string }
+    }
+  | { type: 'SEND_FAILURE'; payload: { sendMsg: string } }
+  | { type: 'VERIFY_REQUEST' }
+  | { type: 'VERIFY_SUCCESS'; payload: { token: string; verifyMsg: string } }
+  | { type: 'VERIFY_FAILURE'; payload: { verifyMsg: string } }
+  | { type: 'EXPIRED'; payload: { verifyMsg: string } }
+
+function verificationReducer(
+  state: VerificationState,
+  action: VerificationAction
+): VerificationState {
+  switch (action.type) {
+    case 'IDENTITY_CHANGED':
+      return INITIAL_STATE
+
+    case 'RESET_VERIFY_STATE':
+      return {
+        ...state,
+        verified: false,
+        token: null,
+        verifyStatus: 'idle',
+        verifyMsg: null,
+      }
+    case 'SEND_REQUEST':
+      return {
+        ...state,
+        sendStatus: 'pending',
+        sendMsg: null,
+      }
+    case 'SEND_SUCCESS': {
+      const sendMsg =
+        action.payload.mode === 'resend'
+          ? action.payload.resent
+          : action.payload.sent
+      return {
+        ...state,
+        sendStatus: 'success',
+        sendMsg,
+        codeSent: true,
+      }
+    }
+    case 'SEND_FAILURE':
+      return {
+        ...state,
+        sendStatus: 'error',
+        sendMsg: action.payload.sendMsg,
+      }
+
+    case 'VERIFY_REQUEST':
+      return {
+        ...state,
+        verifyStatus: 'pending',
+        verifyMsg: null,
+      }
+    case 'VERIFY_SUCCESS':
+      return {
+        ...state,
+        token: action.payload.token,
+        verified: true,
+        verifyStatus: 'success',
+        verifyMsg: action.payload.verifyMsg,
+      }
+    case 'VERIFY_FAILURE':
+    case 'EXPIRED':
+      return {
+        ...state,
+        verified: false,
+        token: null,
+        verifyStatus: 'error',
+        verifyMsg: action.payload.verifyMsg,
+      }
+    default:
+      return state
+  }
 }
 
 export function useVerificationFlow<TVerifyRes>({
@@ -106,37 +220,37 @@ export function useVerificationFlow<TVerifyRes>({
   text,
 }: UseVerificationFlowArgs<TVerifyRes>) {
   const timer = useCountdown(ttlSec)
+  const timerRef = useRef(timer)
+  timerRef.current = timer
 
-  const [token, setToken] = useState<string | null>(null)
-  const [codeSent, setCodeSent] = useState(false)
-  const [sendStatus, setSendStatus] = useState<Status>('idle')
-  const [sendMsg, setSendMsg] = useState<string | null>(null)
-  const [verified, setVerified] = useState(false)
-  const [verifyStatus, setVerifyStatus] = useState<Status>('idle')
-  const [verifyMsg, setVerifyMsg] = useState<string | null>(null)
+  const [state, dispatch] = useReducer(verificationReducer, INITIAL_STATE)
 
-  function resetOnIdentityChange() {
-    setSendStatus('idle')
-    setSendMsg(null)
-    setVerified(false)
-    setToken(null)
-    setVerifyStatus('idle')
-    setVerifyMsg(null)
-    setCodeSent(false)
-    timer.reset()
-  }
+  const {
+    token,
+    verified,
+    codeSent,
+    sendStatus,
+    sendMsg,
+    verifyStatus,
+    verifyMsg,
+  } = state
 
-  function resetVerification() {
-    setVerified(false)
-    setToken(null)
-    setVerifyStatus('idle')
-    setVerifyMsg(null)
+  const resetAll = useCallback(() => {
+    dispatch({ type: 'IDENTITY_CHANGED' })
+    timerRef.current.reset()
+  }, [])
+
+  useEffect(() => {
+    resetAll()
+  }, [identity, resetAll])
+
+  function resetVerifyState() {
+    dispatch({ type: 'RESET_VERIFY_STATE' })
   }
 
   function applyIdentityValidationError(v: ValidationResult) {
     const msg = v.message ?? text.identityInvalid
-    setSendStatus('error')
-    setSendMsg(msg)
+    dispatch({ type: 'SEND_FAILURE', payload: { sendMsg: msg } })
     if (v.fieldErrors) {
       Object.entries(v.fieldErrors).forEach(([k, m]) => setFieldError(k, m))
     } else {
@@ -153,64 +267,58 @@ export function useVerificationFlow<TVerifyRes>({
     }
   }
 
-  useEffect(() => {
-    resetOnIdentityChange()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [identity])
+  const identityValid = useMemo(
+    () => validateIdentity(identity).ok,
+    [identity, validateIdentity]
+  )
 
   const ui = useMemo(
     () =>
-      ({
-        ...computeUI({
-          verified,
-          sendStatus,
-          verifyStatus,
-          codeSent,
-          identity,
-          code,
-          busy,
-          validateIdentity,
-        }),
-        toFieldState,
-      }) as ReturnType<typeof computeUI> & { toFieldState: typeof toFieldState },
-    [
-      verified,
-      sendStatus,
-      verifyStatus,
-      codeSent,
-      identity,
-      code,
-      busy,
-      validateIdentity,
-    ]
+      computeUI({
+        verified,
+        sendStatus,
+        verifyStatus,
+        codeSent,
+        code,
+        busy,
+        identityValid,
+      }),
+    [verified, sendStatus, verifyStatus, codeSent, code, busy, identityValid]
   )
 
   const onSendCode = async () => {
     clearErrors([...identityFields, codeField])
-    resetVerification()
 
     const v = validateIdentity(identity)
     if (!v.ok) {
       applyIdentityValidationError(v)
-      setCodeSent(false)
-      timer.reset()
+      timerRef.current.reset()
       return
     }
 
+    if (busy || sendStatus === 'pending') return
+
+    resetVerifyState()
+    dispatch({ type: 'SEND_REQUEST' })
+
+    const isResend = codeSent
     await withBusy(async () => {
       try {
         await send(identity)
-        setSendStatus('success')
-        setSendMsg(codeSent ? text.resent : text.sent)
-        setCodeSent(true)
-        timer.start()
+        dispatch({
+          type: 'SEND_SUCCESS',
+          payload: {
+            mode: isResend ? 'resend' : 'first',
+            sent: text.sent,
+            resent: text.resent,
+          },
+        })
+        timerRef.current.start()
       } catch (err) {
         const msg = getSendErrorMessage(err)
-        setSendStatus('error')
-        setSendMsg(msg)
+        dispatch({ type: 'SEND_FAILURE', payload: { sendMsg: msg } })
         identityFields.forEach((f) => setFieldError(f, msg))
-        setCodeSent(false)
-        timer.reset()
+        timerRef.current.reset()
       }
     })
   }
@@ -223,26 +331,30 @@ export function useVerificationFlow<TVerifyRes>({
       return
     }
 
-    if (!timer.isRunning) {
-      resetVerification()
-      setVerifyStatus('error')
-      setVerifyMsg(text.expired)
+    if (!timerRef.current.isRunning) {
+      resetVerifyState()
+      dispatch({ type: 'EXPIRED', payload: { verifyMsg: text.expired } })
       return
     }
 
+    if (busy || verifyStatus === 'pending') return
+
     await withBusy(async () => {
+      dispatch({ type: 'VERIFY_REQUEST' })
       try {
         const res = await verify(identity, code.trim())
-        setToken(getToken(res))
-        setVerified(true)
-        setVerifyStatus('success')
-        setVerifyMsg(text.verifySuccess)
-        timer.reset()
+        const tokenValue = getToken(res)
+        dispatch({
+          type: 'VERIFY_SUCCESS',
+          payload: {
+            token: tokenValue,
+            verifyMsg: text.verifySuccess,
+          },
+        })
+        timerRef.current.reset()
       } catch (err) {
         const msg = getVerifyErrorMessage(err)
-        resetVerification()
-        setVerifyStatus('error')
-        setVerifyMsg(msg)
+        dispatch({ type: 'VERIFY_FAILURE', payload: { verifyMsg: msg } })
         setFieldError(codeField, msg)
       }
     })
@@ -261,6 +373,8 @@ export function useVerificationFlow<TVerifyRes>({
     timer,
 
     ui,
+
+    toFieldState,
 
     actions: {
       onSendCode,

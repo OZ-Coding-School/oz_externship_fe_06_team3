@@ -9,7 +9,6 @@ export type CountdownTimer = {
   reset: () => void
 }
 
-/** Return shape of useVerificationFlow (used by email/sms flows) */
 export type VerificationFlowReturn = {
   token: string | null
   verified: boolean
@@ -25,8 +24,8 @@ export type VerificationFlowReturn = {
     canVerify: boolean
     fieldState: string
     codeFieldState: string
-    toFieldState: (s: Status) => 'success' | 'error' | 'default'
   }
+  toFieldState: (s: Status) => 'success' | 'error' | 'default'
   actions: {
     onSendCode: () => Promise<void>
     onVerifyCode: () => Promise<void>
@@ -89,7 +88,10 @@ export type SmsSectionActions = {
   onVerifySmsCode: () => Promise<void>
 }
 
-export type PasswordSectionValues = { password: string; passwordConfirm: string }
+export type PasswordSectionValues = {
+  password: string
+  passwordConfirm: string
+}
 export type PasswordSectionUI = {
   passwordFieldState: FieldState
   passwordConfirmState: FieldState

@@ -1,6 +1,7 @@
 import { Check } from 'lucide-react'
 
 import cn from '@/lib/cn'
+import type { Status } from '@/hooks/useVerificationFlow'
 import { Button } from '@/components/common/Button'
 import { CommonInputField } from '@/components/common/CommonInputField'
 import type { FieldState } from '@/components/common/CommonInput'
@@ -17,7 +18,7 @@ type Props = {
   smsCodeFieldState: FieldState
 
   phoneSendMsg: string | null
-  phoneSendStatus: 'idle' | 'error' | 'success'
+  phoneSendStatus: Status
   smsVerifyMsg: string | null
 
   smsVerified: boolean
