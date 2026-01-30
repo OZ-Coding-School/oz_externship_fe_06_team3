@@ -1,85 +1,98 @@
-import type { FieldState } from '@/components/common/CommonInput'
+import { useCallback, useMemo } from 'react'
 import { useSignupFormLogic } from '@/hooks/signup/useSignupFormLogic'
-import { useSignupFormVM } from '@/hooks/signup/useSignupFormVM'
+import {
+  useNicknameSection,
+  useEmailSection,
+  useSmsSection,
+  usePasswordSection,
+  useSubmitSection,
+} from '@/hooks/signup/sections'
 
 export function useSignupEmailForm() {
   const logic = useSignupFormLogic()
+  const v = logic.watchValues
 
-  const vm = useSignupFormVM({
-    password: logic.watchValues.password,
-    passwordConfirm: logic.watchValues.passwordConfirm,
-    trigger: (name: string) => logic.trigger(name as Parameters<typeof logic.trigger>[0]),
-    nicknameStatus: logic.nicknameStatus,
+  const trigger = useCallback(
+    (name: string) =>
+      logic.trigger(name as Parameters<typeof logic.trigger>[0]),
+    [logic]
+  )
+
+  const nicknameSection = useNicknameSection({
+    nickname: v.nickname,
     nicknameChecked: logic.nicknameChecked,
-    nickname: logic.watchValues.nickname,
+    nicknameStatus: logic.nicknameStatus,
+    nicknameMsg: logic.nicknameMsg,
     busy: logic.busy,
-    formValid: logic.formState.isValid,
-    emailVerified: logic.emailFlow.verified,
-    smsVerified: logic.smsFlow.verified,
-    smsSendStatus: logic.smsFlow.sendStatus,
+    onCheckNickname: logic.onCheckNickname,
   })
 
-  return {
-    methods: logic.methods,
+  const emailSection = useEmailSection({
+    emailFlow: logic.emailFlow,
+    email: v.email,
+    emailCode: v.emailCode,
+  })
 
-    values: logic.watchValues,
+  const smsSection = useSmsSection({
+    smsFlow: logic.smsFlow,
+    phone1: v.phone1,
+    phone2: v.phone2,
+    phone3: v.phone3,
+    smsCode: v.smsCode,
+    phoneNumber: v.phoneNumber,
+  })
 
-    ui: {
-      busy: logic.busy,
+  const passwordSection = usePasswordSection({
+    password: v.password,
+    passwordConfirm: v.passwordConfirm,
+    trigger,
+  })
 
-      nicknameChecked: logic.nicknameChecked,
-      canCheckNickname: vm.canCheckNickname,
-      nicknameFieldState: vm.nicknameFieldState,
+  const submitSection = useSubmitSection({
+    formValid: logic.formState.isValid,
+    busy: logic.busy,
+    nicknameChecked: nicknameSection.ui.nicknameChecked,
+    emailVerified: emailSection.ui.emailVerified,
+    smsVerified: smsSection.ui.smsVerified,
+    passwordFieldState: passwordSection.ui.passwordFieldState,
+    passwordConfirmState: passwordSection.ui.passwordConfirmState,
+    onSubmit: logic.onSubmit,
+  })
 
-      emailVerified: logic.emailFlow.verified,
-      emailCodeSent: logic.emailFlow.codeSent,
-      emailFieldState: logic.emailFlow.ui.fieldState as FieldState,
-      emailCodeFieldState: logic.emailFlow.ui.codeFieldState as FieldState,
-      emailTimer: logic.emailFlow.timer,
-      emailSendLabel: logic.emailFlow.codeSent ? '재전송' : '인증코드전송',
-      canSendEmail: logic.emailFlow.ui.canSend,
-      canVerifyEmail: logic.emailFlow.ui.canVerify,
-
-      smsVerified: logic.smsFlow.verified,
-      smsCodeSent: logic.smsFlow.codeSent,
-      phoneDigitsState: vm.phoneDigitsState,
-      smsCodeFieldState: logic.smsFlow.ui.codeFieldState as FieldState,
-      smsTimer: logic.smsFlow.timer,
-      smsSendLabel: logic.smsFlow.codeSent ? '재전송' : '인증번호 받기',
-      canSendSms: logic.smsFlow.ui.canSend,
-      canVerifySms: logic.smsFlow.ui.canVerify,
-      phoneSendStatus: logic.smsFlow.sendStatus,
-
-      passwordFieldState: vm.passwordFieldState,
-      passwordConfirmState: vm.passwordConfirmState,
-
-      canSubmit: vm.canSubmit,
-    },
-
-    messages: {
-      nicknameMsg: logic.nicknameMsg,
-
-      emailSendMsg: logic.emailFlow.sendMsg,
-      emailVerifyMsg: logic.emailFlow.verifyMsg,
-
-      phoneSendMsg: logic.smsFlow.sendMsg,
-      smsVerifyMsg: logic.smsFlow.verifyMsg,
-
-      passwordConfirmMsg: vm.passwordConfirmMsg,
-
-      formError: logic.formError,
-    },
-
-    actions: {
-      onCheckNickname: logic.onCheckNickname,
-
-      onSendEmailCode: logic.emailFlow.actions.onSendCode,
-      onVerifyEmailCode: logic.emailFlow.actions.onVerifyCode,
-
-      onSendSmsCode: logic.smsFlow.actions.onSendCode,
-      onVerifySmsCode: logic.smsFlow.actions.onVerifyCode,
-
-      onSubmit: logic.onSubmit,
-    },
-  }
+  // 섹션 훅 반환 객체가 매 렌더 새로 만들어진다면 useMemo 효과가 줄어듦 → 필요 시 각 섹션 훅 내부에서 반환값 useMemo로 안정화
+  return useMemo(
+    () => ({
+      methods: logic.methods,
+      values: {
+        name: v.name,
+        birthdate: v.birthdate,
+        ...nicknameSection.values,
+        ...emailSection.values,
+        ...smsSection.values,
+        ...passwordSection.values,
+      },
+      ui: {
+        busy: logic.busy,
+        ...nicknameSection.ui,
+        ...emailSection.ui,
+        ...smsSection.ui,
+        ...passwordSection.ui,
+        ...submitSection.ui,
+      },
+      messages: {
+        ...nicknameSection.messages,
+        ...emailSection.messages,
+        ...smsSection.messages,
+        ...passwordSection.messages,
+        formError: logic.formError,
+      },
+      actions: {
+        ...nicknameSection.actions,
+        ...emailSection.actions,
+        ...smsSection.actions,
+        ...submitSection.actions,
+      },
+    }),
+    [logic, v, nicknameSection, emailSection, smsSection, passwordSection, submitSection]
+  )
 }
