@@ -45,6 +45,15 @@ export function EmailSection({
   // 인증코드 전송 전에는 인증코드 입력칸 비활성화
   const isCodeInputEnabled = emailCodeSent && !emailVerified
 
+  const emailCodeRightSlot =
+    emailVerified ? (
+      <Check className="h-5 w-5 text-green-600" />
+    ) : emailCodeSent && emailTimer.isRunning ? (
+      <span className="text-sm font-semibold text-red-500">
+        {emailTimer.mmss}
+      </span>
+    ) : null
+
   return (
     <div className="flex flex-col gap-5">
       <label className="inline-flex items-start text-left text-[16px] leading-[22.24px] font-normal tracking-[-0.48px] text-[#121212]">
@@ -92,7 +101,7 @@ export function EmailSection({
       </div>
 
       {/* 인증번호 입력 + 버튼 */}
-      <div className="flex min-w-0 items-center gap-3 overflow-hidden">
+      <div className="flex min-w-0 gap-3 overflow-hidden">
         <div className="min-w-0 flex-1 overflow-hidden">
           <CommonInputField<SignupFormData>
             name="emailVerificationCode"
@@ -106,23 +115,11 @@ export function EmailSection({
               success: emailVerifyMsg,
               error: emailVerifyMsg,
             }}
-            // 코드 전송 전에는 입력 비활성화
             locked={!isCodeInputEnabled}
             disabled={!isCodeInputEnabled}
-            rightSlot={
-              emailVerified ? (
-                <Check className="h-5 w-5 text-green-600" />
-              ) : null
-            }
+            rightSlot={emailCodeRightSlot}
           />
         </div>
-
-        {/* 타이머 표시 */}
-        {emailCodeSent && !emailVerified ? (
-          <span className="shrink-0 text-[14px] leading-[19.6px] tracking-[-0.42px] text-[#6B7280]">
-            {emailTimer.mmss}
-          </span>
-        ) : null}
 
         <Button
           type="button"
