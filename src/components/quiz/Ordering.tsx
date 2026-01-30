@@ -204,20 +204,11 @@ export default function Ordering({ question, answer, onAnswerChange }: OrderingP
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
       >
-        {/* 지문 및 옵션 박스 */}
-        {question.prompt ? (
+        {/* 옵션 박스 */}
+        {options.length > 0 && (
           <div className="w-[648px] min-h-[228px] bg-[#F2F3F5]/50 p-[20px] rounded-lg mb-4 ml-6">
-            <p className="text-[16px] font-normal text-[#222222] mb-[18px]">
-              {question.prompt}
-            </p>
             {renderOptions()}
           </div>
-        ) : (
-          options.length > 0 && (
-            <div className="w-[648px] min-h-[228px] bg-[#F2F3F5]/50 p-[20px] rounded-lg mb-4 ml-6">
-              {renderOptions()}
-            </div>
-          )
         )}
 
         {/* 빈칸 영역 */}

@@ -116,14 +116,8 @@ export default function SingleChoice({
         <span className="quiz-header-badge">단일선택</span>
       </div>
 
-      {/* 지문 및 옵션 */}
-      <div className="min-h-[96px] rounded-lg ml-8">
-        {question.prompt && (
-          <p className="text-[16px] font-normal text-[#222222] mb-[26px]">
-            {question.prompt}
-          </p>
-        )}
-        {renderOptions()}
+      {/* 옵션 */}
+      <div className="min-h-[96px] rounded-lg ml-8">        {renderOptions()}
         {isResult && explanation && (
           <div className="mt-5">
             <QuizResultExplanation explanation={explanation} isCorrect={isCorrect} />
