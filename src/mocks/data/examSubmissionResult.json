@@ -18,8 +18,8 @@
       "answer": ["<h1>"],
       "point": 5,
       "explanation": "HTML에서 가장 큰 제목 태그는 h1입니다.",
-      "is_correct": true,
-      "submitted_answer": ["<h1>"]
+      "is_correct": false,
+      "submitted_answer": ["<h2>"]
     },
     {
       "id": 5002,
