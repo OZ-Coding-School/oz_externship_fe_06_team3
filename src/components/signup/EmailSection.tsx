@@ -5,20 +5,25 @@ import { CommonInputField } from '@/components/common/CommonInputField'
 import type { FieldState } from '@/components/common/CommonInput'
 import type { SignupFormData } from '@/schemas/auth'
 
-type EmailSectionProps = {
+type Props = {
   emailFieldState: FieldState
   emailCodeFieldState: FieldState
+
   emailSendMsg: string | null
   emailVerifyMsg: string | null
+
   emailVerified: boolean
   emailCodeSent: boolean
+
   emailTimer: {
     mmss: string
     isRunning: boolean
   }
+
   emailSendLabel: string
   canSendEmail: boolean
   canVerifyEmail: boolean
+
   onSendEmailCode: () => void
   onVerifyEmailCode: () => void
 }
@@ -36,32 +41,18 @@ export function EmailSection({
   canVerifyEmail,
   onSendEmailCode,
   onVerifyEmailCode,
-}: EmailSectionProps) {
-  const EmailCodeRightSlot = (
-    <div className="flex items-center gap-2">
-      {emailVerified ? (
-        <Check className="h-5 w-5 text-green-600" />
-      ) : emailCodeSent && emailTimer.isRunning ? (
-        <span className="text-sm font-semibold text-red-500">
-          {emailTimer.mmss}
-        </span>
-      ) : null}
-    </div>
-  )
+}: Props) {
+  // 인증코드 전송 전에는 인증코드 입력칸 비활성화
+  const isCodeInputEnabled = emailCodeSent && !emailVerified
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="inline-flex items-center gap-4">
-        <label className="inline-flex items-start text-left text-[16px] leading-[22.24px] font-normal tracking-[-0.48px] text-[#121212]">
-          이메일
-          <span className="ml-0 text-[16px] leading-normal font-normal tracking-[-0.32px] text-[#EC0037]">
-            *
-          </span>
-        </label>
-        <p className="text-primary text-left text-[14px] leading-[19.6px] font-semibold tracking-[-0.42px]">
-          로그인 시 아이디로 사용합니다.
-        </p>
-      </div>
+      <label className="inline-flex items-start text-left text-[16px] leading-[22.24px] font-normal tracking-[-0.48px] text-[#121212]">
+        이메일
+        <span className="ml-0 text-[16px] leading-normal font-normal tracking-[-0.32px] text-[#EC0037]">
+          *
+        </span>
+      </label>
 
       {/* 이메일 입력, 전송 버튼 */}
       <div className="flex min-w-0 gap-3 overflow-hidden">
@@ -79,13 +70,20 @@ export function EmailSection({
               error: emailSendMsg,
             }}
             locked={emailVerified}
+            disabled={emailVerified}
+            rightSlot={
+              emailVerified ? (
+                <Check className="h-5 w-5 text-green-600" />
+              ) : null
+            }
           />
         </div>
 
         <Button
           type="button"
           size="sm"
-          variant={!canSendEmail ? 'disabled' : 'secondary'}
+          variant={canSendEmail ? 'secondary' : 'disabled'}
+          disabled={!canSendEmail}
           className="whitespace-nowrap"
           onClick={onSendEmailCode}
         >
@@ -93,13 +91,13 @@ export function EmailSection({
         </Button>
       </div>
 
-      {/* 이메일 인증 코드 + 확인 버튼 */}
-      <div className="flex min-w-0 gap-3 overflow-hidden">
+      {/* 인증번호 입력 + 버튼 */}
+      <div className="flex min-w-0 items-center gap-3 overflow-hidden">
         <div className="min-w-0 flex-1 overflow-hidden">
           <CommonInputField<SignupFormData>
             name="emailVerificationCode"
             type="text"
-            placeholder="전송된 코드를 입력해주세요."
+            placeholder="인증번호를 입력해주세요"
             width="100%"
             placeholderVariant="a"
             state={emailCodeFieldState}
@@ -108,19 +106,33 @@ export function EmailSection({
               success: emailVerifyMsg,
               error: emailVerifyMsg,
             }}
-            rightSlot={EmailCodeRightSlot}
-            locked={emailVerified}
+            // 코드 전송 전에는 입력 비활성화
+            locked={!isCodeInputEnabled}
+            disabled={!isCodeInputEnabled}
+            rightSlot={
+              emailVerified ? (
+                <Check className="h-5 w-5 text-green-600" />
+              ) : null
+            }
           />
         </div>
+
+        {/* 타이머 표시 */}
+        {emailCodeSent && !emailVerified ? (
+          <span className="shrink-0 text-[14px] leading-[19.6px] tracking-[-0.42px] text-[#6B7280]">
+            {emailTimer.mmss}
+          </span>
+        ) : null}
 
         <Button
           type="button"
           size="sm"
-          variant={!canVerifyEmail ? 'disabled' : 'secondary'}
+          variant={canVerifyEmail ? 'secondary' : 'disabled'}
+          disabled={!canVerifyEmail}
           className="whitespace-nowrap"
           onClick={onVerifyEmailCode}
         >
-          {emailVerified ? '인증완료' : '인증번호 확인'}
+          확인
         </Button>
       </div>
     </div>
