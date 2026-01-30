@@ -103,7 +103,7 @@ export default function SingleChoice({
     </div>
   )
 
-  const containerClass = isResult ? 'mb-8' : 'mb-20'
+  const containerClass = isResult ? 'mb-[100px]' : 'mb-20'
 
   return (
     <div className={containerClass}>
@@ -117,7 +117,7 @@ export default function SingleChoice({
       </div>
 
       {/* 지문 및 옵션 */}
-      <div className="min-h-[96px] p-4 rounded-lg ml-6">
+      <div className="min-h-[96px] rounded-lg ml-8">
         {question.prompt && (
           <p className="text-[16px] font-normal text-[#222222] mb-[26px]">
             {question.prompt}
@@ -125,7 +125,7 @@ export default function SingleChoice({
         )}
         {renderOptions()}
         {isResult && explanation && (
-          <div className="mt-6">
+          <div className="mt-5">
             <QuizResultExplanation explanation={explanation} isCorrect={isCorrect} />
           </div>
         )}

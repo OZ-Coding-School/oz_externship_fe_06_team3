@@ -11,7 +11,7 @@ export default function QuizResultExplanation({
 
   return (
     <div className={`rounded-lg ${boxClass} px-4 py-6`}>
-      <div className="flex items-start gap-3">
+      <div className="flex items-center gap-3">
         {isCorrect ? (
           <svg
             xmlns="http://www.w3.org/2000/svg"
