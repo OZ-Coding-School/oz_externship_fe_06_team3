@@ -70,6 +70,10 @@ function QuizResultPage() {
             question={mapped as any}
             answer={(submitted ?? null) as string[] | null}
             onAnswerChange={() => { }}
+            isResult
+            correctAnswer={(question.answer ?? null) as string[] | null}
+            isCorrect={question.isCorrect}
+            explanation={question.explanation}
           />
         )
       case 'short_answer':

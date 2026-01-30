@@ -28,11 +28,11 @@
       "blank_count": 0,
       "options": ["margin", "border", "padding", "content"],
       "type": "multiple_choice",
-      "answer": ["margin", "border", "padding", "content"],
+      "answer": ["border", "padding", "content"],
       "point": 5,
-      "explanation": "CSS에서 margin, border, padding, content 중 요소의 크기를 포함하는 속성은 margin입니다.",
+      "explanation": "요소의 크기에 포함되는 것은 content, padding, border이며 margin은 포함되지 않는다.",
       "is_correct": false,
-      "submitted_answer": ["margin", "padding"]
+      "submitted_answer": ["margin"]
     },
     {
       "id": 5003,
