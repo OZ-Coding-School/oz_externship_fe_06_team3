@@ -1,4 +1,5 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useRef } from 'react'
+import type { SignupFormData } from '@/schemas/auth'
 import { useSignupFormLogic } from '@/hooks/signup/useSignupFormLogic'
 import {
   useNicknameSection,
@@ -10,13 +11,9 @@ import {
 
 export function useSignupEmailForm() {
   const logic = useSignupFormLogic()
+  const logicRef = useRef(logic)
+  logicRef.current = logic
   const v = logic.watchValues
-
-  const trigger = useCallback(
-    (name: string) =>
-      logic.trigger(name as Parameters<typeof logic.trigger>[0]),
-    [logic]
-  )
 
   const nicknameSection = useNicknameSection({
     nickname: v.nickname,
@@ -42,10 +39,15 @@ export function useSignupEmailForm() {
     phoneNumber: v.phoneNumber,
   })
 
+  const triggerForForm = useCallback(
+    (name: keyof SignupFormData) => logicRef.current.trigger(name),
+    []
+  )
+
   const passwordSection = usePasswordSection({
     password: v.password,
     passwordConfirm: v.passwordConfirm,
-    trigger,
+    trigger: triggerForForm,
   })
 
   const submitSection = useSubmitSection({
@@ -59,40 +61,42 @@ export function useSignupEmailForm() {
     onSubmit: logic.onSubmit,
   })
 
-  // 섹션 훅 반환 객체가 매 렌더 새로 만들어진다면 useMemo 효과가 줄어듦 → 필요 시 각 섹션 훅 내부에서 반환값 useMemo로 안정화
-  return useMemo(
-    () => ({
-      methods: logic.methods,
-      values: {
-        name: v.name,
-        birthdate: v.birthdate,
-        ...nicknameSection.values,
-        ...emailSection.values,
-        ...smsSection.values,
-        ...passwordSection.values,
+  return {
+    methods: logic.methods,
+    common: {
+      busy: logic.busy,
+      formError: logic.formError,
+      name: v.name,
+      birthdate: v.birthdate,
+    },
+    sections: {
+      nickname: {
+        values: nicknameSection.values,
+        ui: nicknameSection.ui,
+        messages: nicknameSection.messages,
+        actions: nicknameSection.actions,
       },
-      ui: {
-        busy: logic.busy,
-        ...nicknameSection.ui,
-        ...emailSection.ui,
-        ...smsSection.ui,
-        ...passwordSection.ui,
-        ...submitSection.ui,
+      email: {
+        values: emailSection.values,
+        ui: emailSection.ui,
+        messages: emailSection.messages,
+        actions: emailSection.actions,
       },
-      messages: {
-        ...nicknameSection.messages,
-        ...emailSection.messages,
-        ...smsSection.messages,
-        ...passwordSection.messages,
-        formError: logic.formError,
+      sms: {
+        values: smsSection.values,
+        ui: smsSection.ui,
+        messages: smsSection.messages,
+        actions: smsSection.actions,
       },
-      actions: {
-        ...nicknameSection.actions,
-        ...emailSection.actions,
-        ...smsSection.actions,
-        ...submitSection.actions,
+      password: {
+        values: passwordSection.values,
+        ui: passwordSection.ui,
+        messages: passwordSection.messages,
       },
-    }),
-    [logic, v, nicknameSection, emailSection, smsSection, passwordSection, submitSection]
-  )
+      submit: {
+        ui: submitSection.ui,
+        actions: submitSection.actions,
+      },
+    },
+  }
 }

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react'
+import type { SignupFormData } from '@/schemas/auth'
 import { PASSWORD_REGEX } from '@/utils/signupUtils'
 import type { FieldState } from '@/components/common/CommonInput'
 import type {
@@ -10,7 +11,7 @@ import type {
 export type UsePasswordSectionArgs = {
   password: string
   passwordConfirm: string
-  trigger: (name: string) => Promise<boolean>
+  trigger: (name: keyof SignupFormData) => Promise<boolean>
 }
 
 export function usePasswordSection(args: UsePasswordSectionArgs) {
