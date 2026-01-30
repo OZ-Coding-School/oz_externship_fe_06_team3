@@ -44,7 +44,7 @@ export function useSignupEmailForm() {
   const { handleSubmit, watch, setError, clearErrors, trigger, formState } =
     methods
 
-  const NICKNAME_REGEX = /^[A-Za-z0-9가-\uD7A3]{2,10}$/
+  const NICKNAME_REGEX = /^[A-Za-z0-9가-힣]{2,10}$/
 
   const [busy, setBusy] = useState(false)
 
@@ -81,20 +81,37 @@ export function useSignupEmailForm() {
   }, [password])
 
   const passwordConfirmState: FieldState = useMemo(() => {
-    const value = passwordConfirm.trim()
-    if (!value) return 'default'
-    if (!password.trim()) return 'error'
-    return value === password ? 'success' : 'error'
+    const pw = password.trim()
+    const confirm = passwordConfirm.trim()
+
+    if (!confirm) return 'default'
+
+    // 비밀번호가 유효하지 않으면 비밀번호 확인도 에러 처리
+    if (!pw) return 'error'
+    if (!PASSWORD_REGEX.test(pw)) return 'error'
+
+    // 비밀번호 유효할 때만 일치 판정
+    return confirm === pw ? 'success' : 'error'
   }, [password, passwordConfirm])
 
   const passwordConfirmMsg = useMemo(() => {
-    const value = passwordConfirm.trim()
-    if (!value) return null
-    if (!password.trim()) return '* 비밀번호를 먼저 입력해주세요.'
-    return value === password
+    const pw = password.trim()
+    const confirm = passwordConfirm.trim()
+
+    if (!confirm) return null
+    if (!pw) return '* 비밀번호를 먼저 입력해주세요.'
+    if (!PASSWORD_REGEX.test(pw)) return '* 비밀번호 형식이 올바르지 않습니다.'
+    return confirm === pw
       ? '* 비밀번호가 일치합니다.'
       : '* 비밀번호가 일치하지 않습니다.'
   }, [password, passwordConfirm])
+
+  // 비밀번호가 바뀌면 비밀번호 확인도 즉시 재검사
+  useEffect(() => {
+    if (passwordConfirm.trim()) {
+      void trigger('passwordConfirm')
+    }
+  }, [password, passwordConfirm, trigger])
 
   // 닉네임 입력 변경 시 초기화
   useEffect(() => {
@@ -123,9 +140,11 @@ export function useSignupEmailForm() {
   const onCheckNickname = async () => {
     setFormError(null)
 
-    // zod 검증을 먼저 통과해야 중복확인
+    // zod 검증을 먼저 통과해야 중복확인 API 호출
     const ok = await trigger('nickname')
     if (!ok) return
+
+    clearErrors('nickname')
 
     setBusy(true)
     try {
@@ -344,7 +363,6 @@ export function useSignupEmailForm() {
     passwordConfirmState === 'success' &&
     !busy
 
-  // 닉네임 중복확인 버튼 활성화 조건
   const canCheckNickname =
     !busy && !nicknameChecked && NICKNAME_REGEX.test(nickname)
 

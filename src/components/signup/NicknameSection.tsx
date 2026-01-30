@@ -20,7 +20,6 @@ export function NicknameSection({
   nicknameMsg,
   nicknameChecked,
   canCheckNickname,
-  busy,
   onCheckNickname,
 }: NicknameSectionProps) {
   return (
@@ -57,11 +56,8 @@ export function NicknameSection({
         <Button
           type="button"
           size="sm"
-          variant={
-            !canCheckNickname || busy || nicknameChecked
-              ? 'disabled'
-              : 'secondary'
-          }
+          variant={canCheckNickname ? 'secondary' : 'disabled'}
+          disabled={!canCheckNickname}
           className="whitespace-nowrap"
           onClick={onCheckNickname}
         >
