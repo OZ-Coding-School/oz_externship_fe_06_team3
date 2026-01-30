@@ -55,8 +55,6 @@ export function PasswordSection({
           success: passwordConfirmMsg,
           error: passwordConfirmMsg,
         }}
-        locked={passwordFieldState !== 'success'}
-        disabled={passwordFieldState !== 'success'}
         rightSlot={
           passwordConfirmState === 'success' ? (
             <Check className="h-5 w-5 text-green-600" />
