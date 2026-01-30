@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { PASSWORD_REGEX } from '@/utils/signupUtils'
 import type { FieldState } from '@/components/common/CommonInput'
 import type {
@@ -15,6 +15,8 @@ export type UsePasswordSectionArgs = {
 
 export function usePasswordSection(args: UsePasswordSectionArgs) {
   const { password, passwordConfirm, trigger } = args
+  const triggerRef = useRef(trigger)
+  triggerRef.current = trigger
 
   const values: PasswordSectionValues = useMemo(
     () => ({ password, passwordConfirm }),
@@ -49,9 +51,9 @@ export function usePasswordSection(args: UsePasswordSectionArgs) {
 
   useEffect(() => {
     if (passwordConfirm.trim()) {
-      void trigger('passwordConfirm')
+      void triggerRef.current('passwordConfirm')
     }
-  }, [password, passwordConfirm, trigger])
+  }, [password, passwordConfirm])
 
   const ui: PasswordSectionUI = useMemo(
     () => ({
