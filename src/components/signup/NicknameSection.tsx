@@ -10,6 +10,7 @@ type NicknameSectionProps = {
   nicknameMsg: string | null
   nicknameChecked: boolean
   nickname: string
+  canCheckNickname: boolean
   busy: boolean
   onCheckNickname: () => void
 }
@@ -18,7 +19,7 @@ export function NicknameSection({
   nicknameFieldState,
   nicknameMsg,
   nicknameChecked,
-  nickname,
+  canCheckNickname,
   busy,
   onCheckNickname,
 }: NicknameSectionProps) {
@@ -30,6 +31,7 @@ export function NicknameSection({
           *
         </span>
       </label>
+
       <div className="flex min-w-0 gap-3 overflow-hidden">
         <div className="min-w-0 flex-1 overflow-hidden">
           <CommonInputField<SignupFormData>
@@ -56,7 +58,7 @@ export function NicknameSection({
           type="button"
           size="sm"
           variant={
-            !nickname || busy || nicknameChecked
+            !canCheckNickname || busy || nicknameChecked
               ? 'disabled'
               : 'secondary'
           }

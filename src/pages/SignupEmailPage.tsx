@@ -56,6 +56,7 @@ export default function SignupEmailPage() {
                 nicknameMsg={messages.nicknameMsg}
                 nicknameChecked={ui.nicknameChecked}
                 nickname={values.nickname}
+                canCheckNickname={ui.canCheckNickname}
                 busy={ui.busy}
                 onCheckNickname={actions.onCheckNickname}
               />
@@ -124,6 +125,7 @@ export default function SignupEmailPage() {
                 type="submit"
                 size="xxl"
                 variant={ui.canSubmit ? 'primary' : 'disabled'}
+                disabled={!ui.canSubmit}
                 className="whitespace-nowrap"
               >
                 {ui.busy ? '처리 중...' : '가입하기'}

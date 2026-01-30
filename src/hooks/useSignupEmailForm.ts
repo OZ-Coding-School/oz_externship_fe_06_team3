@@ -41,7 +41,10 @@ export function useSignupEmailForm() {
     shouldFocusError: true,
   })
 
-  const { handleSubmit, watch, setError, clearErrors } = methods
+  const { handleSubmit, watch, setError, clearErrors, trigger, formState } =
+    methods
+
+  const NICKNAME_REGEX = /^[A-Za-z0-9가-\uD7A3]{2,10}$/
 
   const [busy, setBusy] = useState(false)
 
@@ -119,12 +122,10 @@ export function useSignupEmailForm() {
   // 닉네임 중복 확인
   const onCheckNickname = async () => {
     setFormError(null)
-    clearErrors('nickname')
 
-    if (!nickname) {
-      setError('nickname', { message: '* 닉네임을 입력해주세요.' })
-      return
-    }
+    // zod 검증을 먼저 통과해야 중복확인
+    const ok = await trigger('nickname')
+    if (!ok) return
 
     setBusy(true)
     try {
@@ -335,14 +336,17 @@ export function useSignupEmailForm() {
 
   // 회원가입 제출 가능 여부
   const canSubmit =
-    !!name &&
-    !!birthdate &&
+    formState.isValid &&
     nicknameChecked &&
     emailFlow.verified &&
     smsFlow.verified &&
     passwordFieldState === 'success' &&
     passwordConfirmState === 'success' &&
     !busy
+
+  // 닉네임 중복확인 버튼 활성화 조건
+  const canCheckNickname =
+    !busy && !nicknameChecked && NICKNAME_REGEX.test(nickname)
 
   return {
     methods,
@@ -366,6 +370,7 @@ export function useSignupEmailForm() {
       busy,
 
       nicknameChecked,
+      canCheckNickname,
       nicknameFieldState,
 
       // 이메일 인증 상태
