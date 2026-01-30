@@ -58,6 +58,10 @@ function QuizResultPage() {
             question={mapped as any}
             answer={(submitted?.[0] ?? null) as string | null}
             onAnswerChange={() => { }}
+            isResult
+            correctAnswer={(question.answer?.[0] ?? null) as string | null}
+            isCorrect={question.isCorrect}
+            explanation={question.explanation}
           />
         )
       case 'multiple_choice':
@@ -66,6 +70,10 @@ function QuizResultPage() {
             question={mapped as any}
             answer={(submitted ?? null) as string[] | null}
             onAnswerChange={() => { }}
+            isResult
+            correctAnswer={(question.answer ?? null) as string[] | null}
+            isCorrect={question.isCorrect}
+            explanation={question.explanation}
           />
         )
       case 'short_answer':
@@ -74,6 +82,9 @@ function QuizResultPage() {
             question={mapped as any}
             answer={(submitted?.[0] ?? '') as string}
             onAnswerChange={() => { }}
+            isResult
+            isCorrect={question.isCorrect}
+            explanation={question.explanation}
           />
         )
       case 'ox':
@@ -82,6 +93,10 @@ function QuizResultPage() {
             question={mapped as any}
             answer={(submitted?.[0] ?? null) as string | null}
             onAnswerChange={() => { }}
+            isResult
+            correctAnswer={(question.answer?.[0] ?? null) as string | null}
+            isCorrect={question.isCorrect}
+            explanation={question.explanation}
           />
         )
       case 'fill_blank':
@@ -105,6 +120,7 @@ function QuizResultPage() {
     }
   }
 
+
   return (
     <div>
       <QuizHeader
@@ -115,9 +131,11 @@ function QuizResultPage() {
       <main>
         <QuizResultTop />
         <div className="flex justify-center">
-          <div className="w-[1290px] py-10 space-y-10">
+          <div className="w-[1290px] py-10 space-y-6">
             {data?.questions?.map((question, index) => (
-              <div key={question.id}>{renderQuestion(question, index)}</div>
+              <div key={question.id} className="space-y-4">
+                {renderQuestion(question, index)}
+              </div>
             ))}
           </div>
         </div>

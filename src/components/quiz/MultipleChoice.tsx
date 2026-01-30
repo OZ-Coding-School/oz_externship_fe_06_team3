@@ -1,9 +1,14 @@
 import type { ExamDeploymentDetailResult } from '@/mappers/examDeploymentDetail'
+import QuizResultExplanation from './QuizResultExplanation'
 
 interface MultipleChoiceProps {
   question: ExamDeploymentDetailResult['questions'][0]
   answer: string[] | null
   onAnswerChange: (questionId: number, answer: string[]) => void
+  isResult?: boolean
+  correctAnswer?: string[] | null
+  isCorrect?: boolean
+  explanation?: string | null
 }
 
 const isChecked = (answer: string[] | null, option: string) =>
@@ -20,14 +25,20 @@ export default function MultipleChoice({
   question,
   answer,
   onAnswerChange,
+  isResult = false,
+  correctAnswer = null,
+  isCorrect = false,
+  explanation = null,
 }: MultipleChoiceProps) {
   const handleOptionChange = (option: string) => {
     const next = toggleOption(answer, option)
     onAnswerChange(question.questionId, next)
   }
 
+  const containerClass = isResult ? 'mb-[100px]' : 'mb-20'
+
   return (
-    <div className="mb-20">
+    <div className={containerClass}>
       <div className="quiz-header">
         <span className="quiz-header-title">
           {question.number}. {question.question}
@@ -36,9 +47,19 @@ export default function MultipleChoice({
         <span className="quiz-header-badge">다중선택</span>
       </div>
 
-      <div className="ml-6 space-y-4">
+      <div className="ml-8 space-y-4">
         {question.options?.map((option, index) => {
           const checked = isChecked(answer, option)
+          const isCorrectOption = isResult && !!correctAnswer?.includes(option)
+          const isWrongSelected =
+            isResult && checked && !!correctAnswer && !correctAnswer.includes(option)
+          const textColor = isResult
+            ? isCorrectOption
+              ? 'text-[#14C786]'
+              : isWrongSelected
+                ? 'text-[#EC0037]'
+                : 'text-[#222222]'
+            : 'text-[#222222]'
           return (
             <label key={index} className="flex items-center gap-3 cursor-pointer">
               <input
@@ -71,10 +92,15 @@ export default function MultipleChoice({
                   </svg>
                 )}
               </span>
-              <span className="text-[16px] font-normal text-[#222222]">{option}</span>
+              <span className={`text-[16px] font-normal ${textColor}`}>{option}</span>
             </label>
           )
         })}
+        {isResult && explanation && (
+          <div className="mt-5">
+            <QuizResultExplanation explanation={explanation} isCorrect={isCorrect} />
+          </div>
+        )}
       </div>
     </div>
   )
