@@ -1,14 +1,16 @@
 import { useEffect, useMemo, useReducer, useCallback, useRef } from 'react'
+import type { Path } from 'react-hook-form'
+import type { FieldState } from '@/components/common/CommonInput'
+import type { SignupFormData } from '@/schemas/auth'
 import { useCountdown } from '@/hooks/useCountdown'
+import { type FlowMessage, IDLE_FLOW_MESSAGE } from '@/utils/formMessage'
 
 export type Status = 'idle' | 'pending' | 'error' | 'success'
-
-type FieldErrorMap = Record<string, string>
 
 type ValidationResult = {
   ok: boolean
   message?: string
-  fieldErrors?: FieldErrorMap
+  fieldErrors?: Partial<Record<Path<SignupFormData>, string>>
 }
 
 type UseVerificationFlowArgs<TVerifyRes> = {
@@ -17,11 +19,13 @@ type UseVerificationFlowArgs<TVerifyRes> = {
   ttlSec: number
   busy: boolean
   setBusy: (v: boolean) => void
-  clearErrors: (names: string | string[]) => void
-  setFieldError: (name: string, message: string) => void
+  clearErrors: (
+    names: Path<SignupFormData> | Path<SignupFormData>[]
+  ) => void
+  setFieldError: (name: Path<SignupFormData>, message: string) => void
 
-  identityFields: string[]
-  codeField: string
+  identityFields: Path<SignupFormData>[]
+  codeField: Path<SignupFormData>
 
   validateIdentity: (identity: string) => ValidationResult
 
@@ -53,14 +57,13 @@ type ComputeUIParams = {
 }
 
 type ComputeUIResult = {
-  sendLabel: string
   canSend: boolean
   canVerify: boolean
-  fieldState: 'success' | 'error' | 'default'
-  codeFieldState: 'success' | 'error' | 'default'
+  fieldState: FieldState
+  codeFieldState: FieldState
 }
 
-function toFieldState(s: Status): 'success' | 'error' | 'default' {
+function toFieldState(s: Status): FieldState {
   switch (s) {
     case 'success':
       return 'success'
@@ -83,7 +86,6 @@ function computeUI(params: ComputeUIParams): ComputeUIResult {
     busy,
     identityValid,
   } = params
-  const sendLabel = codeSent ? '재전송' : '전송'
   const canSend =
     identityValid && !busy && !verified && sendStatus !== 'pending'
   const canVerify =
@@ -93,9 +95,10 @@ function computeUI(params: ComputeUIParams): ComputeUIResult {
     !verified &&
     verifyStatus !== 'pending'
 
-  const fieldState = verified ? 'success' : toFieldState(sendStatus)
-  const codeFieldState = verified ? 'success' : toFieldState(verifyStatus)
-  return { sendLabel, canSend, canVerify, fieldState, codeFieldState }
+  const fieldState: FieldState = verified ? 'success' : toFieldState(sendStatus)
+  const codeFieldState: FieldState =
+    verified ? 'success' : toFieldState(verifyStatus)
+  return { canSend, canVerify, fieldState, codeFieldState }
 }
 
 type VerificationState = {
@@ -103,9 +106,8 @@ type VerificationState = {
   verified: boolean
   codeSent: boolean
   sendStatus: Status
-  sendMsg: string | null
+  flowMessage: FlowMessage
   verifyStatus: Status
-  verifyMsg: string | null
 }
 
 const INITIAL_STATE: VerificationState = {
@@ -113,9 +115,8 @@ const INITIAL_STATE: VerificationState = {
   verified: false,
   codeSent: false,
   sendStatus: 'idle',
-  sendMsg: null,
+  flowMessage: IDLE_FLOW_MESSAGE,
   verifyStatus: 'idle',
-  verifyMsg: null,
 }
 
 type VerificationAction =
@@ -126,11 +127,11 @@ type VerificationAction =
       type: 'SEND_SUCCESS'
       payload: { mode: 'first' | 'resend'; sent: string; resent: string }
     }
-  | { type: 'SEND_FAILURE'; payload: { sendMsg: string } }
+  | { type: 'SEND_FAILURE'; payload: { message: string } }
   | { type: 'VERIFY_REQUEST' }
-  | { type: 'VERIFY_SUCCESS'; payload: { token: string; verifyMsg: string } }
-  | { type: 'VERIFY_FAILURE'; payload: { verifyMsg: string } }
-  | { type: 'EXPIRED'; payload: { verifyMsg: string } }
+  | { type: 'VERIFY_SUCCESS'; payload: { token: string; message: string } }
+  | { type: 'VERIFY_FAILURE'; payload: { message: string } }
+  | { type: 'EXPIRED'; payload: { message: string } }
 
 function verificationReducer(
   state: VerificationState,
@@ -146,23 +147,23 @@ function verificationReducer(
         verified: false,
         token: null,
         verifyStatus: 'idle',
-        verifyMsg: null,
+        flowMessage: IDLE_FLOW_MESSAGE,
       }
     case 'SEND_REQUEST':
       return {
         ...state,
         sendStatus: 'pending',
-        sendMsg: null,
+        flowMessage: IDLE_FLOW_MESSAGE,
       }
     case 'SEND_SUCCESS': {
-      const sendMsg =
+      const message =
         action.payload.mode === 'resend'
           ? action.payload.resent
           : action.payload.sent
       return {
         ...state,
         sendStatus: 'success',
-        sendMsg,
+        flowMessage: { type: 'success', message, scope: 'send' },
         codeSent: true,
       }
     }
@@ -170,14 +171,18 @@ function verificationReducer(
       return {
         ...state,
         sendStatus: 'error',
-        sendMsg: action.payload.sendMsg,
+        flowMessage: {
+          type: 'error',
+          message: action.payload.message,
+          scope: 'send',
+        },
       }
 
     case 'VERIFY_REQUEST':
       return {
         ...state,
         verifyStatus: 'pending',
-        verifyMsg: null,
+        flowMessage: IDLE_FLOW_MESSAGE,
       }
     case 'VERIFY_SUCCESS':
       return {
@@ -185,16 +190,35 @@ function verificationReducer(
         token: action.payload.token,
         verified: true,
         verifyStatus: 'success',
-        verifyMsg: action.payload.verifyMsg,
+        flowMessage: {
+          type: 'success',
+          message: action.payload.message,
+          scope: 'verify',
+        },
       }
     case 'VERIFY_FAILURE':
+      return {
+        ...state,
+        verified: false,
+        token: null,
+        verifyStatus: 'error',
+        flowMessage: {
+          type: 'error',
+          message: action.payload.message,
+          scope: 'verify',
+        },
+      }
     case 'EXPIRED':
       return {
         ...state,
         verified: false,
         token: null,
         verifyStatus: 'error',
-        verifyMsg: action.payload.verifyMsg,
+        flowMessage: {
+          type: 'error',
+          message: action.payload.message,
+          scope: 'expired',
+        },
       }
     default:
       return state
@@ -230,9 +254,8 @@ export function useVerificationFlow<TVerifyRes>({
     verified,
     codeSent,
     sendStatus,
-    sendMsg,
+    flowMessage,
     verifyStatus,
-    verifyMsg,
   } = state
 
   const resetAll = useCallback(() => {
@@ -250,9 +273,10 @@ export function useVerificationFlow<TVerifyRes>({
 
   function applyIdentityValidationError(v: ValidationResult) {
     const msg = v.message ?? text.identityInvalid
-    dispatch({ type: 'SEND_FAILURE', payload: { sendMsg: msg } })
     if (v.fieldErrors) {
-      Object.entries(v.fieldErrors).forEach(([k, m]) => setFieldError(k, m))
+      ;(
+        Object.entries(v.fieldErrors) as [Path<SignupFormData>, string][]
+      ).forEach(([k, m]) => setFieldError(k, m))
     } else {
       identityFields.forEach((f) => setFieldError(f, msg))
     }
@@ -315,9 +339,8 @@ export function useVerificationFlow<TVerifyRes>({
         })
         timerRef.current.start()
       } catch (err) {
-        const msg = getSendErrorMessage(err)
-        dispatch({ type: 'SEND_FAILURE', payload: { sendMsg: msg } })
-        identityFields.forEach((f) => setFieldError(f, msg))
+        const message = getSendErrorMessage(err)
+        dispatch({ type: 'SEND_FAILURE', payload: { message } })
         timerRef.current.reset()
       }
     })
@@ -333,7 +356,7 @@ export function useVerificationFlow<TVerifyRes>({
 
     if (!timerRef.current.isRunning) {
       resetVerifyState()
-      dispatch({ type: 'EXPIRED', payload: { verifyMsg: text.expired } })
+      dispatch({ type: 'EXPIRED', payload: { message: text.expired } })
       return
     }
 
@@ -348,14 +371,13 @@ export function useVerificationFlow<TVerifyRes>({
           type: 'VERIFY_SUCCESS',
           payload: {
             token: tokenValue,
-            verifyMsg: text.verifySuccess,
+            message: text.verifySuccess,
           },
         })
         timerRef.current.reset()
       } catch (err) {
-        const msg = getVerifyErrorMessage(err)
-        dispatch({ type: 'VERIFY_FAILURE', payload: { verifyMsg: msg } })
-        setFieldError(codeField, msg)
+        const message = getVerifyErrorMessage(err)
+        dispatch({ type: 'VERIFY_FAILURE', payload: { message } })
       }
     })
   }
@@ -366,9 +388,8 @@ export function useVerificationFlow<TVerifyRes>({
     codeSent,
 
     sendStatus,
-    sendMsg,
+    flowMessage,
     verifyStatus,
-    verifyMsg,
 
     timer,
 

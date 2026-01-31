@@ -1,25 +1,63 @@
 import { Check } from 'lucide-react'
 
-import cn from '@/lib/cn'
-import type { Status } from '@/hooks/useVerificationFlow'
+import { ActionRow } from '@/components/signup/ActionRow'
 import { Button } from '@/components/common/Button'
+import cn from '@/lib/cn'
 import { CommonInputField } from '@/components/common/CommonInputField'
 import type { FieldState } from '@/components/common/CommonInput'
 import type { SignupFormData } from '@/schemas/auth'
+import type { FlowMessage } from '@/utils/formMessage'
 
 type TimerLike = {
   isRunning: boolean
   mmss: string
 }
 
-type Props = {
+function getButtonProps(canAct: boolean) {
+  return {
+    variant: canAct ? 'secondary' : 'disabled',
+    disabled: !canAct,
+  } as const
+}
+
+function getSmsCodeRightSlot(params: {
+  verified: boolean
+  showTimer: boolean
+  mmss: string
+}) {
+  const { verified, showTimer, mmss } = params
+  return (
+    <div className="flex items-center gap-2">
+      {verified ? (
+        <Check className="h-5 w-5 text-green-600" />
+      ) : showTimer ? (
+        <span className="text-sm font-semibold text-red-500">{mmss}</span>
+      ) : null}
+    </div>
+  )
+}
+
+function renderFlowMessage(msg: FlowMessage) {
+  if (msg.type === 'idle' || !msg.message) return null
+  return (
+    <p
+      className={cn(
+        'text-xs font-medium',
+        msg.type === 'success' && 'text-green-600',
+        msg.type === 'error' && 'text-red-500'
+      )}
+    >
+      {msg.message}
+    </p>
+  )
+}
+
+export type PhoneSectionProps = {
   phone1: string
   phoneDigitsState: FieldState
-  smsCodeFieldState: FieldState
+  phoneVerificationCodeFieldState: FieldState
 
-  phoneSendMsg: string | null
-  phoneSendStatus: Status
-  smsVerifyMsg: string | null
+  flowMessage: FlowMessage
 
   smsVerified: boolean
   smsCodeSent: boolean
@@ -30,8 +68,6 @@ type Props = {
   canSendSms: boolean
   canVerifySms: boolean
 
-  formError: string | null
-
   onSendSmsCode: () => void
   onVerifySmsCode: () => void
 }
@@ -39,31 +75,81 @@ type Props = {
 export function PhoneSection({
   phone1,
   phoneDigitsState,
-  smsCodeFieldState,
-  phoneSendMsg,
-  phoneSendStatus,
-  smsVerifyMsg,
+  phoneVerificationCodeFieldState,
+  flowMessage,
   smsVerified,
   smsCodeSent,
   smsTimer,
   smsSendLabel,
   canSendSms,
   canVerifySms,
-  formError,
   onSendSmsCode,
   onVerifySmsCode,
-}: Props) {
+}: PhoneSectionProps) {
   const canTypeSmsCode = smsCodeSent && !smsVerified
+  const showTimerInCodeInput = smsCodeSent && smsTimer.isRunning && !smsVerified
 
-  const SmsCodeRightSlot = (
-    <div className="flex items-center gap-2">
-      {smsVerified ? (
-        <Check className="h-5 w-5 text-green-600" />
-      ) : smsCodeSent && smsTimer.isRunning ? (
-        <span className="text-sm font-semibold text-red-500">
-          {smsTimer.mmss}
-        </span>
-      ) : null}
+  const sendBtn = getButtonProps(canSendSms)
+  const verifyBtn = getButtonProps(canVerifySms)
+
+  const smsCodeRightSlot = getSmsCodeRightSlot({
+    verified: smsVerified,
+    showTimer: showTimerInCodeInput,
+    mmss: smsTimer.mmss,
+  })
+
+  const sendFlowMessage: FlowMessage =
+    flowMessage.scope === 'send'
+      ? flowMessage
+      : { type: 'idle', message: null, scope: null }
+  const verifyFlowMessage: FlowMessage =
+    flowMessage.scope === 'verify' || flowMessage.scope === 'expired'
+      ? flowMessage
+      : { type: 'idle', message: null, scope: null }
+
+  const firstRowBelow = renderFlowMessage(sendFlowMessage)
+  const secondRowBelow = renderFlowMessage(verifyFlowMessage)
+
+  const phoneDigitsLeft = (
+    <div className="grid w-full min-w-0 grid-cols-[1fr_auto_1fr_auto_1fr] items-start gap-1">
+      <div className="min-w-0">
+        <CommonInputField<SignupFormData>
+          name="phone1"
+          type="text"
+          placeholder={phone1 || '010'}
+          placeholderVariant="a"
+          disabled
+          width="100%"
+        />
+      </div>
+      <span className="shrink-0 text-[14px] leading-normal tracking-[-0.42px] text-[#9D9D9D]">
+        -
+      </span>
+      <div className="min-w-0">
+        <CommonInputField<SignupFormData>
+          name="phone2"
+          type="text"
+          placeholder="0000"
+          placeholderVariant="a"
+          locked={smsVerified}
+          state={phoneDigitsState}
+          width="100%"
+        />
+      </div>
+      <span className="shrink-0 text-[14px] leading-normal tracking-[-0.42px] text-[#9D9D9D]">
+        -
+      </span>
+      <div className="min-w-0">
+        <CommonInputField<SignupFormData>
+          name="phone3"
+          type="text"
+          placeholder="0000"
+          placeholderVariant="a"
+          locked={smsVerified}
+          state={phoneDigitsState}
+          width="100%"
+        />
+      </div>
     </div>
   )
 
@@ -76,115 +162,52 @@ export function PhoneSection({
         </span>
       </label>
 
-      <div className="flex min-w-0 items-start gap-3 overflow-hidden">
-        <div className="min-w-0 flex-1 overflow-hidden">
-          <div className="grid w-full min-w-0 grid-cols-[1fr_auto_1fr_auto_1fr] items-center gap-1 overflow-hidden">
-            <div className="min-w-0">
-              <CommonInputField<SignupFormData>
-                name="phone1"
-                type="text"
-                placeholder={phone1 || '010'}
-                placeholderVariant="a"
-                disabled
-                width="100%"
-              />
-            </div>
+      <ActionRow
+        left={phoneDigitsLeft}
+        right={
+          <Button
+            type="button"
+            size="sm"
+            variant={sendBtn.variant}
+            disabled={sendBtn.disabled}
+            className="whitespace-nowrap"
+            onClick={onSendSmsCode}
+          >
+            {smsSendLabel}
+          </Button>
+        }
+        below={firstRowBelow}
+      />
 
-            <span className="shrink-0 text-[14px] leading-normal tracking-[-0.42px] text-[#9D9D9D]">
-              -
-            </span>
-
-            <div className="min-w-0">
-              <CommonInputField<SignupFormData>
-                name="phone2"
-                type="text"
-                placeholder="0000"
-                placeholderVariant="a"
-                locked={smsVerified}
-                state={phoneDigitsState}
-                width="100%"
-              />
-            </div>
-
-            <span className="shrink-0 text-[14px] leading-normal tracking-[-0.42px] text-[#9D9D9D]">
-              -
-            </span>
-
-            <div className="min-w-0">
-              <CommonInputField<SignupFormData>
-                name="phone3"
-                type="text"
-                placeholder="0000"
-                placeholderVariant="a"
-                locked={smsVerified}
-                state={phoneDigitsState}
-                width="100%"
-              />
-            </div>
-          </div>
-
-          {phoneSendMsg && (
-            <p
-              className={cn(
-                'mt-2 px-1 text-xs font-medium',
-                phoneSendStatus === 'success'
-                  ? 'text-green-600'
-                  : phoneSendStatus === 'error'
-                    ? 'text-red-500'
-                    : 'text-gray-400'
-              )}
-            >
-              {phoneSendMsg}
-            </p>
-          )}
-        </div>
-
-        <Button
-          type="button"
-          size="sm"
-          variant={!canSendSms ? 'disabled' : 'secondary'}
-          className="whitespace-nowrap"
-          onClick={onSendSmsCode}
-        >
-          {smsSendLabel}
-        </Button>
-      </div>
-
-      {/* 인증번호 입력, 확인 버튼 */}
-      <div className="flex min-w-0 gap-3 overflow-hidden">
-        <div className="min-w-0 flex-1 overflow-hidden">
+      <ActionRow
+        left={
           <CommonInputField<SignupFormData>
             name="phoneVerificationCode"
             type="text"
             placeholder="인증번호 6자리를 입력해주세요"
             width="100%"
             placeholderVariant="a"
-            state={smsCodeFieldState}
+            state={phoneVerificationCodeFieldState}
             helperVisibility="always"
-            helperTextByState={{
-              success: smsVerifyMsg,
-              error: smsVerifyMsg,
-            }}
-            rightSlot={SmsCodeRightSlot}
+            rightSlot={smsCodeRightSlot}
             locked={smsVerified}
             disabled={!canTypeSmsCode}
           />
-        </div>
-
-        <Button
-          type="button"
-          size="sm"
-          variant={!canVerifySms ? 'disabled' : 'secondary'}
-          className="whitespace-nowrap"
-          onClick={onVerifySmsCode}
-        >
-          {smsVerified ? '인증완료' : '인증번호 확인'}
-        </Button>
-      </div>
-
-      {formError && (
-        <p className="px-1 text-xs font-medium text-red-500">{formError}</p>
-      )}
+        }
+        right={
+          <Button
+            type="button"
+            size="sm"
+            variant={verifyBtn.variant}
+            disabled={verifyBtn.disabled}
+            className="whitespace-nowrap"
+            onClick={onVerifySmsCode}
+          >
+            {smsVerified ? '인증완료' : '인증번호 확인'}
+          </Button>
+        }
+        below={secondRowBelow}
+      />
     </div>
   )
 }
