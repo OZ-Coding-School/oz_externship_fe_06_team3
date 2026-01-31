@@ -1,11 +1,12 @@
 import { Check } from 'lucide-react'
 
+import { AUTH_MESSAGES } from '@/constants/authMessages'
 import { PasswordField } from '@/components/common/PasswordField'
 import { CommonInputField } from '@/components/common/CommonInputField'
 import type { FieldState } from '@/components/common/CommonInput'
 import type { SignupFormData } from '@/schemas/auth'
 
-type PasswordSectionProps = {
+export type PasswordSectionProps = {
   passwordFieldState: FieldState
   passwordConfirmState: FieldState
   passwordConfirmMsg: string | null
@@ -16,6 +17,8 @@ export function PasswordSection({
   passwordConfirmState,
   passwordConfirmMsg,
 }: PasswordSectionProps) {
+  const isConfirmSuccess = passwordConfirmState === 'success'
+
   return (
     <div className="flex flex-col gap-5">
       <div className="inline-flex items-center gap-4">
@@ -39,7 +42,7 @@ export function PasswordSection({
         showDefaultHelper
         helperVisibility="focus"
         helperTextByState={{
-          success: '* 사용 가능한 비밀번호입니다.',
+          success: AUTH_MESSAGES.password.available,
         }}
       />
 
@@ -51,14 +54,9 @@ export function PasswordSection({
         placeholderVariant="a"
         state={passwordConfirmState}
         helperVisibility="always"
-        helperTextByState={{
-          success: passwordConfirmMsg,
-          error: passwordConfirmMsg,
-        }}
+        helperText={passwordConfirmMsg ?? undefined}
         rightSlot={
-          passwordConfirmState === 'success' ? (
-            <Check className="h-5 w-5 text-green-600" />
-          ) : null
+          isConfirmSuccess ? <Check className="h-5 w-5 text-green-600" /> : null
         }
       />
     </div>

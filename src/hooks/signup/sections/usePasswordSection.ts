@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import type { SignupFormData } from '@/schemas/auth'
 import { PASSWORD_REGEX } from '@/utils/signupUtils'
 import type { FieldState } from '@/components/common/CommonInput'
+import { AUTH_MESSAGES } from '@/constants/authMessages'
 import type {
   PasswordSectionMessages,
   PasswordSectionUI,
@@ -43,11 +44,11 @@ export function usePasswordSection(args: UsePasswordSectionArgs) {
     const pw = password.trim()
     const confirm = passwordConfirm.trim()
     if (!confirm) return null
-    if (!pw) return '* 비밀번호를 먼저 입력해주세요.'
-    if (!PASSWORD_REGEX.test(pw)) return '* 비밀번호 형식이 올바르지 않습니다.'
+    if (!pw) return AUTH_MESSAGES.password.required
+    if (!PASSWORD_REGEX.test(pw)) return AUTH_MESSAGES.password.invalidFormat
     return confirm === pw
-      ? '* 비밀번호가 일치합니다.'
-      : '* 비밀번호가 일치하지 않습니다.'
+      ? AUTH_MESSAGES.password.match
+      : AUTH_MESSAGES.password.mismatch
   }, [password, passwordConfirm])
 
   useEffect(() => {

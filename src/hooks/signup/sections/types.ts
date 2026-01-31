@@ -1,5 +1,6 @@
 import type { FieldState } from '@/components/common/CommonInput'
 import type { Status } from '@/hooks/useVerificationFlow'
+import type { FlowMessage } from '@/utils/formMessage'
 
 export type CountdownTimer = {
   remain: number
@@ -14,16 +15,14 @@ export type VerificationFlowReturn = {
   verified: boolean
   codeSent: boolean
   sendStatus: Status
-  sendMsg: string | null
+  flowMessage: FlowMessage
   verifyStatus: Status
-  verifyMsg: string | null
   timer: CountdownTimer
   ui: {
-    sendLabel: string
     canSend: boolean
     canVerify: boolean
-    fieldState: string
-    codeFieldState: string
+    fieldState: FieldState
+    codeFieldState: FieldState
   }
   toFieldState: (s: Status) => 'success' | 'error' | 'default'
   actions: {
@@ -38,24 +37,21 @@ export type NicknameSectionUI = {
   canCheckNickname: boolean
   nicknameFieldState: FieldState
 }
-export type NicknameSectionMessages = { nicknameMsg: string | null }
+export type NicknameSectionMessages = { flowMessage: FlowMessage }
 export type NicknameSectionActions = { onCheckNickname: () => Promise<void> }
 
-export type EmailSectionValues = { email: string; emailCode: string }
+export type EmailSectionValues = { email: string; emailVerificationCode: string }
 export type EmailSectionUI = {
   emailVerified: boolean
   emailCodeSent: boolean
   emailFieldState: FieldState
-  emailCodeFieldState: FieldState
+  emailVerificationCodeFieldState: FieldState
   emailTimer: CountdownTimer
   emailSendLabel: string
   canSendEmail: boolean
   canVerifyEmail: boolean
 }
-export type EmailSectionMessages = {
-  emailSendMsg: string | null
-  emailVerifyMsg: string | null
-}
+export type EmailSectionMessages = { flowMessage: FlowMessage }
 export type EmailSectionActions = {
   onSendEmailCode: () => Promise<void>
   onVerifyEmailCode: () => Promise<void>
@@ -65,24 +61,21 @@ export type SmsSectionValues = {
   phone1: string
   phone2: string
   phone3: string
-  smsCode: string
+  phoneVerificationCode: string
   phoneNumber: string
 }
 export type SmsSectionUI = {
   smsVerified: boolean
   smsCodeSent: boolean
   phoneDigitsState: FieldState
-  smsCodeFieldState: FieldState
+  phoneVerificationCodeFieldState: FieldState
   smsTimer: CountdownTimer
   smsSendLabel: string
   canSendSms: boolean
   canVerifySms: boolean
   phoneSendStatus: Status
 }
-export type SmsSectionMessages = {
-  phoneSendMsg: string | null
-  smsVerifyMsg: string | null
-}
+export type SmsSectionMessages = { flowMessage: FlowMessage }
 export type SmsSectionActions = {
   onSendSmsCode: () => Promise<void>
   onVerifySmsCode: () => Promise<void>

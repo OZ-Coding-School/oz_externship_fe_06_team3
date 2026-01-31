@@ -16,6 +16,7 @@ type PasswordFieldProps<T extends FieldValues> = Omit<
   rules?: RegisterOptions<T>
   state?: FieldState
   autoState?: boolean
+  stateOverride?: FieldState
 }
 
 export function PasswordField<T extends FieldValues>({
@@ -23,6 +24,7 @@ export function PasswordField<T extends FieldValues>({
   rules,
   state = 'default',
   autoState = false,
+  stateOverride,
   helperTextByState,
   ...props
 }: PasswordFieldProps<T>) {
@@ -52,7 +54,7 @@ export function PasswordField<T extends FieldValues>({
       value={fieldValue}
       onChange={(v) => field.onChange(v)}
       onBlur={field.onBlur}
-      state={resolvedState}
+      state={stateOverride ?? resolvedState}
       helperTextByState={{
         ...helperTextByState,
         error: error?.message || helperTextByState?.error,

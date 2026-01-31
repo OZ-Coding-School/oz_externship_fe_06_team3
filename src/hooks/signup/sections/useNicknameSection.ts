@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import type { FieldState } from '@/components/common/CommonInput'
-import type { Status } from '@/hooks/useVerificationFlow'
+import type { FlowMessage } from '@/utils/formMessage'
 import type {
   NicknameSectionActions,
   NicknameSectionMessages,
@@ -10,15 +10,11 @@ import type {
 
 const NICKNAME_REGEX = /^[A-Za-z0-9가-힣]{2,10}$/
 
-function statusToFieldState(s: Status): FieldState {
-  return s === 'success' ? 'success' : s === 'error' ? 'error' : 'default'
-}
-
 export type UseNicknameSectionArgs = {
   nickname: string
   nicknameChecked: boolean
-  nicknameStatus: Status
-  nicknameMsg: string | null
+  nicknameFlowMessage: FlowMessage
+  nicknameFieldState: FieldState
   busy: boolean
   onCheckNickname: () => Promise<void>
 }
@@ -27,8 +23,8 @@ export function useNicknameSection(args: UseNicknameSectionArgs) {
   const {
     nickname,
     nicknameChecked,
-    nicknameStatus,
-    nicknameMsg,
+    nicknameFlowMessage,
+    nicknameFieldState,
     busy,
     onCheckNickname,
   } = args
@@ -43,14 +39,14 @@ export function useNicknameSection(args: UseNicknameSectionArgs) {
       nicknameChecked,
       canCheckNickname:
         !busy && !nicknameChecked && NICKNAME_REGEX.test(nickname),
-      nicknameFieldState: statusToFieldState(nicknameStatus),
+      nicknameFieldState,
     }),
-    [nicknameChecked, nicknameStatus, nickname, busy]
+    [nicknameChecked, nicknameFieldState, nickname, busy]
   )
 
   const messages: NicknameSectionMessages = useMemo(
-    () => ({ nicknameMsg }),
-    [nicknameMsg]
+    () => ({ flowMessage: nicknameFlowMessage }),
+    [nicknameFlowMessage]
   )
 
   const actions: NicknameSectionActions = useMemo(

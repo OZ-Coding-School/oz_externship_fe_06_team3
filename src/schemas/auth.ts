@@ -29,10 +29,7 @@ export const loginSchema = z.object({
   password: z
     .string()
     .min(1, '비밀번호를 입력해주세요.')
-    .regex(
-      PASSWORD_REGEX,
-      '* 비밀번호는 6~15자이며 영문/숫자/특수문자를 모두 포함해야 합니다.'
-    ),
+    .regex(PASSWORD_REGEX, '* 6~15자의 영문 대/소문자, 숫자 및 특수문자 조합'),
 })
 
 export type LoginFormData = z.infer<typeof loginSchema>
