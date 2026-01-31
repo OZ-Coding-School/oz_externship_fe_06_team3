@@ -260,6 +260,16 @@ export function useVerificationFlow<TVerifyRes>({
     resetAll()
   }, [identity, resetAll])
 
+  useEffect(() => {
+    if (!code?.trim()) {
+      if (verifyStatus === 'error') {
+        dispatch({ type: 'RESET_VERIFY_STATE' })
+      }
+      clearErrors(codeField)
+      return
+    }
+  }, [code, verifyStatus, clearErrors, codeField])
+
   function resetVerifyState() {
     dispatch({ type: 'RESET_VERIFY_STATE' })
   }
