@@ -23,23 +23,25 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isAuthenticated: false,
 
-      setAuth: ({ accessToken, user }) =>
-        set({ accessToken, user, isAuthenticated: true }),
+      setAuth: ({ accessToken, user }) => {
+        set({ accessToken, user, isAuthenticated: true })
+      },
 
-      clearAuth: () =>
-        set({ accessToken: null, user: null, isAuthenticated: false }),
+      clearAuth: () => {
+        set({ accessToken: null, user: null, isAuthenticated: false })
+      },
 
       login: async (payload) => {
         try {
           const res = await authApi.login(payload)
-          if (!res?.access_token) throw new Error('LOGIN_FAILED')
-
-          set({ accessToken: res.access_token, isAuthenticated: true })
+          const token = res?.access_token
+          if (!token) throw new Error('LOGIN_FAILED')
 
           const user = await authApi.me()
-          set({ user, isAuthenticated: true })
+
+          get().setAuth({ accessToken: token, user })
         } catch (err) {
-          set({ accessToken: null, user: null, isAuthenticated: false })
+          get().clearAuth()
           throw err
         }
       },

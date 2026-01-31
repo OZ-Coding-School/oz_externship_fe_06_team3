@@ -1,4 +1,5 @@
 import { FormProvider } from 'react-hook-form'
+import { Link } from 'react-router-dom'
 
 import cn from '@/lib/cn'
 import { CommonInputField } from '@/components/common/CommonInputField'
@@ -40,15 +41,12 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <Button
-                type="button"
-                variant="link"
-                size="auto"
+              <Link
+                to="/signup"
                 className="text-primary gap-2.5 text-[16px] leading-[22.4px] font-normal tracking-[-0.48px] whitespace-nowrap"
-                onClick={actions.goSignup}
               >
                 회원가입 하기
-              </Button>
+              </Link>
             </div>
           </div>
 

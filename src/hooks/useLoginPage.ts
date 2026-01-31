@@ -1,5 +1,5 @@
 import { useEffect, useMemo, type ReactNode } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { zodResolver } from '@hookform/resolvers/zod'
 
@@ -11,16 +11,16 @@ import { pickMessageFromAxios } from '@/utils/signupUtils'
 
 type LocationState = { from?: string }
 
-function deriveSubmitUI(isValid: boolean, isSubmitting: boolean) {
+function submitButtonUI(isValid: boolean, isSubmitting: boolean) {
   const disabled = !isValid || isSubmitting
   return {
-    label: isSubmitting ? AUTH_MESSAGES.login.submitBusy : AUTH_MESSAGES.login.submitLabel,
+    label: isSubmitting
+      ? AUTH_MESSAGES.login.submitBusy
+      : AUTH_MESSAGES.login.submitLabel,
     disabled,
     variant: (disabled ? 'disabled' : 'primary') as 'disabled' | 'primary',
   }
 }
-
-const LOGIN_FIELD_STATE_DEFAULT: FieldState = 'default'
 
 export type LoginVM = {
   fields: {
@@ -44,7 +44,6 @@ export type LoginVM = {
   }
   ui: {
     isSubmitting: boolean
-    canSubmit: boolean
     submitButton: {
       label: string
       disabled: boolean
@@ -52,8 +51,7 @@ export type LoginVM = {
     }
   }
   actions: {
-    onSubmit: (e?: React.BaseSyntheticEvent) => void | Promise<void>
-    goSignup: () => void
+    onSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>
     goFindId: () => void
     goFindPw: () => void
   }
@@ -80,12 +78,22 @@ export function useLoginPage() {
   const {
     handleSubmit,
     formState: { errors, isSubmitting, isValid },
-    watch,
+    control,
     setError,
     clearErrors,
   } = methods
 
   const formError = errors.root?.message ?? null
+
+  const [email, password] = useWatch({
+    control,
+    name: ['email', 'password'],
+  })
+
+  useEffect(() => {
+    if (formError) clearErrors('root')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [email, password])
 
   const onSubmit = handleSubmit(async (data) => {
     clearErrors('root')
@@ -102,17 +110,8 @@ export function useLoginPage() {
     }
   })
 
-  useEffect(() => {
-    const subscription = watch((_, { name }) => {
-      if (name === 'email' || name === 'password') {
-        clearErrors('root')
-      }
-    })
-    return () => subscription.unsubscribe()
-  }, [watch, clearErrors])
-
   const submitButton = useMemo(
-    () => deriveSubmitUI(isValid, isSubmitting),
+    () => submitButtonUI(isValid, isSubmitting),
     [isValid, isSubmitting]
   )
 
@@ -120,35 +119,25 @@ export function useLoginPage() {
     fields: {
       email: {
         name: 'email',
-        state: LOGIN_FIELD_STATE_DEFAULT,
+        state: 'default',
         locked: false,
         helperTextByState: { default: null },
       },
       password: {
         name: 'password',
-        state: LOGIN_FIELD_STATE_DEFAULT,
+        state: 'default',
         locked: false,
         helperTextByState: { default: null },
       },
     },
-    messages: {
-      formError,
-    },
-    ui: {
-      isSubmitting,
-      canSubmit: isValid && !isSubmitting,
-      submitButton,
-    },
+    messages: { formError },
+    ui: { isSubmitting, submitButton },
     actions: {
       onSubmit,
-      goSignup: () => navigate('/signup'),
       goFindId: () => console.log('아이디 찾기'),
       goFindPw: () => console.log('비밀번호 찾기'),
     },
   }
 
-  return {
-    methods,
-    vm,
-  }
+  return { methods, vm }
 }
