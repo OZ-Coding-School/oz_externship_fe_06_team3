@@ -1,5 +1,8 @@
-import { useCallback, useRef } from 'react'
+import { useCallback, type BaseSyntheticEvent } from 'react'
 import type { SignupFormData } from '@/schemas/auth'
+import type { Path } from 'react-hook-form'
+
+import { AUTH_MESSAGES } from '@/constants/authMessages'
 import { useSignupFormLogic } from '@/hooks/signup/useSignupFormLogic'
 import {
   useNicknameSection,
@@ -9,17 +12,31 @@ import {
   useSubmitSection,
 } from '@/hooks/signup/sections'
 
+import type { NicknameSectionProps } from '@/components/signup/NicknameSection'
+import type { EmailSectionProps } from '@/components/signup/EmailSection'
+import type { PhoneSectionProps } from '@/components/signup/PhoneSection'
+import type { PasswordSectionProps } from '@/components/signup/PasswordSection'
+import type { ButtonVariantProps } from '@/components/common/buttonVariants'
+
+export type SignupSubmitProps = {
+  onSubmit: (e?: BaseSyntheticEvent) => Promise<void>
+  label: string
+  formError: string | null
+  button: {
+    disabled: boolean
+    variant: ButtonVariantProps['variant']
+  }
+}
+
 export function useSignupEmailForm() {
   const logic = useSignupFormLogic()
-  const logicRef = useRef(logic)
-  logicRef.current = logic
   const v = logic.watchValues
 
   const nicknameSection = useNicknameSection({
     nickname: v.nickname,
     nicknameChecked: logic.nicknameChecked,
-    nicknameStatus: logic.nicknameStatus,
-    nicknameMsg: logic.nicknameMsg,
+    nicknameFlowMessage: logic.nicknameFlowMessage,
+    nicknameFieldState: logic.nicknameFieldState,
     busy: logic.busy,
     onCheckNickname: logic.onCheckNickname,
   })
@@ -27,7 +44,7 @@ export function useSignupEmailForm() {
   const emailSection = useEmailSection({
     emailFlow: logic.emailFlow,
     email: v.email,
-    emailCode: v.emailCode,
+    emailVerificationCode: v.emailVerificationCode,
   })
 
   const smsSection = useSmsSection({
@@ -35,13 +52,13 @@ export function useSignupEmailForm() {
     phone1: v.phone1,
     phone2: v.phone2,
     phone3: v.phone3,
-    smsCode: v.smsCode,
+    phoneVerificationCode: v.phoneVerificationCode,
     phoneNumber: v.phoneNumber,
   })
 
   const triggerForForm = useCallback(
-    (name: keyof SignupFormData) => logicRef.current.trigger(name),
-    []
+    (name: Path<SignupFormData>) => logic.trigger(name),
+    [logic]
   )
 
   const passwordSection = usePasswordSection({
@@ -61,42 +78,73 @@ export function useSignupEmailForm() {
     onSubmit: logic.onSubmit,
   })
 
+  const nicknameProps: NicknameSectionProps = {
+    nicknameFieldState: nicknameSection.ui.nicknameFieldState,
+    flowMessage: nicknameSection.messages.flowMessage,
+    nicknameChecked: nicknameSection.ui.nicknameChecked,
+    nickname: nicknameSection.values.nickname,
+    canCheckNickname: nicknameSection.ui.canCheckNickname,
+    busy: logic.busy,
+    onCheckNickname: nicknameSection.actions.onCheckNickname,
+  }
+
+  const emailProps: EmailSectionProps = {
+    emailFieldState: emailSection.ui.emailFieldState,
+    emailVerificationCodeFieldState:
+      emailSection.ui.emailVerificationCodeFieldState,
+    flowMessage: emailSection.messages.flowMessage,
+    emailVerified: emailSection.ui.emailVerified,
+    emailCodeSent: emailSection.ui.emailCodeSent,
+    emailTimer: emailSection.ui.emailTimer,
+    emailSendLabel: emailSection.ui.emailSendLabel,
+    canSendEmail: emailSection.ui.canSendEmail,
+    canVerifyEmail: emailSection.ui.canVerifyEmail,
+    onSendEmailCode: emailSection.actions.onSendEmailCode,
+    onVerifyEmailCode: emailSection.actions.onVerifyEmailCode,
+  }
+
+  const phoneProps: PhoneSectionProps = {
+    phone1: smsSection.values.phone1,
+    phoneDigitsState: smsSection.ui.phoneDigitsState,
+    phoneVerificationCodeFieldState:
+      smsSection.ui.phoneVerificationCodeFieldState,
+    flowMessage: smsSection.messages.flowMessage,
+    smsVerified: smsSection.ui.smsVerified,
+    smsCodeSent: smsSection.ui.smsCodeSent,
+    smsTimer: smsSection.ui.smsTimer,
+    smsSendLabel: smsSection.ui.smsSendLabel,
+    canSendSms: smsSection.ui.canSendSms,
+    canVerifySms: smsSection.ui.canVerifySms,
+    onSendSmsCode: smsSection.actions.onSendSmsCode,
+    onVerifySmsCode: smsSection.actions.onVerifySmsCode,
+  }
+
+  const passwordProps: PasswordSectionProps = {
+    passwordFieldState: passwordSection.ui.passwordFieldState,
+    passwordConfirmState: passwordSection.ui.passwordConfirmState,
+    passwordConfirmMsg: passwordSection.messages.passwordConfirmMsg,
+  }
+  
+  const submitProps: SignupSubmitProps = {
+    onSubmit: submitSection.actions.onSubmit,
+    label: logic.busy
+      ? AUTH_MESSAGES.common.submitBusy
+      : AUTH_MESSAGES.common.submitLabel,
+    formError: logic.formError,
+    button: {
+      disabled: !submitSection.ui.canSubmit,
+      variant: submitSection.ui.canSubmit ? 'primary' : 'disabled',
+    },
+  }
+
   return {
     methods: logic.methods,
-    common: {
-      busy: logic.busy,
-      formError: logic.formError,
-      name: v.name,
-      birthdate: v.birthdate,
-    },
     sections: {
-      nickname: {
-        values: nicknameSection.values,
-        ui: nicknameSection.ui,
-        messages: nicknameSection.messages,
-        actions: nicknameSection.actions,
-      },
-      email: {
-        values: emailSection.values,
-        ui: emailSection.ui,
-        messages: emailSection.messages,
-        actions: emailSection.actions,
-      },
-      sms: {
-        values: smsSection.values,
-        ui: smsSection.ui,
-        messages: smsSection.messages,
-        actions: smsSection.actions,
-      },
-      password: {
-        values: passwordSection.values,
-        ui: passwordSection.ui,
-        messages: passwordSection.messages,
-      },
-      submit: {
-        ui: submitSection.ui,
-        actions: submitSection.actions,
-      },
+      nickname: nicknameProps,
+      email: emailProps,
+      sms: phoneProps,
+      password: passwordProps,
+      submit: submitProps,
     },
   }
 }

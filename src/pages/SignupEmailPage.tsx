@@ -12,9 +12,11 @@ import { EmailSection } from '@/components/signup/EmailSection'
 import { PhoneSection } from '@/components/signup/PhoneSection'
 import { PasswordSection } from '@/components/signup/PasswordSection'
 import { GenderField } from '@/components/signup/GenderField'
+import { SectionBlock } from '@/components/signup/SectionBlock'
+import cn from '@/lib/cn'
 
 export default function SignupEmailPage() {
-  const { methods, values, ui, messages, actions } = useSignupEmailForm()
+  const { methods, sections } = useSignupEmailForm()
 
   return (
     <FormProvider {...methods}>
@@ -37,9 +39,12 @@ export default function SignupEmailPage() {
               회원가입
             </h1>
 
-            <form onSubmit={actions.onSubmit} className="flex flex-col gap-11">
+            <form
+              onSubmit={sections.submit.onSubmit}
+              className="flex flex-col gap-11"
+            >
               {/* 이름 */}
-              <FieldBlock label="이름">
+              <SectionBlock label="이름">
                 <CommonInputField<SignupFormData>
                   name="name"
                   type="text"
@@ -48,21 +53,13 @@ export default function SignupEmailPage() {
                   placeholderVariant="a"
                   helperVisibility="always"
                 />
-              </FieldBlock>
+              </SectionBlock>
 
-              {/* 닉네임, 중복확인 */}
-              <NicknameSection
-                nicknameFieldState={ui.nicknameFieldState}
-                nicknameMsg={messages.nicknameMsg}
-                nicknameChecked={ui.nicknameChecked}
-                nickname={values.nickname}
-                canCheckNickname={ui.canCheckNickname}
-                busy={ui.busy}
-                onCheckNickname={actions.onCheckNickname}
-              />
+              {/* 닉네임 */}
+              <NicknameSection {...sections.nickname} />
 
               {/* 생년월일 */}
-              <FieldBlock label="생년월일">
+              <SectionBlock label="생년월일">
                 <CommonInputField<SignupFormData>
                   name="birthdate"
                   type="text"
@@ -71,64 +68,42 @@ export default function SignupEmailPage() {
                   placeholderVariant="a"
                   helperVisibility="always"
                 />
-              </FieldBlock>
+              </SectionBlock>
 
               {/* 성별 */}
-              <FieldBlock label="성별">
+              <SectionBlock label="성별">
                 <GenderField />
-              </FieldBlock>
+              </SectionBlock>
 
               {/* 이메일 */}
-              <EmailSection
-                emailFieldState={ui.emailFieldState}
-                emailCodeFieldState={ui.emailCodeFieldState}
-                emailSendMsg={messages.emailSendMsg}
-                emailVerifyMsg={messages.emailVerifyMsg}
-                emailVerified={ui.emailVerified}
-                emailCodeSent={ui.emailCodeSent}
-                emailTimer={ui.emailTimer}
-                emailSendLabel={ui.emailSendLabel}
-                canSendEmail={ui.canSendEmail}
-                canVerifyEmail={ui.canVerifyEmail}
-                onSendEmailCode={actions.onSendEmailCode}
-                onVerifyEmailCode={actions.onVerifyEmailCode}
-              />
+              <EmailSection {...sections.email} />
 
               {/* 휴대전화 */}
-              <PhoneSection
-                phone1={values.phone1}
-                phoneDigitsState={ui.phoneDigitsState}
-                smsCodeFieldState={ui.smsCodeFieldState}
-                phoneSendMsg={messages.phoneSendMsg}
-                phoneSendStatus={ui.phoneSendStatus}
-                smsVerifyMsg={messages.smsVerifyMsg}
-                smsVerified={ui.smsVerified}
-                smsCodeSent={ui.smsCodeSent}
-                smsTimer={ui.smsTimer}
-                smsSendLabel={ui.smsSendLabel}
-                canSendSms={ui.canSendSms}
-                canVerifySms={ui.canVerifySms}
-                formError={messages.formError}
-                onSendSmsCode={actions.onSendSmsCode}
-                onVerifySmsCode={actions.onVerifySmsCode}
-              />
+              <PhoneSection {...sections.sms} />
 
               {/* 비밀번호 */}
-              <PasswordSection
-                passwordFieldState={ui.passwordFieldState}
-                passwordConfirmState={ui.passwordConfirmState}
-                passwordConfirmMsg={messages.passwordConfirmMsg}
-              />
+              <PasswordSection {...sections.password} />
+
+              {/* 전역 폼 에러 */}
+              <div className="min-h-[20px] px-1 text-xs font-medium text-red-500">
+                <span
+                  className={cn(
+                    sections.submit.formError ? 'visible' : 'invisible'
+                  )}
+                >
+                  {sections.submit.formError ?? '\u00A0'}
+                </span>
+              </div>
 
               {/* 제출 */}
               <Button
                 type="submit"
                 size="xxl"
-                variant={ui.canSubmit ? 'primary' : 'disabled'}
-                disabled={!ui.canSubmit}
+                variant={sections.submit.button.variant}
+                disabled={sections.submit.button.disabled}
                 className="whitespace-nowrap"
               >
-                {ui.busy ? '처리 중...' : '가입하기'}
+                {sections.submit.label}
               </Button>
             </form>
 
@@ -144,26 +119,5 @@ export default function SignupEmailPage() {
         </div>
       </div>
     </FormProvider>
-  )
-}
-
-// UI 레이아웃 컴포넌트
-function FieldBlock({
-  label,
-  children,
-}: {
-  label: string
-  children: React.ReactNode
-}) {
-  return (
-    <div className="flex flex-col gap-5">
-      <label className="inline-flex items-start text-left text-[16px] leading-[22.24px] font-normal tracking-[-0.48px] text-[#121212]">
-        {label}
-        <span className="ml-0 text-[16px] leading-normal font-normal tracking-[-0.32px] text-[#EC0037]">
-          *
-        </span>
-      </label>
-      {children}
-    </div>
   )
 }
