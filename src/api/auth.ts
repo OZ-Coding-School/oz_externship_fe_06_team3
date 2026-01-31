@@ -17,8 +17,13 @@ export async function logout(): Promise<void> {
   await apiClient.post('/api/v1/accounts/logout/')
 }
 
-export async function me(): Promise<User> {
-  const { data } = await apiClient.get<User>('/api/v1/accounts/me/')
+export async function me(accessToken: string | null = null): Promise<User> {
+  const config =
+    accessToken && accessToken !== ''
+      ? { headers: { Authorization: `Bearer ${accessToken}` } }
+      : undefined
+
+  const { data } = await apiClient.get<User>('/api/v1/accounts/me/', config)
   return data
 }
 

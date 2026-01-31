@@ -37,7 +37,7 @@ export const useAuthStore = create<AuthState>()(
           const token = res?.access_token
           if (!token) throw new Error('LOGIN_FAILED')
 
-          const user = await authApi.me()
+          const user = await authApi.me(token)
 
           get().setAuth({ accessToken: token, user })
         } catch (err) {
@@ -59,7 +59,7 @@ export const useAuthStore = create<AuthState>()(
         if (!token) return
 
         try {
-          const user = await authApi.me()
+          const user = await authApi.me(token)
           set({ user, isAuthenticated: true })
         } catch {
           get().clearAuth()

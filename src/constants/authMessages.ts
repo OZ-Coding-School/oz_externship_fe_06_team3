@@ -61,7 +61,7 @@ export const AUTH_MESSAGES = {
   },
   buttons: {
     resend: '재전송',
-    emailSend: '인증코드전송',
+    emailSend: '인증코드 전송',
     smsSend: '인증번호 받기',
   },
   /** 로그인 페이지 */
