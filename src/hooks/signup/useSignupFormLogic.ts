@@ -1,19 +1,34 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch, type Path } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { zodResolver } from '@hookform/resolvers/zod'
 
 import { signupSchema, type SignupFormData } from '@/schemas/auth'
 import * as authApi from '@/api/auth'
 import { useAuthStore } from '@/store/authStore'
-import {
-  pickMessageFromAxios,
-  formatBirthday,
-  mapGender,
-} from '@/utils/signupUtils'
+
+import { pickMessageFromAxios, formatBirthday, mapGender } from '@/utils/signupUtils'
+import { AUTH_MESSAGES } from '@/constants/authMessages'
 import { useEmailVerification } from '@/hooks/signup/useEmailVerification'
 import { useSmsVerification } from '@/hooks/signup/useSmsVerification'
 import type { Status } from '@/hooks/useVerificationFlow'
+import { type FlowMessage, IDLE_FLOW_MESSAGE, deriveFieldState } from '@/utils/formMessage'
+
+export type BusyAction = 'nickname' | 'email' | 'sms' | 'submit' | null
+
+const SIGNUP_WATCH_FIELDS = [
+  'name',
+  'nickname',
+  'birthdate',
+  'email',
+  'emailVerificationCode',
+  'phone1',
+  'phone2',
+  'phone3',
+  'phoneVerificationCode',
+  'password',
+  'passwordConfirm',
+] as const
 
 export function useSignupFormLogic() {
   const navigate = useNavigate()
@@ -40,52 +55,82 @@ export function useSignupFormLogic() {
     shouldFocusError: true,
   })
 
-  const { handleSubmit, watch, setError, clearErrors, trigger, formState } =
-    methods
+  const { handleSubmit, control, setError, clearErrors, trigger, formState } = methods
 
-  const [busy, setBusy] = useState(false)
+  const watched = useWatch({
+    control,
+    name: SIGNUP_WATCH_FIELDS,
+  })
+
+  const [
+    nameRaw,
+    nicknameRaw,
+    birthdateRaw,
+    emailRaw,
+    emailVerificationCodeRaw,
+    phone1Raw,
+    phone2Raw,
+    phone3Raw,
+    phoneVerificationCodeRaw,
+    passwordRaw,
+    passwordConfirmRaw,
+  ] = watched ?? []
+
+  const name = (nameRaw ?? '').toString().trim()
+  const nickname = (nicknameRaw ?? '').toString().trim()
+  const birthdate = (birthdateRaw ?? '').toString().trim()
+  const email = (emailRaw ?? '').toString().trim()
+  const emailVerificationCode = (emailVerificationCodeRaw ?? '').toString().trim()
+  const phone1 = (phone1Raw ?? '').toString().trim()
+  const phone2 = (phone2Raw ?? '').toString().trim()
+  const phone3 = (phone3Raw ?? '').toString().trim()
+  const phoneVerificationCode = (phoneVerificationCodeRaw ?? '').toString().trim()
+  const password = (passwordRaw ?? '') as string
+  const passwordConfirm = (passwordConfirmRaw ?? '') as string
+
+  const [busyAction, setBusyAction] = useState<BusyAction>(null)
+
+  const makeSetBusy =
+    (action: Exclude<BusyAction, null>) =>
+    (v: boolean) => {
+      setBusyAction((curr) => {
+        if (v) return action
+        return curr === action ? null : curr
+      })
+    }
+
+  const busy = busyAction !== null
   const [formError, setFormError] = useState<string | null>(null)
 
   const [nicknameChecked, setNicknameChecked] = useState(false)
   const [nicknameStatus, setNicknameStatus] = useState<Status>('idle')
-  const [nicknameMsg, setNicknameMsg] = useState<string | null>(null)
+  const [nicknameFlowMessage, setNicknameFlowMessage] =
+    useState<FlowMessage>(IDLE_FLOW_MESSAGE)
 
-  const name = watch('name')?.trim() ?? ''
-  const nickname = watch('nickname')?.trim() ?? ''
-  const birthdate = watch('birthdate')?.trim() ?? ''
-
-  const email = watch('email')?.trim() ?? ''
-  const emailCode = watch('emailVerificationCode')?.trim() ?? ''
-
-  const phone1 = watch('phone1')?.trim() ?? ''
-  const phone2 = watch('phone2')?.trim() ?? ''
-  const phone3 = watch('phone3')?.trim() ?? ''
-  const smsCode = watch('phoneVerificationCode')?.trim() ?? ''
-
-  const password = watch('password') ?? ''
-  const passwordConfirm = watch('passwordConfirm') ?? ''
+  const { errors } = formState
+  const nicknameFieldState = deriveFieldState({
+    hasError: !!errors.nickname?.message,
+    isVerified: nicknameChecked,
+    isSuccess: nicknameStatus === 'success',
+  })
 
   const phoneNumber = useMemo(() => {
     return `${phone1}${phone2}${phone3}`.replace(/\D/g, '')
   }, [phone1, phone2, phone3])
 
-  const clearFieldErrors = (names: string | string[]) => {
-    if (Array.isArray(names)) {
-      clearErrors(names as (keyof SignupFormData)[])
-    } else {
-      clearErrors(names as keyof SignupFormData)
-    }
+  const clearFieldErrors = (names: Path<SignupFormData> | Path<SignupFormData>[]) => {
+    clearErrors(names)
   }
 
-  const setFieldError = (name: string, message: string) => {
-    setError(name as keyof SignupFormData, { message })
+  const setFieldError = (name: Path<SignupFormData>, message: string) => {
+    setError(name, { message })
   }
 
   const emailFlow = useEmailVerification({
     email,
-    emailCode,
+    emailVerificationCode,
     busy,
-    setBusy,
+    setBusy: makeSetBusy('email'),
     clearErrors: clearFieldErrors,
     setFieldError,
   })
@@ -94,9 +139,9 @@ export function useSignupFormLogic() {
     phoneNumber,
     phone2,
     phone3,
-    smsCode,
+    phoneVerificationCode,
     busy,
-    setBusy,
+    setBusy: makeSetBusy('sms'),
     clearErrors: clearFieldErrors,
     setFieldError,
   })
@@ -104,7 +149,7 @@ export function useSignupFormLogic() {
   useEffect(() => {
     setNicknameChecked(false)
     setNicknameStatus('idle')
-    setNicknameMsg(null)
+    setNicknameFlowMessage(IDLE_FLOW_MESSAGE)
   }, [nickname])
 
   const onCheckNickname = async () => {
@@ -115,49 +160,50 @@ export function useSignupFormLogic() {
 
     clearErrors('nickname')
 
-    setBusy(true)
+    setBusyAction('nickname')
     try {
       await authApi.checkNickname({ nickname })
       setNicknameChecked(true)
       setNicknameStatus('success')
-      setNicknameMsg('* 사용 가능한 닉네임입니다.')
+      setNicknameFlowMessage({
+        type: 'success',
+        message: AUTH_MESSAGES.nickname.available,
+        scope: null,
+      })
     } catch (err) {
       setNicknameChecked(false)
+      setNicknameFlowMessage(IDLE_FLOW_MESSAGE)
       const msg = pickMessageFromAxios(
         err,
         {
-          409: '* 이미 사용 중인 닉네임입니다.',
-          400: '* 닉네임 형식을 확인해주세요.',
+          409: AUTH_MESSAGES.nickname.duplicated,
+          400: AUTH_MESSAGES.nickname.invalidFormat,
         },
-        '* 닉네임 중복 확인에 실패했습니다.'
+        AUTH_MESSAGES.nickname.checkFailed
       )
       setNicknameStatus('error')
-      setNicknameMsg(msg)
       setError('nickname', { message: msg })
     } finally {
-      setBusy(false)
+      setBusyAction((curr) => (curr === 'nickname' ? null : curr))
     }
   }
 
   const onSubmit = handleSubmit(async (data) => {
     setFormError(null)
 
-    if (!nicknameChecked)
-      return setFormError('* 닉네임 중복확인을 진행해주세요.')
+    if (!nicknameChecked) return setFormError(AUTH_MESSAGES.form.requireNicknameCheck)
     if (!emailFlow.verified || !emailFlow.token)
-      return setFormError('* 이메일 인증을 완료해주세요.')
+      return setFormError(AUTH_MESSAGES.form.requireEmailVerify)
     if (!smsFlow.verified || !smsFlow.token)
-      return setFormError('* 휴대폰 인증을 완료해주세요.')
+      return setFormError(AUTH_MESSAGES.form.requireSmsVerify)
 
     const birthday = formatBirthday(data.birthdate)
     if (!birthday) {
-      setError('birthdate', {
-        message: '* 8자리로 입력해주세요. (예: 20000101)',
-      })
+      setError('birthdate', { message: AUTH_MESSAGES.common.birthdateFormat })
       return
     }
 
-    setBusy(true)
+    setBusyAction('submit')
     try {
       await authApi.signup({
         password: data.password,
@@ -176,14 +222,14 @@ export function useSignupFormLogic() {
       const msg = pickMessageFromAxios(
         err,
         {
-          409: '* 이미 가입된 정보이거나 중복된 회원가입 내역입니다.',
-          400: '* 입력값을 다시 확인해주세요.',
+          409: AUTH_MESSAGES.form.signupDuplicate,
+          400: AUTH_MESSAGES.form.signupBadRequest,
         },
-        '* 회원가입에 실패했습니다. 입력값을 다시 확인해주세요.'
+        AUTH_MESSAGES.form.signupFailed
       )
       setFormError(msg)
     } finally {
-      setBusy(false)
+      setBusyAction((curr) => (curr === 'submit' ? null : curr))
     }
   })
 
@@ -194,21 +240,23 @@ export function useSignupFormLogic() {
       nickname,
       birthdate,
       email,
-      emailCode,
+      emailVerificationCode,
       phone1,
       phone2,
       phone3,
-      smsCode,
+      phoneVerificationCode,
       password,
       passwordConfirm,
       phoneNumber,
     },
     busy,
+    busyAction,
     formError,
     setFormError,
     nicknameChecked,
     nicknameStatus,
-    nicknameMsg,
+    nicknameFlowMessage,
+    nicknameFieldState,
     onCheckNickname,
     emailFlow,
     smsFlow,

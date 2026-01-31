@@ -1,6 +1,9 @@
+import type { Path } from 'react-hook-form'
+import type { SignupFormData } from '@/schemas/auth'
 import { useVerificationFlow } from '@/hooks/useVerificationFlow'
 import * as authApi from '@/api/auth'
 import { pickMessageFromAxios } from '@/utils/signupUtils'
+import { AUTH_MESSAGES } from '@/constants/authMessages'
 
 const TTL_SEC = 5 * 60
 
@@ -8,18 +11,20 @@ type UseSmsVerificationArgs = {
   phoneNumber: string
   phone2: string
   phone3: string
-  smsCode: string
+  phoneVerificationCode: string
   busy: boolean
   setBusy: (v: boolean) => void
-  clearErrors: (names: string | string[]) => void
-  setFieldError: (name: string, message: string) => void
+  clearErrors: (
+    names: Path<SignupFormData> | Path<SignupFormData>[]
+  ) => void
+  setFieldError: (name: Path<SignupFormData>, message: string) => void
 }
 
 export function useSmsVerification({
   phoneNumber,
   phone2,
   phone3,
-  smsCode,
+  phoneVerificationCode,
   busy,
   setBusy,
   clearErrors,
@@ -27,7 +32,7 @@ export function useSmsVerification({
 }: UseSmsVerificationArgs) {
   return useVerificationFlow({
     identity: phoneNumber,
-    code: smsCode,
+    code: phoneVerificationCode,
     ttlSec: TTL_SEC,
     busy,
     setBusy,
@@ -43,17 +48,17 @@ export function useSmsVerification({
       if (!p2ok || !p3ok) {
         return {
           ok: false,
-          message: '* 휴대전화 번호를 올바르게 입력해주세요.',
+          message: AUTH_MESSAGES.sms.identityInvalid,
           fieldErrors: {
-            ...(p2ok ? {} : { phone2: '* 4자리 입력' }),
-            ...(p3ok ? {} : { phone3: '* 4자리 입력' }),
+            ...(p2ok ? {} : { phone2: AUTH_MESSAGES.sms.phoneDigitError }),
+            ...(p3ok ? {} : { phone3: AUTH_MESSAGES.sms.phoneDigitError }),
           },
         }
       }
       if (phoneNumber.length < 10) {
         return {
           ok: false,
-          message: '* 휴대전화 번호를 올바르게 입력해주세요.',
+          message: AUTH_MESSAGES.sms.identityInvalid,
         }
       }
       return { ok: true }
@@ -65,31 +70,23 @@ export function useSmsVerification({
     getToken: (res) => res.sms_token,
 
     getSendErrorMessage: (err) =>
-      pickMessageFromAxios(
-        err,
-        {
-          409: '* 이미 가입에 사용된 휴대전화 번호입니다.',
-          400: '* 휴대전화 번호 형식을 확인해주세요.',
-        },
-        '* 휴대폰 인증번호 전송에 실패했습니다.'
-      ),
+      pickMessageFromAxios(err, {
+        409: AUTH_MESSAGES.sms.sendErrorAlreadyRegistered,
+        400: AUTH_MESSAGES.sms.sendErrorBadRequest,
+      }, AUTH_MESSAGES.sms.sendErrorFallback),
     getVerifyErrorMessage: (err) =>
-      pickMessageFromAxios(
-        err,
-        {
-          400: '* 인증코드가 일치하지 않습니다.',
-          409: '* 이미 가입에 사용된 휴대전화 번호입니다.',
-        },
-        '* 휴대폰 인증에 실패했습니다.'
-      ),
+      pickMessageFromAxios(err, {
+        400: AUTH_MESSAGES.sms.verifyErrorMismatch,
+        409: AUTH_MESSAGES.sms.verifyErrorAlreadyRegistered,
+      }, AUTH_MESSAGES.sms.verifyErrorFallback),
 
     text: {
-      sent: '* 인증번호를 전송했습니다.',
-      resent: '* 인증번호를 재전송했습니다.',
-      identityInvalid: '* 휴대전화 번호를 올바르게 입력해주세요.',
-      codeRequired: '* 인증번호를 입력해주세요.',
-      expired: '* 인증 시간이 만료되었습니다. 인증번호를 다시 요청해주세요.',
-      verifySuccess: '* 휴대폰 인증이 완료되었습니다.',
+      sent: AUTH_MESSAGES.sms.sendSuccess,
+      resent: AUTH_MESSAGES.sms.sendResent,
+      identityInvalid: AUTH_MESSAGES.sms.identityInvalid,
+      codeRequired: AUTH_MESSAGES.sms.codeRequired,
+      expired: AUTH_MESSAGES.sms.expired,
+      verifySuccess: AUTH_MESSAGES.sms.verifySuccess,
     },
   })
 }

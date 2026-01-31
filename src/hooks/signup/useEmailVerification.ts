@@ -1,21 +1,26 @@
+import type { Path } from 'react-hook-form'
+import type { SignupFormData } from '@/schemas/auth'
 import { useVerificationFlow } from '@/hooks/useVerificationFlow'
 import * as authApi from '@/api/auth'
 import { pickMessageFromAxios, emailZ } from '@/utils/signupUtils'
+import { AUTH_MESSAGES } from '@/constants/authMessages'
 
 const TTL_SEC = 5 * 60
 
 type UseEmailVerificationArgs = {
   email: string
-  emailCode: string
+  emailVerificationCode: string
   busy: boolean
   setBusy: (v: boolean) => void
-  clearErrors: (names: string | string[]) => void
-  setFieldError: (name: string, message: string) => void
+  clearErrors: (
+    names: Path<SignupFormData> | Path<SignupFormData>[]
+  ) => void
+  setFieldError: (name: Path<SignupFormData>, message: string) => void
 }
 
 export function useEmailVerification({
   email,
-  emailCode,
+  emailVerificationCode,
   busy,
   setBusy,
   clearErrors,
@@ -23,7 +28,7 @@ export function useEmailVerification({
 }: UseEmailVerificationArgs) {
   return useVerificationFlow({
     identity: email,
-    code: emailCode,
+    code: emailVerificationCode,
     ttlSec: TTL_SEC,
     busy,
     setBusy,
@@ -37,7 +42,7 @@ export function useEmailVerification({
       const ok = emailZ.safeParse(v).success
       return ok
         ? { ok: true }
-        : { ok: false, message: '* 올바른 이메일 형식을 입력해주세요.' }
+        : { ok: false, message: AUTH_MESSAGES.email.identityInvalid }
     },
 
     send: (identity) => authApi.sendEmailVerification({ email: identity }),
@@ -45,31 +50,23 @@ export function useEmailVerification({
     getToken: (res) => res.email_token,
 
     getSendErrorMessage: (err) =>
-      pickMessageFromAxios(
-        err,
-        {
-          409: '* 이미 가입된 이메일입니다.',
-          400: '* 이메일 형식을 확인해주세요.',
-        },
-        '* 이메일 인증 코드 전송에 실패했습니다.'
-      ),
+      pickMessageFromAxios(err, {
+        409: AUTH_MESSAGES.email.sendErrorAlreadyRegistered,
+        400: AUTH_MESSAGES.email.sendErrorBadRequest,
+      }, AUTH_MESSAGES.email.sendErrorFallback),
     getVerifyErrorMessage: (err) =>
-      pickMessageFromAxios(
-        err,
-        {
-          400: '* 인증코드가 일치하지 않습니다.',
-          409: '* 이미 가입된 이메일입니다.',
-        },
-        '* 이메일 인증에 실패했습니다.'
-      ),
+      pickMessageFromAxios(err, {
+        400: AUTH_MESSAGES.email.verifyErrorMismatch,
+        409: AUTH_MESSAGES.email.verifyErrorAlreadyRegistered,
+      }, AUTH_MESSAGES.email.verifyErrorFallback),
 
     text: {
-      sent: '* 인증코드를 전송했습니다.',
-      resent: '* 인증코드를 재전송했습니다.',
-      identityInvalid: '* 올바른 이메일 형식을 입력해주세요.',
-      codeRequired: '* 인증코드를 입력해주세요.',
-      expired: '* 인증 시간이 만료되었습니다. 인증코드를 다시 요청해주세요.',
-      verifySuccess: '* 이메일 인증이 완료되었습니다.',
+      sent: AUTH_MESSAGES.email.sendSuccess,
+      resent: AUTH_MESSAGES.email.sendResent,
+      identityInvalid: AUTH_MESSAGES.email.identityInvalid,
+      codeRequired: AUTH_MESSAGES.email.codeRequired,
+      expired: AUTH_MESSAGES.email.expired,
+      verifySuccess: AUTH_MESSAGES.email.verifySuccess,
     },
   })
 }
