@@ -20,7 +20,7 @@ export default function SignupEmailPage() {
 
   return (
     <FormProvider {...methods}>
-      <div className="flex min-h-[calc(100vh-96px)] items-center justify-center bg-gray-100 pt-20 pb-24">
+      <div className="flex min-h-[calc(100vh-96px)] items-center justify-center bg-gray-100 pt-[min(8vh)] pb-[min(10vh)]">
         <div className="bg-white px-6 py-10">
           <div className="flex w-[480px] flex-col gap-9">
             {/* 상단 */}
@@ -83,28 +83,30 @@ export default function SignupEmailPage() {
 
               {/* 비밀번호 */}
               <PasswordSection {...sections.password} />
-
+              
               {/* 전역 폼 에러 */}
-              <div className="min-h-[20px] px-1 text-xs font-medium text-red-500">
-                <span
-                  className={cn(
-                    sections.submit.formError ? 'visible' : 'invisible'
-                  )}
-                >
-                  {sections.submit.formError ?? '\u00A0'}
-                </span>
-              </div>
+              <div className="flex flex-col gap-2">
+                <div className="min-h-[16px] px-1 text-xs text-red-500">
+                  <span
+                    className={cn(
+                      sections.submit.formError ? 'visible' : 'invisible'
+                    )}
+                  >
+                    {sections.submit.formError ?? '\u00A0'}
+                  </span>
+                </div>
 
-              {/* 제출 */}
-              <Button
-                type="submit"
-                size="xxl"
-                variant={sections.submit.button.variant}
-                disabled={sections.submit.button.disabled}
-                className="whitespace-nowrap"
-              >
-                {sections.submit.label}
-              </Button>
+                {/* 제출 */}
+                <Button
+                  type="submit"
+                  size="xxl"
+                  variant={sections.submit.button.variant}
+                  disabled={sections.submit.button.disabled}
+                  className="whitespace-nowrap"
+                >
+                  {sections.submit.label}
+                </Button>
+              </div>
             </form>
 
             <p className="mt-6 text-center">

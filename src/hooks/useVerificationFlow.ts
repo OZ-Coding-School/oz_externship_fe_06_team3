@@ -19,9 +19,7 @@ type UseVerificationFlowArgs<TVerifyRes> = {
   ttlSec: number
   busy: boolean
   setBusy: (v: boolean) => void
-  clearErrors: (
-    names: Path<SignupFormData> | Path<SignupFormData>[]
-  ) => void
+  clearErrors: (names: Path<SignupFormData> | Path<SignupFormData>[]) => void
   setFieldError: (name: Path<SignupFormData>, message: string) => void
 
   identityFields: Path<SignupFormData>[]
@@ -96,8 +94,9 @@ function computeUI(params: ComputeUIParams): ComputeUIResult {
     verifyStatus !== 'pending'
 
   const fieldState: FieldState = verified ? 'success' : toFieldState(sendStatus)
-  const codeFieldState: FieldState =
-    verified ? 'success' : toFieldState(verifyStatus)
+  const codeFieldState: FieldState = verified
+    ? 'success'
+    : toFieldState(verifyStatus)
   return { canSend, canVerify, fieldState, codeFieldState }
 }
 
@@ -249,14 +248,8 @@ export function useVerificationFlow<TVerifyRes>({
 
   const [state, dispatch] = useReducer(verificationReducer, INITIAL_STATE)
 
-  const {
-    token,
-    verified,
-    codeSent,
-    sendStatus,
-    flowMessage,
-    verifyStatus,
-  } = state
+  const { token, verified, codeSent, sendStatus, flowMessage, verifyStatus } =
+    state
 
   const resetAll = useCallback(() => {
     dispatch({ type: 'IDENTITY_CHANGED' })

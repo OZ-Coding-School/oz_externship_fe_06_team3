@@ -7,12 +7,20 @@ import { signupSchema, type SignupFormData } from '@/schemas/auth'
 import * as authApi from '@/api/auth'
 import { useAuthStore } from '@/store/authStore'
 
-import { pickMessageFromAxios, formatBirthday, mapGender } from '@/utils/signupUtils'
+import {
+  pickMessageFromAxios,
+  formatBirthday,
+  mapGender,
+} from '@/utils/signupUtils'
 import { AUTH_MESSAGES } from '@/constants/authMessages'
 import { useEmailVerification } from '@/hooks/signup/useEmailVerification'
 import { useSmsVerification } from '@/hooks/signup/useSmsVerification'
 import type { Status } from '@/hooks/useVerificationFlow'
-import { type FlowMessage, IDLE_FLOW_MESSAGE, deriveFieldState } from '@/utils/formMessage'
+import {
+  type FlowMessage,
+  IDLE_FLOW_MESSAGE,
+  deriveFieldState,
+} from '@/utils/formMessage'
 
 export type BusyAction = 'nickname' | 'email' | 'sms' | 'submit' | null
 
@@ -55,7 +63,8 @@ export function useSignupFormLogic() {
     shouldFocusError: true,
   })
 
-  const { handleSubmit, control, setError, clearErrors, trigger, formState } = methods
+  const { handleSubmit, control, setError, clearErrors, trigger, formState } =
+    methods
 
   const watched = useWatch({
     control,
@@ -80,21 +89,24 @@ export function useSignupFormLogic() {
   const nickname = (nicknameRaw ?? '').toString().trim()
   const birthdate = (birthdateRaw ?? '').toString().trim()
   const email = (emailRaw ?? '').toString().trim()
-  const emailVerificationCode = (emailVerificationCodeRaw ?? '').toString().trim()
+  const emailVerificationCode = (emailVerificationCodeRaw ?? '')
+    .toString()
+    .trim()
   const phone1 = (phone1Raw ?? '').toString().trim()
   const phone2 = (phone2Raw ?? '').toString().trim()
   const phone3 = (phone3Raw ?? '').toString().trim()
-  const phoneVerificationCode = (phoneVerificationCodeRaw ?? '').toString().trim()
+  const phoneVerificationCode = (phoneVerificationCodeRaw ?? '')
+    .toString()
+    .trim()
   const password = (passwordRaw ?? '') as string
   const passwordConfirm = (passwordConfirmRaw ?? '') as string
 
   const [busyAction, setBusyAction] = useState<BusyAction>(null)
 
   const makeSetBusy =
-    (action: Exclude<BusyAction, null>) =>
-    (v: boolean) => {
+    (action: Exclude<BusyAction, null>) => (isBusy: boolean) => {
       setBusyAction((curr) => {
-        if (v) return action
+        if (isBusy) return action
         return curr === action ? null : curr
       })
     }
@@ -118,7 +130,9 @@ export function useSignupFormLogic() {
     return `${phone1}${phone2}${phone3}`.replace(/\D/g, '')
   }, [phone1, phone2, phone3])
 
-  const clearFieldErrors = (names: Path<SignupFormData> | Path<SignupFormData>[]) => {
+  const clearFieldErrors = (
+    names: Path<SignupFormData> | Path<SignupFormData>[]
+  ) => {
     clearErrors(names)
   }
 
@@ -191,7 +205,8 @@ export function useSignupFormLogic() {
   const onSubmit = handleSubmit(async (data) => {
     setFormError(null)
 
-    if (!nicknameChecked) return setFormError(AUTH_MESSAGES.form.requireNicknameCheck)
+    if (!nicknameChecked)
+      return setFormError(AUTH_MESSAGES.form.requireNicknameCheck)
     if (!emailFlow.verified || !emailFlow.token)
       return setFormError(AUTH_MESSAGES.form.requireEmailVerify)
     if (!smsFlow.verified || !smsFlow.token)
