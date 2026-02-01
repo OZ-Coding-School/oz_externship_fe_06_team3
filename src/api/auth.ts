@@ -69,7 +69,7 @@ export async function verifySms(payload: {
 
 export async function signup(payload: {
   password: string
-  password_confirm?: string
+  password_confirm: string
   nickname: string
   name: string
   birthday: string

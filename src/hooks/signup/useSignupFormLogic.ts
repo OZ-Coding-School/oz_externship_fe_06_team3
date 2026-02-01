@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm, useWatch, type Path } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -130,15 +130,19 @@ export function useSignupFormLogic() {
     return `${phone1}${phone2}${phone3}`.replace(/\D/g, '')
   }, [phone1, phone2, phone3])
 
-  const clearFieldErrors = (
-    names: Path<SignupFormData> | Path<SignupFormData>[]
-  ) => {
-    clearErrors(names)
-  }
+  const clearFieldErrors = useCallback(
+    (names: Path<SignupFormData> | Path<SignupFormData>[]) => {
+      clearErrors(names)
+    },
+    [clearErrors]
+  )
 
-  const setFieldError = (name: Path<SignupFormData>, message: string) => {
-    setError(name, { message })
-  }
+  const setFieldError = useCallback(
+    (name: Path<SignupFormData>, message: string) => {
+      setError(name, { message })
+    },
+    [setError]
+  )
 
   const emailFlow = useEmailVerification({
     email,

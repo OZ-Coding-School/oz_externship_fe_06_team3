@@ -18,6 +18,7 @@ export function mapGender(g: 'male' | 'female'): 'M' | 'F' {
 type ErrorResponseData =
   | {
       error_detail?: string | Record<string, string | string[]>
+      detail?: string
     }
   | undefined
 
@@ -39,6 +40,7 @@ export function pickMessageFromAxios(
       if (Array.isArray(first) && typeof first[0] === 'string')
         return first[0]
     }
+    if (typeof data?.detail === 'string') return data.detail
   }
   return fallback
 }

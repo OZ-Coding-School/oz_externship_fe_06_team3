@@ -4,8 +4,9 @@ import SocialLoginSection from '@/components/auth/SocialLoginSection'
 import type { SocialProviderId } from '@/types/social'
 
 export default function SignupPage() {
-  const handleSocialSignup = (_provider: SocialProviderId) => {
-    void _provider
+  const handleSocialSignup = (provider: SocialProviderId) => {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? ''
+    window.location.href = `${baseUrl}/api/v1/accounts/login/${provider}/`
   }
 
   return (

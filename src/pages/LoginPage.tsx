@@ -14,8 +14,9 @@ import { useLoginPage } from '@/hooks/useLoginPage'
 export default function LoginPage() {
   const { methods, vm } = useLoginPage()
 
-  const handleSocialLogin = (_provider: SocialProviderId) => {
-    // TODO: 소셜 로그인 구현
+  const handleSocialLogin = (provider: SocialProviderId) => {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL ?? ''
+    window.location.href = `${baseUrl}/api/v1/accounts/login/${provider}/`
   }
 
   const { fields, messages, ui, actions } = vm
