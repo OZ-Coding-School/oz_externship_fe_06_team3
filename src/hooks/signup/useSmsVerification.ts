@@ -5,7 +5,8 @@ import * as authApi from '@/api/auth'
 import { pickMessageFromAxios } from '@/utils/signupUtils'
 import { AUTH_MESSAGES } from '@/constants/authMessages'
 
-const TTL_SEC = 5 * 60
+/** SMS 인증코드 유효시간 10분  */
+const TTL_SEC = 10 * 60
 
 type UseSmsVerificationArgs = {
   phoneNumber: string
@@ -14,9 +15,7 @@ type UseSmsVerificationArgs = {
   phoneVerificationCode: string
   busy: boolean
   setBusy: (v: boolean) => void
-  clearErrors: (
-    names: Path<SignupFormData> | Path<SignupFormData>[]
-  ) => void
+  clearErrors: (names: Path<SignupFormData> | Path<SignupFormData>[]) => void
   setFieldError: (name: Path<SignupFormData>, message: string) => void
 }
 
@@ -70,15 +69,23 @@ export function useSmsVerification({
     getToken: (res) => res.sms_token,
 
     getSendErrorMessage: (err) =>
-      pickMessageFromAxios(err, {
-        409: AUTH_MESSAGES.sms.sendErrorAlreadyRegistered,
-        400: AUTH_MESSAGES.sms.sendErrorBadRequest,
-      }, AUTH_MESSAGES.sms.sendErrorFallback),
+      pickMessageFromAxios(
+        err,
+        {
+          409: AUTH_MESSAGES.sms.sendErrorAlreadyRegistered,
+          400: AUTH_MESSAGES.sms.sendErrorBadRequest,
+        },
+        AUTH_MESSAGES.sms.sendErrorFallback
+      ),
     getVerifyErrorMessage: (err) =>
-      pickMessageFromAxios(err, {
-        400: AUTH_MESSAGES.sms.verifyErrorMismatch,
-        409: AUTH_MESSAGES.sms.verifyErrorAlreadyRegistered,
-      }, AUTH_MESSAGES.sms.verifyErrorFallback),
+      pickMessageFromAxios(
+        err,
+        {
+          400: AUTH_MESSAGES.sms.verifyErrorMismatch,
+          409: AUTH_MESSAGES.sms.verifyErrorAlreadyRegistered,
+        },
+        AUTH_MESSAGES.sms.verifyErrorFallback
+      ),
 
     text: {
       sent: AUTH_MESSAGES.sms.sendSuccess,

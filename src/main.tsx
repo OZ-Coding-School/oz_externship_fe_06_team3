@@ -12,7 +12,8 @@ import { useAuthStore } from '@/store/authStore'
 const queryClient = new QueryClient()
 
 async function enableMocking() {
-  if (!import.meta.env.DEV) return
+  if (!import.meta.env.DEV || import.meta.env.VITE_USE_MSW !== 'true')
+    return
 
   const { worker } = await import('./mocks/browser')
   await worker.start({
