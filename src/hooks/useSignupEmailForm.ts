@@ -1,430 +1,150 @@
-import { useEffect, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useCallback, type BaseSyntheticEvent } from 'react'
+import type { SignupFormData } from '@/schemas/auth'
+import type { Path } from 'react-hook-form'
 
-import { signupSchema, type SignupFormData } from '@/schemas/auth'
-import * as authApi from '@/api/auth'
-import { useAuthStore } from '@/store/authStore'
+import { AUTH_MESSAGES } from '@/constants/authMessages'
+import { useSignupFormLogic } from '@/hooks/signup/useSignupFormLogic'
 import {
-  pickMessageFromAxios,
-  formatBirthday,
-  mapGender,
-  PASSWORD_REGEX,
-  emailZ,
-} from '@/utils/signupUtils'
-import type { FieldState } from '@/components/common/CommonInput'
-import { useVerificationFlow, type Status } from '@/hooks/useVerificationFlow'
+  useNicknameSection,
+  useEmailSection,
+  useSmsSection,
+  usePasswordSection,
+  useSubmitSection,
+} from '@/hooks/signup/sections'
+
+import type { NicknameSectionProps } from '@/components/signup/NicknameSection'
+import type { EmailSectionProps } from '@/components/signup/EmailSection'
+import type { PhoneSectionProps } from '@/components/signup/PhoneSection'
+import type { PasswordSectionProps } from '@/components/signup/PasswordSection'
+import type { ButtonVariantProps } from '@/components/common/buttonVariants'
+
+export type SignupSubmitProps = {
+  onSubmit: (e?: BaseSyntheticEvent) => Promise<void>
+  label: string
+  formError: string | null
+  button: {
+    disabled: boolean
+    variant: ButtonVariantProps['variant']
+  }
+}
 
 export function useSignupEmailForm() {
-  const navigate = useNavigate()
-  const authLogin = useAuthStore((s) => s.login)
+  const logic = useSignupFormLogic()
+  const v = logic.watchValues
 
-  const methods = useForm<SignupFormData>({
-    resolver: zodResolver(signupSchema),
-    defaultValues: {
-      name: '',
-      nickname: '',
-      birthdate: '',
-      gender: 'male',
-      email: '',
-      emailVerificationCode: '',
-      phone1: '010',
-      phone2: '',
-      phone3: '',
-      phoneVerificationCode: '',
-      password: '',
-      passwordConfirm: '',
-    },
-    mode: 'onChange',
-    reValidateMode: 'onChange',
-    shouldFocusError: true,
+  const nicknameSection = useNicknameSection({
+    nickname: v.nickname,
+    nicknameChecked: logic.nicknameChecked,
+    nicknameFlowMessage: logic.nicknameFlowMessage,
+    nicknameFieldState: logic.nicknameFieldState,
+    busy: logic.busy,
+    onCheckNickname: logic.onCheckNickname,
   })
 
-  const { handleSubmit, watch, setError, clearErrors } = methods
+  const emailSection = useEmailSection({
+    emailFlow: logic.emailFlow,
+    email: v.email,
+    emailVerificationCode: v.emailVerificationCode,
+  })
 
-  const [busy, setBusy] = useState(false)
+  const smsSection = useSmsSection({
+    smsFlow: logic.smsFlow,
+    phone1: v.phone1,
+    phone2: v.phone2,
+    phone3: v.phone3,
+    phoneVerificationCode: v.phoneVerificationCode,
+    phoneNumber: v.phoneNumber,
+  })
 
-  const [nicknameChecked, setNicknameChecked] = useState(false)
-  const [nicknameStatus, setNicknameStatus] = useState<Status>('idle')
-  const [nicknameMsg, setNicknameMsg] = useState<string | null>(null)
+  const triggerForForm = useCallback(
+    (name: Path<SignupFormData>) => logic.trigger(name),
+    [logic]
+  )
 
-  const [formError, setFormError] = useState<string | null>(null)
+  const passwordSection = usePasswordSection({
+    password: v.password,
+    passwordConfirm: v.passwordConfirm,
+    trigger: triggerForForm,
+  })
 
-  const name = watch('name')?.trim() ?? ''
-  const nickname = watch('nickname')?.trim() ?? ''
-  const birthdate = watch('birthdate')?.trim() ?? ''
+  const submitSection = useSubmitSection({
+    formValid: logic.formState.isValid,
+    busy: logic.busy,
+    nicknameChecked: nicknameSection.ui.nicknameChecked,
+    emailVerified: emailSection.ui.emailVerified,
+    smsVerified: smsSection.ui.smsVerified,
+    passwordFieldState: passwordSection.ui.passwordFieldState,
+    passwordConfirmState: passwordSection.ui.passwordConfirmState,
+    onSubmit: logic.onSubmit,
+  })
 
-  const email = watch('email')?.trim() ?? ''
-  const emailCode = watch('emailVerificationCode')?.trim() ?? ''
-
-  const phone1 = watch('phone1')?.trim() ?? ''
-  const phone2 = watch('phone2')?.trim() ?? ''
-  const phone3 = watch('phone3')?.trim() ?? ''
-  const smsCode = watch('phoneVerificationCode')?.trim() ?? ''
-
-  const password = watch('password') ?? ''
-  const passwordConfirm = watch('passwordConfirm') ?? ''
-
-  const phoneNumber = useMemo(() => {
-    return `${phone1}${phone2}${phone3}`.replace(/\D/g, '')
-  }, [phone1, phone2, phone3])
-
-  // 비밀번호 상태 관리
-  const passwordFieldState: FieldState = useMemo(() => {
-    const value = password.trim()
-    if (!value) return 'default'
-    return PASSWORD_REGEX.test(value) ? 'success' : 'error'
-  }, [password])
-
-  const passwordConfirmState: FieldState = useMemo(() => {
-    const value = passwordConfirm.trim()
-    if (!value) return 'default'
-    if (!password.trim()) return 'error'
-    return value === password ? 'success' : 'error'
-  }, [password, passwordConfirm])
-
-  const passwordConfirmMsg = useMemo(() => {
-    const value = passwordConfirm.trim()
-    if (!value) return null
-    if (!password.trim()) return '* 비밀번호를 먼저 입력해주세요.'
-    return value === password
-      ? '* 비밀번호가 일치합니다.'
-      : '* 비밀번호가 일치하지 않습니다.'
-  }, [password, passwordConfirm])
-
-  // 닉네임 입력 변경 시 초기화
-  useEffect(() => {
-    setNicknameChecked(false)
-    setNicknameStatus('idle')
-    setNicknameMsg(null)
-  }, [nickname])
-
-  // 닉네임 상태 변환
-  const toFieldState = (s: Status): FieldState =>
-    s === 'success' ? 'success' : s === 'error' ? 'error' : 'default'
-
-  const clearFieldErrors = (names: string | string[]) => {
-    if (Array.isArray(names)) {
-      clearErrors(names as (keyof SignupFormData)[])
-    } else {
-      clearErrors(names as keyof SignupFormData)
-    }
+  const nicknameProps: NicknameSectionProps = {
+    nicknameFieldState: nicknameSection.ui.nicknameFieldState,
+    flowMessage: nicknameSection.messages.flowMessage,
+    nicknameChecked: nicknameSection.ui.nicknameChecked,
+    nickname: nicknameSection.values.nickname,
+    canCheckNickname: nicknameSection.ui.canCheckNickname,
+    busy: logic.busy,
+    onCheckNickname: nicknameSection.actions.onCheckNickname,
   }
 
-  const setFieldError = (name: string, message: string) => {
-    setError(name as keyof SignupFormData, { message })
+  const emailProps: EmailSectionProps = {
+    emailFieldState: emailSection.ui.emailFieldState,
+    emailVerificationCodeFieldState:
+      emailSection.ui.emailVerificationCodeFieldState,
+    flowMessage: emailSection.messages.flowMessage,
+    emailVerified: emailSection.ui.emailVerified,
+    emailCodeSent: emailSection.ui.emailCodeSent,
+    emailTimer: emailSection.ui.emailTimer,
+    emailSendLabel: emailSection.ui.emailSendLabel,
+    canSendEmail: emailSection.ui.canSendEmail,
+    canVerifyEmail: emailSection.ui.canVerifyEmail,
+    onSendEmailCode: emailSection.actions.onSendEmailCode,
+    onVerifyEmailCode: emailSection.actions.onVerifyEmailCode,
   }
 
-  // 닉네임 중복 확인
-  const onCheckNickname = async () => {
-    setFormError(null)
-    clearErrors('nickname')
-
-    if (!nickname) {
-      setError('nickname', { message: '* 닉네임을 입력해주세요.' })
-      return
-    }
-
-    setBusy(true)
-    try {
-      await authApi.checkNickname({ nickname })
-      setNicknameChecked(true)
-      setNicknameStatus('success')
-      setNicknameMsg('* 사용 가능한 닉네임입니다.')
-    } catch (err) {
-      setNicknameChecked(false)
-      const msg = pickMessageFromAxios(
-        err,
-        {
-          409: '* 이미 사용 중인 닉네임입니다.',
-          400: '* 닉네임 형식을 확인해주세요.',
-        },
-        '* 닉네임 중복 확인에 실패했습니다.'
-      )
-      setNicknameStatus('error')
-      setNicknameMsg(msg)
-      setError('nickname', { message: msg })
-    } finally {
-      setBusy(false)
-    }
+  const phoneProps: PhoneSectionProps = {
+    phone1: smsSection.values.phone1,
+    phoneDigitsState: smsSection.ui.phoneDigitsState,
+    phoneVerificationCodeFieldState:
+      smsSection.ui.phoneVerificationCodeFieldState,
+    flowMessage: smsSection.messages.flowMessage,
+    smsVerified: smsSection.ui.smsVerified,
+    smsCodeSent: smsSection.ui.smsCodeSent,
+    smsTimer: smsSection.ui.smsTimer,
+    smsSendLabel: smsSection.ui.smsSendLabel,
+    canSendSms: smsSection.ui.canSendSms,
+    canVerifySms: smsSection.ui.canVerifySms,
+    onSendSmsCode: smsSection.actions.onSendSmsCode,
+    onVerifySmsCode: smsSection.actions.onVerifySmsCode,
   }
 
-  // 이메일 인증 플로우
-  const emailFlow = useVerificationFlow({
-    identity: email,
-    code: emailCode,
-    ttlSec: 5 * 60,
-    busy,
-    setBusy,
-    clearErrors: clearFieldErrors,
-    setFieldError,
-
-    identityFields: ['email'],
-    codeField: 'emailVerificationCode',
-
-    validateIdentity: (v) => {
-      const ok = emailZ.safeParse(v).success
-      return ok
-        ? { ok: true }
-        : { ok: false, message: '* 올바른 이메일 형식을 입력해주세요.' }
+  const passwordProps: PasswordSectionProps = {
+    passwordFieldState: passwordSection.ui.passwordFieldState,
+    passwordConfirmState: passwordSection.ui.passwordConfirmState,
+    passwordConfirmMsg: passwordSection.messages.passwordConfirmMsg,
+  }
+  
+  const submitProps: SignupSubmitProps = {
+    onSubmit: submitSection.actions.onSubmit,
+    label: logic.busy
+      ? AUTH_MESSAGES.common.submitBusy
+      : AUTH_MESSAGES.common.submitLabel,
+    formError: logic.formError,
+    button: {
+      disabled: !submitSection.ui.canSubmit,
+      variant: submitSection.ui.canSubmit ? 'primary' : 'disabled',
     },
-
-    send: (identity) => authApi.sendEmailVerification({ email: identity }),
-    verify: (identity, code) => authApi.verifyEmail({ email: identity, code }),
-    getToken: (res) => res.email_token,
-
-    getSendErrorMessage: (err) =>
-      pickMessageFromAxios(
-        err,
-        {
-          409: '* 이미 가입된 이메일입니다.',
-          400: '* 이메일 형식을 확인해주세요.',
-        },
-        '* 이메일 인증 코드 전송에 실패했습니다.'
-      ),
-    getVerifyErrorMessage: (err) =>
-      pickMessageFromAxios(
-        err,
-        {
-          400: '* 인증코드가 일치하지 않습니다.',
-          409: '* 이미 가입된 이메일입니다.',
-        },
-        '* 이메일 인증에 실패했습니다.'
-      ),
-
-    text: {
-      sent: '* 인증코드를 전송했습니다.',
-      resent: '* 인증코드를 재전송했습니다.',
-      identityInvalid: '* 올바른 이메일 형식을 입력해주세요.',
-      codeRequired: '* 인증코드를 입력해주세요.',
-      expired: '* 인증 시간이 만료되었습니다. 인증코드를 다시 요청해주세요.',
-      verifySuccess: '* 이메일 인증이 완료되었습니다.',
-    },
-  })
-
-  // 휴대폰 인증 플로우
-  const smsFlow = useVerificationFlow({
-    identity: phoneNumber,
-    code: smsCode,
-    ttlSec: 5 * 60,
-    busy,
-    setBusy,
-    clearErrors: clearFieldErrors,
-    setFieldError,
-
-    identityFields: ['phone2', 'phone3'],
-    codeField: 'phoneVerificationCode',
-
-    validateIdentity: () => {
-      const p2ok = /^\d{4}$/.test(phone2)
-      const p3ok = /^\d{4}$/.test(phone3)
-      if (!p2ok || !p3ok) {
-        return {
-          ok: false,
-          message: '* 휴대전화 번호를 올바르게 입력해주세요.',
-          fieldErrors: {
-            ...(p2ok ? {} : { phone2: '* 4자리 입력' }),
-            ...(p3ok ? {} : { phone3: '* 4자리 입력' }),
-          },
-        }
-      }
-      if (phoneNumber.length < 10) {
-        return {
-          ok: false,
-          message: '* 휴대전화 번호를 올바르게 입력해주세요.',
-        }
-      }
-      return { ok: true }
-    },
-
-    send: (identity) => authApi.sendSmsVerification({ phone_number: identity }),
-    verify: (identity, code) =>
-      authApi.verifySms({ phone_number: identity, code }),
-    getToken: (res) => res.sms_token,
-
-    getSendErrorMessage: (err) =>
-      pickMessageFromAxios(
-        err,
-        {
-          409: '* 이미 가입에 사용된 휴대전화 번호입니다.',
-          400: '* 휴대전화 번호 형식을 확인해주세요.',
-        },
-        '* 휴대폰 인증번호 전송에 실패했습니다.'
-      ),
-    getVerifyErrorMessage: (err) =>
-      pickMessageFromAxios(
-        err,
-        {
-          400: '* 인증코드가 일치하지 않습니다.',
-          409: '* 이미 가입에 사용된 휴대전화 번호입니다.',
-        },
-        '* 휴대폰 인증에 실패했습니다.'
-      ),
-
-    text: {
-      sent: '* 인증번호를 전송했습니다.',
-      resent: '* 인증번호를 재전송했습니다.',
-      identityInvalid: '* 휴대전화 번호를 올바르게 입력해주세요.',
-      codeRequired: '* 인증번호를 입력해주세요.',
-      expired: '* 인증 시간이 만료되었습니다. 인증번호를 다시 요청해주세요.',
-      verifySuccess: '* 휴대폰 인증이 완료되었습니다.',
-    },
-  })
-
-  // 회원가입 제출
-  const onSubmit = handleSubmit(async (data) => {
-    setFormError(null)
-
-    if (!nicknameChecked)
-      return setFormError('* 닉네임 중복확인을 진행해주세요.')
-    if (!emailFlow.verified || !emailFlow.token)
-      return setFormError('* 이메일 인증을 완료해주세요.')
-    if (!smsFlow.verified || !smsFlow.token)
-      return setFormError('* 휴대폰 인증을 완료해주세요.')
-
-    const birthday = formatBirthday(data.birthdate)
-    if (!birthday) {
-      setError('birthdate', {
-        message: '* 8자리로 입력해주세요. (예: 20000101)',
-      })
-      return
-    }
-
-    setBusy(true)
-    try {
-      await authApi.signup({
-        password: data.password,
-        password_confirm: data.passwordConfirm,
-        nickname: data.nickname.trim(),
-        name: data.name.trim(),
-        birthday,
-        gender: mapGender(data.gender),
-        email_token: emailFlow.token,
-        sms_token: smsFlow.token,
-      })
-
-      await authLogin({ email: data.email.trim(), password: data.password })
-      navigate('/', { replace: true })
-    } catch (err) {
-      const msg = pickMessageFromAxios(
-        err,
-        {
-          409: '* 이미 가입된 정보이거나 중복된 회원가입 내역입니다.',
-          400: '* 입력값을 다시 확인해주세요.',
-        },
-        '* 회원가입에 실패했습니다. 입력값을 다시 확인해주세요.'
-      )
-      setFormError(msg)
-    } finally {
-      setBusy(false)
-    }
-  })
-
-  // 닉네임 상태
-  const nicknameFieldState = toFieldState(nicknameStatus)
-
-  // 휴대폰 인증 상태
-  const phoneDigitsState: FieldState = smsFlow.verified
-    ? 'success'
-    : smsFlow.sendStatus === 'error'
-      ? 'error'
-      : smsFlow.sendStatus === 'success'
-        ? 'success'
-        : 'default'
-
-  // 회원가입 제출 가능 여부
-  const canSubmit =
-    !!name &&
-    !!birthdate &&
-    nicknameChecked &&
-    emailFlow.verified &&
-    smsFlow.verified &&
-    passwordFieldState === 'success' &&
-    passwordConfirmState === 'success' &&
-    !busy
+  }
 
   return {
-    methods,
-
-    values: {
-      name,
-      nickname,
-      birthdate,
-      email,
-      emailCode,
-      phone1,
-      phone2,
-      phone3,
-      smsCode,
-      password,
-      passwordConfirm,
-      phoneNumber,
-    },
-
-    ui: {
-      busy,
-
-      nicknameChecked,
-      nicknameFieldState,
-
-      // 이메일 인증 상태
-      emailVerified: emailFlow.verified,
-      emailCodeSent: emailFlow.codeSent,
-      emailFieldState: emailFlow.ui.fieldState as FieldState,
-      emailCodeFieldState: emailFlow.ui.codeFieldState as FieldState,
-      emailTimer: emailFlow.timer,
-      emailSendLabel: emailFlow.codeSent ? '재전송' : '인증코드전송',
-      canSendEmail: emailFlow.ui.canSend,
-      canVerifyEmail: emailFlow.ui.canVerify,
-
-      // 휴대폰 인증 상태
-      smsVerified: smsFlow.verified,
-      smsCodeSent: smsFlow.codeSent,
-      phoneDigitsState,
-      smsCodeFieldState: smsFlow.ui.codeFieldState as FieldState,
-      smsTimer: smsFlow.timer,
-      smsSendLabel: smsFlow.codeSent ? '재전송' : '인증번호 받기',
-      canSendSms: smsFlow.ui.canSend,
-      canVerifySms: smsFlow.ui.canVerify,
-      phoneSendStatus: smsFlow.sendStatus,
-
-      // 비밀번호 상태
-      passwordFieldState,
-      passwordConfirmState,
-
-      canSubmit,
-    },
-
-    messages: {
-      nicknameMsg,
-
-      // 이메일 인증 메시지
-      emailSendMsg: emailFlow.sendMsg,
-      emailVerifyMsg: emailFlow.verifyMsg,
-
-      // 휴대폰 인증 메시지
-      phoneSendMsg: smsFlow.sendMsg,
-      smsVerifyMsg: smsFlow.verifyMsg,
-
-      // 비밀번호 확인 메시지
-      passwordConfirmMsg,
-
-      formError,
-    },
-
-    actions: {
-      onCheckNickname,
-
-      // 이메일 인증 버튼
-      onSendEmailCode: emailFlow.actions.onSendCode,
-      onVerifyEmailCode: emailFlow.actions.onVerifyCode,
-
-      // 휴대폰 인증 버튼
-      onSendSmsCode: smsFlow.actions.onSendCode,
-      onVerifySmsCode: smsFlow.actions.onVerifyCode,
-
-      onSubmit,
+    methods: logic.methods,
+    sections: {
+      nickname: nicknameProps,
+      email: emailProps,
+      sms: phoneProps,
+      password: passwordProps,
+      submit: submitProps,
     },
   }
 }

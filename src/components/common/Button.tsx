@@ -4,7 +4,8 @@ import cn from '@/lib/cn'
 
 import { buttonVariants, type ButtonVariantProps } from './buttonVariants'
 
-export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & ButtonVariantProps
+export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
+  ButtonVariantProps
 
 /**
  * 버튼 컴포넌트
@@ -18,11 +19,15 @@ export function Button({
   rounded,
   className,
   children,
+  disabled,
   ...props
 }: ButtonProps) {
+  const isDisabled = Boolean(disabled || variant === 'disabled')
+
   return (
     <button
       {...props}
+      disabled={isDisabled}
       className={cn(buttonVariants({ variant, size, rounded }), className)}
     >
       {children}

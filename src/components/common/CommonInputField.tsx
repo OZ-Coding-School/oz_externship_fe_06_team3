@@ -18,12 +18,14 @@ type CommonInputFieldProps<T extends FieldValues> = Omit<
   name: Path<T>
   rules?: RegisterOptions<T>
   state?: FieldState
+  stateOverride?: FieldState
 }
 
 export function CommonInputField<T extends FieldValues>({
   name,
   rules,
   state = 'default',
+  stateOverride,
   helperTextByState,
   ...props
 }: CommonInputFieldProps<T>) {
@@ -51,7 +53,7 @@ export function CommonInputField<T extends FieldValues>({
       value={fieldValue}
       onChange={(v) => field.onChange(v)}
       onBlur={field.onBlur}
-      state={resolvedState}
+      state={stateOverride ?? resolvedState}
       helperTextByState={{
         ...helperTextByState,
         error: error?.message || helperTextByState?.error,

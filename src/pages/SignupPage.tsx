@@ -10,7 +10,7 @@ export default function SignupPage() {
 
   return (
     <div className="flex h-[calc(100vh-96px)] items-center justify-center bg-white px-4 py-12">
-      <div className="relative mb-100 flex w-[348px] flex-col items-center gap-16">
+      <div className="relative mb-[min(40vh)] flex w-[348px] flex-col items-center gap-16">
         {/* 로고, 로그인 */}
         <div className="flex w-full flex-col items-center gap-[27px]">
           <div className="flex w-[191px] flex-col items-center gap-4">
@@ -23,7 +23,7 @@ export default function SignupPage() {
 
           <div className="flex w-full items-start justify-center gap-3">
             <div className="inline-flex items-center justify-center gap-2.5">
-              <span className="truncate whitespace-nowrap text-mono-600">
+              <span className="text-mono-600 truncate whitespace-nowrap">
                 현재 회원이신가요?{' '}
               </span>
               <Link
