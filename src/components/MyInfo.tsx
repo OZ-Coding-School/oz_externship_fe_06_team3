@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Button } from './common'
+import { Button, Loading } from './common'
 import { ViewMyInfo } from './myinfo/ViewMyInfo'
 import { EditMyInfo } from './myinfo/EditMyInfo'
 import type { User } from '@/types/auth'
@@ -62,7 +62,12 @@ export default function MyInfo() {
 
   // 저장 버튼 활성화 조건 계산 관련 미사용 변수 삭제
 
-  if (loading) return <div>로딩중...</div>
+  if (loading)
+    return (
+      <div className="flex-center h-[600px]">
+        <Loading />
+      </div>
+    )
   if (!user) return <div>정보를 불러올 수 없습니다.</div>
 
   return (

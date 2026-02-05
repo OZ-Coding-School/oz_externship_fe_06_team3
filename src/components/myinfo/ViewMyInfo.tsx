@@ -1,6 +1,5 @@
 import { unmapGender } from '@/utils/gender'
 import { useState, useEffect } from 'react'
-import { refreshToken } from '@/api/refresh'
 import { useAuthStore } from '@/store/authStore'
 import { WithdrawalReasonModal } from '../common'
 import { withdraw, getMyCourses } from '@/api/info'
@@ -9,12 +8,7 @@ import { WITHDRAW_REASON_MAP } from '@/constants/withdrawReason'
 import type { WithdrawalReasonFormData } from '@/schemas/modalSchemas'
 
 export function ViewMyInfo() {
-  const {
-    accessToken,
-    user: currentUser,
-    setAuth,
-    refreshToken: zRefreshToken,
-  } = useAuthStore()
+  const { accessToken, user: currentUser, setAuth } = useAuthStore()
   // 프로필 상태
   const [profileLoading, setProfileLoading] = useState(false)
   const [profileError, setProfileError] = useState<string | null>(null)
@@ -32,24 +26,11 @@ export function ViewMyInfo() {
       setProfileError(null)
       try {
         const res = await import('@/api/auth')
-        try {
-          if (!accessToken) throw new Error('토큰 없음')
-          const info = await res.me(accessToken)
-          setAuth({ accessToken: accessToken as string, user: info })
-        } catch (err: any) {
-          if (err?.response?.status === 401) {
-            try {
-              if (!zRefreshToken) throw new Error('리프레시 토큰 없음')
-              const newToken = await refreshToken(zRefreshToken)
-              const info = await res.me(newToken)
-              setAuth({ accessToken: newToken, user: info })
-            } catch (refreshErr) {
-              setProfileError('세션이 만료되었습니다. 다시 로그인 해주세요.')
-            }
-          } else {
-            setProfileError('내 정보 조회에 실패했습니다.')
-          }
-        }
+        if (!accessToken) throw new Error('토큰 없음')
+        const info = await res.me(accessToken)
+        setAuth({ accessToken: accessToken as string, user: info })
+      } catch (err: any) {
+        setProfileError('내 정보 조회에 실패했습니다.')
       } finally {
         setProfileLoading(false)
       }
@@ -76,25 +57,6 @@ export function ViewMyInfo() {
     fetchCoursesData()
   }, [setCourses, setCoursesLoading, setCoursesError])
 
-  // 5분마다 토큰 자동 갱신
-  useEffect(() => {
-    const interval = setInterval(
-      async () => {
-        try {
-          if (!zRefreshToken) return
-          const newToken = await refreshToken(zRefreshToken)
-          if (currentUser && newToken) {
-            setAuth({ accessToken: newToken, user: currentUser })
-          }
-        } catch (e) {
-          console.error('토큰 갱신 실패', e)
-        }
-      },
-      5 * 60 * 1000
-    ) // 5분
-    return () => clearInterval(interval)
-  }, [setAuth, currentUser, zRefreshToken])
-  // (불필요한 gender 변수 제거)
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false)
 
   /* ================= 회원 탈퇴 ================= */
@@ -191,7 +153,6 @@ export function ViewMyInfo() {
                   </p>
                 </div>
 
-                {/* 썸네일 */}
                 {item.course.thumbnail_img_url ? (
                   <img
                     src={item.course.thumbnail_img_url}
@@ -233,8 +194,6 @@ export function ViewMyInfo() {
     </>
   )
 }
-
-/* ===== sub ===== */
 
 function InfoSection({
   title,

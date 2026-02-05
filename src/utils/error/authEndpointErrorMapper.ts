@@ -108,6 +108,30 @@ export function mapResetPasswordError(err: unknown): MappedError {
   return toForm(message)
 }
 
+export function mapChangePasswordError(err: unknown): MappedError {
+  const parsed = parseAxiosError(err)
+  const newPasswordError = parsed.fieldErrors?.new_password
+  const oldPasswordError = parsed.fieldErrors?.old_password
+
+  if (newPasswordError) {
+    return toField('newPassword', newPasswordError)
+  }
+  if (oldPasswordError) {
+    return toField('currentPassword', oldPasswordError)
+  }
+
+  if (parsed.status === 401) {
+    return toForm(parsed.detail ?? AUTH_MESSAGES.changePassword.unauthorized)
+  }
+
+  const message = resolveMessage(
+    parsed,
+    { 400: AUTH_MESSAGES.changePassword.failed },
+    getFallbackMessage(parsed, AUTH_MESSAGES.changePassword.failed)
+  )
+  return toForm(message)
+}
+
 export function mapCheckNicknameError(err: unknown): MappedError {
   const parsed = parseAxiosError(err)
   const message = resolveMessage(

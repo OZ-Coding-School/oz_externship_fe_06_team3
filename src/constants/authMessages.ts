@@ -105,6 +105,12 @@ export const AUTH_MESSAGES = {
     failed: '* 비밀번호 재설정에 실패했습니다. 다시 시도해주세요.',
     tokenInvalid: '* 이메일 인증을 다시 진행해주세요.',
   },
+  // 비밀번호 변경 (내 정보)
+  changePassword: {
+    success: '비밀번호 변경 성공.',
+    failed: '* 비밀번호 변경에 실패했습니다. 다시 시도해주세요.',
+    unauthorized: '* 로그인 정보가 필요합니다.',
+  },
   // 아이디 찾기
   findId: {
     defaultGuide: '이름과 휴대전화를 입력하고 인증번호를 요청해주세요.',
