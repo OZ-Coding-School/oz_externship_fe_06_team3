@@ -93,73 +93,6 @@ function DraggableLabel({
   )
 }
 
-/** 슬롯 안에 들어간 라벨(드래그 가능, 슬롯 간 맞바꾸기용) */
-interface DraggableSlotLabelProps {
-  slotIndex: number
-  label: string
-  onRemove: () => void
-  isResult?: boolean
-  isSlotCorrect?: boolean
-}
-
-function DraggableSlotLabel({
-  slotIndex,
-  label,
-  onRemove,
-  isResult,
-  isSlotCorrect,
-}: DraggableSlotLabelProps) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } =
-    useDraggable({
-      id: `slot-label-${slotIndex}`,
-      disabled: !!isResult,
-      data: { label, slotIndex },
-    })
-
-  const getLabelInnerClass = () => {
-    if (!isResult || isSlotCorrect === undefined) {
-      return 'text-primary bg-primary-100 text-[18px] font-normal w-8 h-8 flex items-center justify-center rounded-[4px]'
-    }
-    return isSlotCorrect
-      ? 'text-success text-[20px] font-bold bg-surface w-10 h-10 flex items-center justify-center rounded-[4px]'
-      : 'text-warning text-[20px] font-bold bg-surface w-10 h-10 flex items-center justify-center rounded-[4px]'
-  }
-
-  const style = transform
-    ? { transform: CSS.Translate.toString(transform), opacity: isDragging ? 0.5 : 1 }
-    : undefined
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="relative flex h-full w-full items-center justify-center"
-    >
-      {!isResult && (
-        <Button
-          type="button"
-          variant="link"
-          size="auto"
-          onClick={(e) => {
-            e.stopPropagation()
-            onRemove()
-          }}
-          className="absolute -top-1 -right-1 z-10 flex h-4 w-4 min-w-0 items-center justify-center rounded-full border border-gray-300 bg-white p-0 text-xs text-gray-400 hover:text-gray-600 hover:no-underline"
-          aria-label="제거"
-        >
-          ×
-        </Button>
-      )}
-      <span
-        className={`${getLabelInnerClass()} ${!isResult ? 'cursor-grab active:cursor-grabbing' : ''}`}
-        {...(isResult ? {} : { ...listeners, ...attributes })}
-      >
-        {label}
-      </span>
-    </div>
-  )
-}
-
 interface DroppableSlotProps {
   id: string
   index: number
@@ -197,21 +130,26 @@ function DroppableSlot({
       className={`flex h-[62px] w-[62px] items-center justify-center rounded-[4px] bg-surface p-[3px] transition-colors ${slotBorderClass}`}
     >
       {label ? (
-        isResult ? (
-          <div className="relative flex h-full w-full items-center justify-center">
-            <span className={getLabelInnerClass()}>{label}</span>
-          </div>
-        ) : (
-          <DraggableSlotLabel
-            slotIndex={index}
-            label={label}
-            onRemove={onRemove}
-            isResult={isResult}
-            isSlotCorrect={isSlotCorrect}
-          />
-        )
+        <div className="relative flex h-full w-full items-center justify-center">
+          {!isResult && (
+            <Button
+              type="button"
+              variant="link"
+              size="auto"
+              onClick={(e) => {
+                e.stopPropagation()
+                onRemove()
+              }}
+              className="absolute -top-1 -right-1 flex h-4 w-4 min-w-0 items-center justify-center rounded-full border border-gray-300 bg-white p-0 text-xs text-gray-400 hover:text-gray-600 hover:no-underline"
+              aria-label="제거"
+            >
+              ×
+            </Button>
+          )}
+          <span className={getLabelInnerClass()}>{label}</span>
+        </div>
       ) : (
-        <span className="text-surface text-sm font-medium">{index + 1}</span>
+        <span className="text-mono-600 text-sm font-medium">{index + 1}</span>
       )}
     </div>
   )
@@ -236,18 +174,12 @@ export default function Ordering({
     initializeSlots(options, answer, optionLabels)
   )
 
-  // 부모에서 넘긴 answer와 동기화. 우리가 방금 보낸 답안과 같으면 슬롯 덮어쓰지 않음(중간 제거 시 나머지 슬롯 자리 유지).
+  // 부모에서 넘긴 answer와 동기화. questionId, options 길이, answer 값(직렬화)만으로 동기화 여부 판단.
   const prevSyncKey = useRef<string | null>(null)
-  const lastSentAnswerRef = useRef<string | null>(null)
   useEffect(() => {
     const syncKey = `${question.questionId}:${options.length}:${JSON.stringify(answer)}`
     if (prevSyncKey.current === syncKey) return
     prevSyncKey.current = syncKey
-    if (lastSentAnswerRef.current !== null && lastSentAnswerRef.current === JSON.stringify(answer)) {
-      lastSentAnswerRef.current = null
-      return
-    }
-    lastSentAnswerRef.current = null
     setSlots(initializeSlots(options, answer, optionLabels))
   }, [question.questionId, answer, options, optionLabels])
 
@@ -272,50 +204,33 @@ export default function Ordering({
     const { active, over } = event
     if (!over) return
 
+    // 슬롯이 아닌 곳(예: 다른 라벨 위)에 드롭한 경우 무시
     const overId = over.id as string
     if (!overId.startsWith('slot-')) return
     const slotIndex = parseInt(overId.replace('slot-', ''), 10)
     if (Number.isNaN(slotIndex) || slotIndex < 0 || slotIndex >= slots.length)
       return
 
-    const activeId = active.id as string
-    let draggedLabel: string
-    let sourceSlotIndex: number
-
-    if (activeId.startsWith('slot-label-')) {
-      sourceSlotIndex = parseInt(activeId.replace('slot-label-', ''), 10)
-      draggedLabel = slots[sourceSlotIndex] ?? ''
-    } else {
-      draggedLabel = activeId.replace('label-', '')
-      sourceSlotIndex = slots.findIndex((label) => label === draggedLabel)
-    }
-
-    if (!draggedLabel) return
-
+    const draggedLabel = (active.id as string).replace('label-', '')
     const newSlots = [...slots]
-    const targetLabel = newSlots[slotIndex]
+    const existingSlotIndex = newSlots.findIndex(
+      (label) => label === draggedLabel
+    )
 
-    if (sourceSlotIndex !== -1) {
-      newSlots[sourceSlotIndex] = targetLabel
-    } else if (targetLabel !== null) {
-      const firstEmpty = newSlots.findIndex((l) => l === null)
-      if (firstEmpty !== -1) newSlots[firstEmpty] = targetLabel
+    if (existingSlotIndex !== -1) {
+      newSlots[existingSlotIndex] = null
     }
-    newSlots[slotIndex] = draggedLabel
 
-    const nextAnswer = convertLabelsToAnswers(newSlots)
-    lastSentAnswerRef.current = JSON.stringify(nextAnswer)
+    newSlots[slotIndex] = draggedLabel
     setSlots(newSlots)
-    onAnswerChange(question.questionId, nextAnswer)
+    onAnswerChange(question.questionId, convertLabelsToAnswers(newSlots))
   }
 
   const handleRemoveFromSlot = (index: number) => {
     const newSlots = [...slots]
     newSlots[index] = null
-    const nextAnswer = convertLabelsToAnswers(newSlots)
-    lastSentAnswerRef.current = JSON.stringify(nextAnswer)
     setSlots(newSlots)
-    onAnswerChange(question.questionId, nextAnswer)
+    onAnswerChange(question.questionId, convertLabelsToAnswers(newSlots))
   }
 
   const isLabelUsed = (label: string) => slots.includes(label)

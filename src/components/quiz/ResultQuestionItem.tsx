@@ -10,20 +10,6 @@ import ShortAnswer from './ShortAnswer'
 type ResultQuestion = ExamSubmissionResult['questions'][0]
 type QuizQuestion = ExamDeploymentDetailResult['questions'][0]
 
-/** 결과 API 문항 타입 → 내부 타입 (자식 컴포넌트용) */
-const RESULT_API_TYPE_TO_INTERNAL: Record<string, string> = {
-  SINGLE_CHOICE: 'single_choice',
-  MULTI_SELECT: 'multiple_choice',
-  OX: 'ox',
-  SHORT_ANSWER: 'short_answer',
-  FILL_IN_BLANK: 'fill_blank',
-  ORDERING: 'ordering',
-}
-
-function toInternalType(apiType: string): QuizQuestion['type'] {
-  return (RESULT_API_TYPE_TO_INTERNAL[apiType] ?? apiType) as QuizQuestion['type']
-}
-
 interface ResultQuestionItemProps {
   question: ResultQuestion
   index: number
@@ -36,7 +22,7 @@ function mapResultQuestionToQuizQuestion(
   return {
     questionId: question.id,
     number: index + 1,
-    type: toInternalType(question.type),
+    type: question.type as QuizQuestion['type'],
     question: question.question,
     point: question.point,
     prompt: question.prompt,
@@ -55,7 +41,7 @@ export default function ResultQuestionItem({ question, index }: ResultQuestionIt
   const noop = () => {}
 
   switch (question.type) {
-    case 'SINGLE_CHOICE':
+    case 'single_choice':
       return (
         <SingleChoice
           question={mapped}
@@ -67,7 +53,7 @@ export default function ResultQuestionItem({ question, index }: ResultQuestionIt
           explanation={question.explanation}
         />
       )
-    case 'MULTI_SELECT':
+    case 'multiple_choice':
       return (
         <MultipleChoice
           question={mapped}
@@ -79,7 +65,7 @@ export default function ResultQuestionItem({ question, index }: ResultQuestionIt
           explanation={question.explanation}
         />
       )
-    case 'SHORT_ANSWER':
+    case 'short_answer':
       return (
         <ShortAnswer
           question={mapped}
@@ -90,7 +76,7 @@ export default function ResultQuestionItem({ question, index }: ResultQuestionIt
           explanation={question.explanation}
         />
       )
-    case 'OX':
+    case 'ox':
       return (
         <OX
           question={mapped}
@@ -102,7 +88,7 @@ export default function ResultQuestionItem({ question, index }: ResultQuestionIt
           explanation={question.explanation}
         />
       )
-    case 'FILL_IN_BLANK':
+    case 'fill_blank':
       return (
         <FillBlank
           question={mapped}
@@ -114,7 +100,7 @@ export default function ResultQuestionItem({ question, index }: ResultQuestionIt
           explanation={question.explanation}
         />
       )
-    case 'ORDERING':
+    case 'ordering':
       return (
         <Ordering
           question={mapped}

@@ -1,4 +1,3 @@
-/** 결과 조회 API 응답 (서버가 snake_case + 대문자 type 사용) */
 export interface ExamSubmissionResultResponse {
   id: number
   submitter_id: number
@@ -11,7 +10,7 @@ export interface ExamSubmissionResultResponse {
   questions: Array<{
     id: number
     question: string
-    prompt: string | null
+    prompt: string
     blank_count: number
     options: string[]
     type: string
@@ -62,35 +61,33 @@ export interface ExamSubmissionResult {
 export const mapExamSubmissionResult = (
   response: ExamSubmissionResultResponse
 ): ExamSubmissionResult => {
-  const questions = response.questions ?? []
-  const exam = response.exam
   return {
     id: response.id,
     submitterId: response.submitter_id,
     deploymentId: response.deployment_id,
     exam: {
-      id: exam?.id ?? 0,
-      title: exam?.title ?? '',
-      thumbnailImgUrl: exam?.thumbnail_img_url ?? '',
+      id: response.exam.id,
+      title: response.exam.title,
+      thumbnailImgUrl: response.exam.thumbnail_img_url,
     },
-    questions: questions.map((q) => ({
-      id: q.id,
-      question: q.question ?? '',
-      prompt: q.prompt ?? '',
-      blankCount: q.blank_count ?? 0,
-      options: Array.isArray(q.options) ? q.options : [],
-      type: q.type ?? '',
-      answer: Array.isArray(q.answer) ? q.answer : [],
-      point: q.point ?? 0,
-      explanation: q.explanation ?? '',
-      isCorrect: q.is_correct ?? false,
-      submittedAnswer: Array.isArray(q.submitted_answer) ? q.submitted_answer : [],
+    questions: response.questions.map((question) => ({
+      id: question.id,
+      question: question.question,
+      prompt: question.prompt,
+      blankCount: question.blank_count,
+      options: question.options,
+      type: question.type,
+      answer: question.answer,
+      point: question.point,
+      explanation: question.explanation,
+      isCorrect: question.is_correct,
+      submittedAnswer: question.submitted_answer,
     })),
-    cheatingCount: response.cheating_count ?? 0,
-    totalScore: response.total_score ?? 0,
-    correctAnswerCount: response.correct_answer_count ?? 0,
-    elapsedTime: response.elapsed_time ?? 0,
-    startedAt: response.started_at ?? '',
-    submittedAt: response.submitted_at ?? '',
+    cheatingCount: response.cheating_count,
+    totalScore: response.total_score,
+    correctAnswerCount: response.correct_answer_count,
+    elapsedTime: response.elapsed_time,
+    startedAt: response.started_at,
+    submittedAt: response.submitted_at,
   }
 }

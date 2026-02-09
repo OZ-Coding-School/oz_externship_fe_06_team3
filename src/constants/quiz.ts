@@ -34,26 +34,3 @@ export const SECONDS_PER_MINUTE = 60
 export const ARRAY_ANSWER_TYPES = new Set<
   'multiple_choice' | 'fill_blank' | 'ordering'
 >(['multiple_choice', 'fill_blank', 'ordering'])
-
-/** 제출 API용: 내부 타입 → API 타입 (SINGLE_CHOICE, MULTI_SELECT 등) */
-export const EXAM_QUESTION_TYPE_TO_API = {
-  single_choice: 'SINGLE_CHOICE',
-  fill_blank: 'FILL_IN_BLANK',
-  ordering: 'ORDERING',
-  multiple_choice: 'MULTI_SELECT',
-  short_answer: 'SHORT_ANSWER',
-  ox: 'OX',
-} as const
-
-export type ExamQuestionTypeApi =
-  (typeof EXAM_QUESTION_TYPE_TO_API)[keyof typeof EXAM_QUESTION_TYPE_TO_API]
-
-/** 결과 조회 API 응답 타입 → 내부 타입 (렌더링용 자식 컴포넌트에 전달) */
-export const API_TO_EXAM_QUESTION_TYPE: Record<ExamQuestionTypeApi, string> = {
-  SINGLE_CHOICE: 'single_choice',
-  FILL_IN_BLANK: 'fill_blank',
-  ORDERING: 'ordering',
-  MULTI_SELECT: 'multiple_choice',
-  SHORT_ANSWER: 'short_answer',
-  OX: 'ox',
-}
